@@ -31,14 +31,16 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
+\pdf_title "Sequential Monte Carlo Methods for Atmospheric Dispersion Model Assimilation"
+\pdf_author "Matěj Laitl"
 \pdf_bookmarks true
 \pdf_bookmarksnumbered false
-\pdf_bookmarksopen false
+\pdf_bookmarksopen true
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks false
-\pdf_pdfborder false
-\pdf_colorlinks false
-\pdf_backref false
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref page
 \pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry false
@@ -76,8 +78,7 @@
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-preview true
-filename "startpages.tex"
+filename "vyzkumak-startpages.tex"
 
 \end_inset
 
@@ -91,6 +92,416 @@ LatexCommand tableofcontents
 \end_inset
 
 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{Notation}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter*
+Notation
+\end_layout
+
+\begin_layout Standard
+Following notation is used throughout this text:
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="85text%">
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathbb{N}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+set of natural numbers excluding zero
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathbb{N}_{0}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+set of natural numbers including zero
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathbb{R}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+set of real numbers
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{t}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+discrete time moment; 
+\begin_inset Formula \ensuremath{t\in\mathbb{N}_{0}}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{a_{t}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value of quantity 
+\begin_inset Formula \ensuremath{a}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t}
+
+\end_inset
+
+; 
+\begin_inset Formula \ensuremath{a_{t}\in\mathbb{R}^{n},n\in\mathbb{N}}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{a_{t:t'}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sequence of quantities 
+\begin_inset Formula \ensuremath{(a_{t},a_{t+1},\dotsc,a_{t'-1},a_{t'})}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{p(a_{t})}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+probability density function of quantity 
+\begin_inset Formula \ensuremath{a}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t;}
+
+\end_inset
+
+for the purpose of this text, probability density function 
+\begin_inset Formula \ensuremath{p}
+
+\end_inset
+
+ is multivariate non-negative function 
+\begin_inset Formula \ensuremath{\mathbb{R}^{n}\rightarrow\mathbb{R};\;\int_{\mathrm{supp\,}p}p(x_{1},x_{2},\dotsc,x_{n})\;\mathrm{d}x_{1}\mathrm{d}x_{2}\dotsb\mathrm{d}x_{n}=1}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{p(a_{t}|b_{t'})}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+conditional probability density function of quantity 
+\begin_inset Formula \ensuremath{a}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t}
+
+\end_inset
+
+ given value of quantity 
+\begin_inset Formula \ensuremath{b}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t'}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\delta(a)}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dirac delta function; used exclusively in context of probability density
+ functions to denote discrete distribution within framework of continuous
+ distributions, so that 
+\begin_inset Formula \ensuremath{\int_{-\infty}^{\infty}f(x)\delta(x-\mu)\;\mathrm{d}x=f(\mu)}
+
+\end_inset
+
+ and more complex expressions can be derived using integral linearity and
+ Fubini's theorem
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathcal{N}(\mu,\Sigma)}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multivariate normal (Gaussian) probability density function with mean vector
+ 
+\begin_inset Formula \ensuremath{\mu}
+
+\end_inset
+
+ and covariance matrix 
+\begin_inset Formula \ensuremath{\Sigma}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{Introduction}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*
@@ -99,23 +510,302 @@ Introduction
 
 \begin_layout Standard
 TODO: motivation for radioactive release assimilation, viability of Bayesian
- statistics (cite what Technometrics cites)
+ statistics (cite what Technometrics cites) GAGA 
+\lang british
+fhkjdhfads
+\lang english
+ kj
 \end_layout
 
 \begin_layout Chapter
 Sequential Monte Carlo Methods
 \end_layout
 
-\begin_layout Chapter
-Atmosperic Radioactive Release Model and its Assimilation
+\begin_layout Standard
+This chapter presents the Sequential Monte Carlo method
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Gordon93"
+
+\end_inset
+
+ (which is also known as the particle filter or SIR
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Sequential Importance Resampling
+\end_layout
+
+\end_inset
+
+ filter) and its variants within the framework of Bayesian statistics.
+ The problem of the recursive Bayesian estimation is first stated, its general
+ solution is then briefly derived.
+ Finally, the particle filter is then introduced as an approximation of
+ the general solution and its properties and alternate forms are discussed.
+\end_layout
+
+\begin_layout Section
+Recursive Bayesian Estimation
+\end_layout
+
+\begin_layout Standard
+Suppose a hidden state vector sequence 
+\begin_inset Formula $x_{1:t}$
+\end_inset
+
+ has to be estimated in discretized time steps 
+\begin_inset Formula $1:t$
+\end_inset
+
+ using a sequence of measurements 
+\begin_inset Formula $y_{1:t}$
+\end_inset
+
+ with knowledge of the state model (which describes how state evolves in
+ time) and the observation model (which describes how a given state 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ is observed in 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+).
+ Suppose also that both state model and observation are encumbered by random
+ noise, whose statistical parameters are known.
+ Such situation can then be mathematically formalized as
+\begin_inset Formula 
+\begin{align}
+x_{t} & =f_{t}(x_{t-1},v_{t-1})\label{eq:DynSysFt}\\
+y_{t} & =h_{t}(x_{t},w_{t}),\label{eq:DynSysHt}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $f_{t}$
+\end_inset
+
+ is the state model at time 
+\begin_inset Formula $t$
+\end_inset
+
+, 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ is the random noise of the state model at time 
+\begin_inset Formula $t$
+\end_inset
+
+, 
+\begin_inset Formula $h_{t}$
+\end_inset
+
+ is the observation model and 
+\begin_inset Formula $w_{t}$
+\end_inset
+
+ is the observation noise at time 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ Both state and observation models often don't depend on time and are referred
+ to simply as 
+\begin_inset Formula $f$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+ respectively.
+ To make our reasoning bellow correct, one must further assume that both
+ state and observation posses the Markov property, i.e.
+ 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ depends only on 
+\end_layout
+
+\begin_layout Standard
+General solution (in Bayesian sense) of the problem is known and portrayed
+ here.
+ Both 
+\begin_inset Formula $x_{t}\;(\forall t)$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{r}\;(\forall t)$
+\end_inset
+
+ are treated as (multivariate) random variables from now on.
+ First, let us observe that the state probability density function 
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+ can be derived from 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:DynSysFt"
+
+\end_inset
+
+ and the observation probability density function 
+\begin_inset Formula $p(y_{t}|x_{t})$
+\end_inset
+
+ can be derived from 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:DynSysHt"
+
+\end_inset
+
+ likewise.
+ So-called 
+\emph on
+prior
+\emph default
+ probability density function 
+\begin_inset Formula $p(x_{t}|y_{t-1})$
+\end_inset
+
+ can be expressed using only known densities by applying reverse marginalization
+ over 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+, applying chain rule for probability density functions and finally taking
+ into account that 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ doesn't depend on 
+\begin_inset Formula $y_{t-1}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{align}
+p(x_{t}|y_{t-1}) & =\int p(x_{t},x_{t-1}|y_{t-1})\;\mathrm{d}x_{t-1}\nonumber \\
+p(x_{t}|y_{t-1}) & =\int p(x_{t}|x_{t-1},y_{t-1})p(x_{t-1}|y_{t-1})\;\mathrm{d}x_{t-1}\nonumber \\
+p(x_{t}|y_{t-1}) & =\int p(x_{t}|x_{t-1})p(x_{t-1}|y_{t-1})\;\mathrm{d}x_{t-1}.\label{eq:PriorPdf}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Next straightforward step in the solution is to derive 
+\emph on
+posterior
+\emph default
+ probability density function 
+\begin_inset Formula $p(x_{t}|y_{t})$
+\end_inset
+
+, which is done by applying the Bayes theorem and taking the fact that observati
+on 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ depends only on the newest state 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ so that 
+\begin_inset Formula $p(y_{t}|x_{t},y_{t-1})=p(y_{t}|x_{t})$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+p(x_{t}|y_{t}) & =\frac{p(y_{t}|x_{t},y_{t-1})p(x_{t}|y_{t-1})}{p(y_{t}|y_{t-1})}\nonumber \\
+p(x_{t}|y_{t}) & =\frac{p(y_{t}|x_{t})p(x_{t}|y_{t-1})}{p(y_{t}|y_{t-1})},\label{eq:PosteriorPdf}
+\end{align}
+
+\end_inset
+
+where the denominator of 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PosteriorPdf"
+
+\end_inset
+
+ can be computed using marginalization over 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ or not at all, because it doesn't depend on 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ and serves only the purpose of the normalization constant.
+ Formulas and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PriorPdf"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PosteriorPdf"
+
+\end_inset
+
+ together form the solution of the above posed problem.
 \end_layout
 
 \begin_layout Chapter
-Sample Impoverishment Problem and Counter-measures
+Atmospheric Radioactive Release Model
+\end_layout
+
+\begin_layout Chapter
+Atmospheric Radioactive Release Assimilation
 \end_layout
 
 \begin_layout Chapter
 Results
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{Conclusion}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*
@@ -123,7 +813,59 @@ Conclusion
 \end_layout
 
 \begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{
+\backslash
+listfigurename}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset FloatList figure
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference 
+\end_layout
 
 \end_inset
 
@@ -134,7 +876,7 @@ Conclusion
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 bibfiles "/home/strohel/skola/prace/bibliography"
-options "plain"
+options "bibtotoc,plain"
 
 \end_inset
 
