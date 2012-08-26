@@ -5,6 +5,8 @@
 \textclass report
 \begin_preamble
 \usepackage{epsfig}
+\AtBeginDocument{\renewcommand{\ref}[1]{\mbox{\autoref{#1}}}}
+\addto\extrasenglish{\renewcommand*{\equationautorefname}[1]{}}
 \end_preamble
 \options 12pt
 \use_default_options true
@@ -53,7 +55,7 @@
 \use_indices false
 \paperorientation portrait
 \suppress_date false
-\use_refstyle 1
+\use_refstyle 0
 \index Index
 \shortcut idx
 \color #008000
@@ -126,7 +128,8 @@ Notation
 \end_layout
 
 \begin_layout Standard
-Following notation is used throughout this text:
+Following notation is used throughout this text: TODO: decide whether leave
+ this or just define each item when first used
 \end_layout
 
 \begin_layout Standard
@@ -525,7 +528,7 @@ Sequential Monte Carlo Methods
 This chapter presents the Sequential Monte Carlo method
 \begin_inset CommandInset citation
 LatexCommand cite
-key "Gordon93"
+key "Gordon:93"
 
 \end_inset
 
@@ -650,7 +653,7 @@ General solution (in Bayesian sense) of the problem is known and portrayed
 
  can be derived from 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand eqref
 reference "eq:DynSysFt"
 
 \end_inset
@@ -661,7 +664,7 @@ reference "eq:DynSysFt"
 
  can be derived from 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand eqref
 reference "eq:DynSysHt"
 
 \end_inset
@@ -711,8 +714,8 @@ posterior
 \begin_inset Formula $p(x_{t}|y_{t})$
 \end_inset
 
-, which is done by applying the Bayes theorem and taking the fact that observati
-on 
+, which is done by applying the Bayes' theorem and taking the fact that
+ observation 
 \begin_inset Formula $y_{t}$
 \end_inset
 
@@ -735,7 +738,7 @@ p(x_{t}|y_{t}) & =\frac{p(y_{t}|x_{t})p(x_{t}|y_{t-1})}{p(y_{t}|y_{t-1})},\label
 
 where the denominator of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand eqref
 reference "eq:PosteriorPdf"
 
 \end_inset
@@ -749,29 +752,517 @@ reference "eq:PosteriorPdf"
 \end_inset
 
  and serves only the purpose of the normalization constant.
- Formulas and 
+ Formulas 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand eqref
 reference "eq:PriorPdf"
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand eqref
 reference "eq:PosteriorPdf"
 
 \end_inset
 
- together form the solution of the above posed problem.
+ together form the solution of the problem posed above.
+\end_layout
+
+\begin_layout Standard
+On the other hand, this solution in its general form has only limited applicatio
+n, because the integral 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PriorPdf"
+
+\end_inset
+
+, unless tractable analytically, constitutes a major computational challenge.
+ The situation when the analytical solution is known is represented by the
+ famous Kalman filter
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman:60"
+
+\end_inset
+
+ and its variants, which applies when state and observation models are linear
+ and noises are normally distributed.
+ If these models are highly non-linear (which is our case in radioactive
+ release assimilation), one of the viable approaches is to resort to some
+ kind of approximation of the solution.
+ One such approximation is the particle filter described below.
+\end_layout
+
+\begin_layout Section
+The Particle Filter
+\end_layout
+
+\begin_layout Standard
+The particle filter (or sequential Monte Carlo technique, SIR filter) is
+ based on approximation of the posterior probability density function using
+ the weighted empirical density
+\begin_inset Formula 
+\begin{equation}
+p(x_{t}|y_{1:t})\approx\sum_{i=1}^{N}\omega_{t}^{(i)}\delta(x_{t}-x_{t}^{(i)}),\label{eq:PFPosterior}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $N$
+\end_inset
+
+ is the total number of particles (an important parameter of the filter),
+ 
+\begin_inset Formula $\omega_{t}^{(i)}$
+\end_inset
+
+ is the weight of the 
+\begin_inset Formula $i$
+\end_inset
+
+-th particle
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+constraint 
+\begin_inset Formula $\sum_{i=1}^{N}\omega_{t}^{(i)}=1\quad\forall t$
+\end_inset
+
+ must hold
+\end_layout
+
+\end_inset
+
+ and finally 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ is the value of the 
+\begin_inset Formula $i$
+\end_inset
+
+-th particle, a hypothetical state the model could be in.
+ The algorithm begins by i.i.d.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+independently identically distributed
+\end_layout
+
+\end_inset
+
+ sampling initial particles 
+\begin_inset Formula $x_{0}^{(1:N)}$
+\end_inset
+
+ from the initial probability density function 
+\begin_inset Formula $p(x_{0})$
+\end_inset
+
+, which is assumed to be known.
+ When new observation 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ is available, recursive update is performed as described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "alg:PF"
+
+\end_inset
+
+.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "DouFreGor:01"
+
+\end_inset
+
+ 
+\begin_inset Float algorithm
+wide false
+sideways false
+status open
+
+\begin_layout Enumerate
+for each 
+\begin_inset Formula $i$
+\end_inset
+
+ in 
+\begin_inset Formula $\{1,\ldots,N\}$
+\end_inset
+
+ do:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+draw 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ from the proposal density 
+\begin_inset Formula $q(x_{t}|x_{t-1},y_{t})$
+\end_inset
+
+, where 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+ is substituted by 
+\begin_inset Formula $x_{t-1}^{(i)}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ is the observation.
+\end_layout
+
+\begin_layout Itemize
+update weight using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PFweight"
+
+\end_inset
+
+ where 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+ is substituted by 
+\begin_inset Formula $x_{t-1}^{(i)},\: x_{t}$
+\end_inset
+
+ is substituted by 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ is the observation,
+\begin_inset Formula 
+\begin{equation}
+\omega_{t}^{(i)}:=\frac{p(y_{t}|x_{t})p(x_{t}|x_{t-1})}{q(x_{t}|x_{t-1},y_{t})}\omega_{t-1}^{(i)}.\label{eq:PFweight}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+for each 
+\begin_inset Formula $i$
+\end_inset
+
+ normalize weights according to 
+\begin_inset Formula $\omega_{t}^{(i)}:=\frac{\omega_{t}^{(i)}}{\sum_{j=1}^{N}\omega_{t}^{(j)}}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+resample 
+\begin_inset Formula $x_{t}^{(1:N)}$
+\end_inset
+
+ from posterior probability density function 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:PFPosterior"
+
+\end_inset
+
+ eliminating low-weight particles, but maintaining posterior statistics.
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "alg:PF"
+
+\end_inset
+
+Recursive update of the particle filter
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+ The algorithm makes use of a so-called 
+\emph on
+proposal
+\emph default
+ density 
+\begin_inset Formula $q(x_{t}|x_{t-1},y_{t})$
+\end_inset
+
+, which is an instrument to optimize the algorithm to a specific problem
+ and which will be used extensively in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Assimilation"
+
+\end_inset
+
+ to improve its performance.
+ Simplest choice of the proposal density (and the one originally described
+ in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Gordon:93"
+
+\end_inset
+
+) is directly the transition density 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+ (sometimes called 
+\family default
+\series default
+\shape default
+\size default
+\emph on
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+naive
+\emph default
+ proposal
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+) that ignores the observation, which simplifies the weight calculation
+ in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PFweight"
+
+\end_inset
+
+ to 
+\begin_inset Formula $\omega_{t}^{(i)}:=p(y_{t}|x_{t})\omega_{t-1}^{(i)}.$
+\end_inset
+
+ Such algorithm is known as the 
+\family default
+\series default
+\shape default
+\size default
+\emph on
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+bootstrap filter
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+The biggest advantage of the particle filter comes from the fact that only
+ sampling from the proposal density and evaluation of it, the transition
+ and observation density is needed, thus it can be applied to virtually
+ any problem of recursive Bayesian estimation, regardless of analytical
+ tractability of the integrals therein.
+ However, this comes with a cost.
+ First and foremost, the particle filter is an approximate and stochastic
+ method.
+ While convergence to the optimal Bayesian solution 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PosteriorPdf"
+
+\end_inset
+
+ as 
+\begin_inset Formula $N$
+\end_inset
+
+ approaches infinity is proven under a set of assumptions
+\begin_inset CommandInset citation
+LatexCommand cite
+key "CriDou:02"
+
+\end_inset
+
+, real-world applications must find a trade-off between accuracy (which
+ improves as 
+\begin_inset Formula $N$
+\end_inset
+
+ grows) and performance (where computation time linearly depends on 
+\begin_inset Formula $N$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Another phenomena worth mentioning is the 
+\emph on
+sample impoverishment
+\emph default
+ problem, which is described as a tendency of the weights of all-but-one
+ particle to drop to zero as time progresses (unless counter-measured).
+ Untreated, this can have a devastating effect on the accuracy of the filter
+ as its posterior density degenerated to a single Dirac delta function.
+ The major approach to eliminate this is the resampling described in step
+ 3.
+ of the 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "alg:PF"
+
+\end_inset
+
+.
+ 
+\emph on
+Number of effective particles
+\emph default
+ 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ is commonly used as a measure of the sample impoverishment and can be estimated
+ using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PFNeff"
+
+\end_inset
+
+.
+ TODO: citation
+\begin_inset Formula 
+\begin{equation}
+N_{\mathrm{eff}}(t)\approx\left(\sum_{i=1}^{N}\left(\omega_{t}^{(i)}\right)^{2}\right)^{-1},\qquad1\leq N_{\mathrm{eff}}\leq N.\label{eq:PFNeff}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ close to 
+\begin_inset Formula $N$
+\end_inset
+
+ denotes near-uniform weight distribution while 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ approaching 1 is a sign of the degenerate case.
+ The resampling step mitigates some effects of the sample impoverishment,
+ but if 
+\begin_inset Formula $N_{\mathrm{eff}}\ll N$
+\end_inset
+
+, available resources are used ineffectively.
+ This is most pronounced when the proposal density doesn't match the resulting
+ posterior density sufficiently (often being too broad) a condition often
+ observed in the bootstrap filter.
+ Careful choice of the proposal density can yield significantly better results
+ with little cost as shown in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "chap:Assimilation"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Chapter
 Atmospheric Radioactive Release Model
 \end_layout
 
+\begin_layout Standard
+In order to test various sequential Monte Carlo techniques on a real-world
+ and useful example, the assimilation
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+TODO
+\end_layout
+
+\end_inset
+
+ of atmospheric radioactive release was chosen as a sufficiently demanding
+ benchmark given its highly non-linear observation model.
+ Chis chapter describes the release scenario and mathematic models used
+ to model it.
+\end_layout
+
 \begin_layout Chapter
 Atmospheric Radioactive Release Assimilation
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Assimilation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
