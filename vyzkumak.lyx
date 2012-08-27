@@ -532,7 +532,7 @@ key "Gordon:93"
 
 \end_inset
 
- (which is also known as the particle filter or SIR
+ (which is also known as the particle filter or the SIR
 \begin_inset Foot
 status open
 
@@ -1011,10 +1011,6 @@ Recursive update of the particle filter
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
  The algorithm makes use of a so-called 
@@ -1224,7 +1220,7 @@ N_{\mathrm{eff}}(t)\approx\left(\sum_{i=1}^{N}\left(\omega_{t}^{(i)}\right)^{2}\
  Careful choice of the proposal density can yield significantly better results
  with little cost as shown in 
 \begin_inset CommandInset ref
-LatexCommand eqref
+LatexCommand ref
 reference "chap:Assimilation"
 
 \end_inset
@@ -1243,19 +1239,483 @@ In order to test various sequential Monte Carlo techniques on a real-world
 status open
 
 \begin_layout Plain Layout
-TODO
+process of adapting numeric simulation to actual measured quantities so
+ that the simulation is in accordance with them
 \end_layout
 
 \end_inset
 
  of atmospheric radioactive release was chosen as a sufficiently demanding
  benchmark given its highly non-linear observation model.
- Chis chapter describes the release scenario and mathematic models used
- to model it.
+ Chis chapter describes the release scenario and mathematical models used
+ to simulate it.
+ We've used a slightly simplified version of the one presented in
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Release Scenario
+\end_layout
+
+\begin_layout Standard
+We are concerned with an early phase
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+first hours after the release, when available information is scarce and
+ good estimate of the current situation and expected progress is critical
+ for decision-making authorities
+\end_layout
+
+\end_inset
+
+ of an atmospheric radioactive pollutant release from a nuclear power plant
+ or a similar site.
+ Our goal is to estimate absorbed ionizing radiation doses at points of
+ interest using available environmental measurements and to predict future
+ development of the radioactive plume and related irradiation.
+ True power plant
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Temelín
+\end_layout
+
+\end_inset
+
+ and existing infrastructure was used as a basis for our simulation.
+ As 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Temelin"
+
+\end_inset
+
+ shows, the power plant is equipped with a network of on-line absorbed ionizing
+ dose sensors (blue circles in the figure) that are laid out in a ring around
+ the plant plus a few of them are scattered in nearby villages.
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename vyzkumak-temelin-receptory.pdf
+	height 30pheight%
+	BoundingBox 460bp 120bp 835bp 520bp
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Temelin"
+
+\end_inset
+
+Temelín power plant and adjacent monitoring network
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ As the plume containing the pollutant is subject to advection and dispersion
+ in the atmosphere, accurate assimilation of atmospheric conditions is crucial.
+ Following real-life possibilities, we assume that wind field predictions
+ from the numerical model are available, though on a sparse grid both spatially
+ (tile size 9 km) and temporally (1 hour time step).
+ Weather station with anemometer
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+a device measuring wind speed and direction
+\end_layout
+
+\end_inset
+
+ is located in the power plant area and can be used to measure local wind
+ conditions.
+\end_layout
+
+\begin_layout Section
+State-Space Model TODO: title?
+\end_layout
+
+\begin_layout Standard
+We've chosen the state-space model described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Johannesson:05"
+
+\end_inset
+
+ with some extensions found in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+ for its simplicity and suitability for sequential Monte Carlo assimilation.
+ Its brief summary continues.
+ The so-called 
+\emph on
+puff model
+\emph default
+ approximates the pollutant plume using a sequence of puffs released periodicall
+y from the source location (marked by red circle in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Temelin"
+
+\end_inset
+
+), each with certain amount of pollutant
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+described by total radioactive activity in our case
+\end_layout
+
+\end_inset
+
+.
+ Pollutant concentration is modeled using 3D Gaussian distribution with
+ 
+\begin_inset Formula $\sigma_{x},\,\sigma_{y},\,\sigma_{z}$
+\end_inset
+
+ dispersion coefficients in respective dimensions that describe how the
+ puff is spread (dispersed) spatially.
+ More precisely, a concentration of the pollutant is given by
+\begin_inset Formula 
+\begin{equation}
+C(\mathbf{s},\,\tau)=\frac{Q_{\tau}}{(2\pi)^{3/2}\sigma_{1}\sigma_{2}\sigma_{3}}\exp\left[-\frac{\left(s_{x}-l_{x,\tau}\right)}{2\sigma_{x}^{2}}^{2}-\frac{\left(s_{y}-l_{y,\tau}\right)^{2}}{2\sigma_{y}^{2}}-\frac{\left(s_{z}-l_{z,\tau}\right)^{2}}{2\sigma_{z}^{2}}\right],\label{eq:puff_conc}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{s}=(s_{x},s_{y},s_{z})$
+\end_inset
+
+ denotes spatial coordinates, 
+\begin_inset Formula $\mathbf{l_{\mathbf{\tau}}}=(l_{x,\tau},l_{y,\tau},l_{z,\tau})$
+\end_inset
+
+ coordinates of the puff center at time 
+\begin_inset Formula $\tau$
+\end_inset
+
+, 
+\begin_inset Formula $Q_{\tau}$
+\end_inset
+
+ [Bq] total puff activity at given time.
+ Puffs are carried away by wind (direction and speed of which fully determines
+ puff trajectory) in discrete time steps and are subject to dispersion which
+ manifests as growth of the 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ parameters.
+ The rate of growth depends on total distance flown by the puff and on current
+ Pasquill's stability category.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+a meteorologic measure of atmospheric turbulence, an important factor affecting
+ dispersion
+\end_layout
+
+\end_inset
+
+ In case of radioactive release the total puff activity decreases over time
+ by radioactive decay.
+\end_layout
+
+\begin_layout Standard
+Once concentration of the pollutant at given location and time 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_conc"
+
+\end_inset
+
+ is known, total dose rate at given receptor location 
+\begin_inset Formula $\mathbf{s}_{r}$
+\end_inset
+
+ that comes from a single puff can be computed using
+\begin_inset Formula 
+\begin{equation}
+D(\mathbf{s}_{r},t_{1},t_{2})=K_{c}\int_{t_{1}}^{t_{2}}\Phi(\mathbf{s}_{r},\tau,E)\:\mathrm{d}\tau,\label{eq:puff_dose}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $Q$
+\end_inset
+
+ is the puff activity, 
+\begin_inset Formula $K_{c}$
+\end_inset
+
+ is a physical constant, 
+\begin_inset Formula $E$
+\end_inset
+
+ the energy produced by gamma decay of released radionuclide (assuming only
+ one radionuclide contributes to absorbed dose) and 
+\begin_inset Formula $\Phi(\mathbf{s}_{R_{j}},\tau,E)$
+\end_inset
+
+ fluency rate that can be computed using
+\begin_inset Formula 
+\begin{equation}
+\Phi(\mathbf{s}_{r},\tau,E)=\int_{\Omega}\frac{C(\mathbf{s},\,\tau)\,(1+k\,\mu r)\exp(-\mu r)}{4\pi r^{2}}\:\mathrm{d}\mathbf{s}.\label{eq:fluency_rate}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $k$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ are physical constants, 
+\begin_inset Formula $r=||\mathbf{s}_{r}-\mathbf{s}||$
+\end_inset
+
+ distance from receptor and 
+\begin_inset Formula $\Omega$
+\end_inset
+
+ is the volume where the puff has not-negligible concentration.
+ Dose from a series of puffs is additive.
+ It should be noted that analytical solution of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluency_rate"
+
+\end_inset
+
+ is not known and must be evaluated numerically and presents the most resource-d
+emanding part of the model even if techniques to reduce problem size.
+ Integral in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_dose"
+
+\end_inset
+
+ is computed as a simple addition of the element of integration at chosen
+ time sub-steps.
+\end_layout
+
+\begin_layout Standard
+Using a model described above, simulation was performed to test assimilation
+ techniques against.
+ Series of 6 puffs with activities 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $[1,5,4,3,2,1]\times10^{16}\, Bq$
+\end_inset
+
+ were released at 10-minute intervals.
+ Simulated wind field had constant speed of 2 m/s, but slightly varying
+ wind direction; Pasquill's stability category was E (neutral).
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:simulation"
+
+\end_inset
+
+ shows total absorbed doses at ground in Sieverts (contour) and puff centre
+ trajectories (color lines).
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "49col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename simulation/03480s-03600s.jpg
+	display false
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename simulation/10680s-10800s.jpg
+	display false
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "49col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename simulation/07080s-07200s.jpg
+	display false
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename simulation/14280s-14400s.jpg
+	display false
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:simulation"
+
+\end_inset
+
+Simulation of radioactive release; 1, 2, 3 4 hours after start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
-Atmospheric Radioactive Release Assimilation
+Assimilation
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Assimilation"
