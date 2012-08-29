@@ -1365,7 +1365,7 @@ a device measuring wind speed and direction
 \end_layout
 
 \begin_layout Section
-State-Space Model TODO: title?
+State-Space Model
 \end_layout
 
 \begin_layout Standard
@@ -1418,7 +1418,7 @@ described by total radioactive activity in our case
  More precisely, a concentration of the pollutant is given by
 \begin_inset Formula 
 \begin{equation}
-C(\mathbf{s},\,\tau)=\frac{Q_{\tau}}{(2\pi)^{3/2}\sigma_{1}\sigma_{2}\sigma_{3}}\exp\left[-\frac{\left(s_{x}-l_{x,\tau}\right)}{2\sigma_{x}^{2}}^{2}-\frac{\left(s_{y}-l_{y,\tau}\right)^{2}}{2\sigma_{y}^{2}}-\frac{\left(s_{z}-l_{z,\tau}\right)^{2}}{2\sigma_{z}^{2}}\right],\label{eq:puff_conc}
+C(\mathbf{s},\,\tau)=\frac{Q_{\tau}}{(2\pi)^{\frac{3}{2}}\sigma_{x}\sigma_{y}\sigma_{z}}\exp\left[-\frac{\left(s_{x}-l_{x,\tau}\right)}{2\sigma_{x}^{2}}^{2}-\frac{\left(s_{y}-l_{y,\tau}\right)^{2}}{2\sigma_{y}^{2}}-\frac{\left(s_{z}-l_{z,\tau}\right)^{2}}{2\sigma_{z}^{2}}\right],\label{eq:puff_conc}
 \end{equation}
 
 \end_inset
@@ -1701,7 +1701,7 @@ name "fig:simulation"
 
 \end_inset
 
-Simulation of radioactive release; 1, 2, 3 4 hours after start
+Simulation of radioactive release; 1, 2, 3, 4 hours after start
 \end_layout
 
 \end_inset
@@ -1719,6 +1719,170 @@ Assimilation
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Assimilation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Conjugate Proposal
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+p(x_{t}|x_{t-1},y_{t}) & = & p(a_{t},b_{t}|a_{t-1},b_{t-1},v_{t},\theta_{t},\mathbf{d}_{t})\\
+ & \approx & p(a_{t}|a_{t-1}v_{t})p(b_{t}|b_{t-1}\theta_{t})
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Wind Speed Conjugate Density
+\end_layout
+
+\begin_layout Standard
+In order to derive formula for 
+\begin_inset Formula $p(a_{t}|a_{t-1},v_{t}),$
+\end_inset
+
+ let us first show general (and well known) result for for inverse gamma
+ density and gamma density with appropriate parametrization.
+ Suppose that 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p(y|a)=i\mathcal{G}\left(y;\alpha,\left(\alpha-1\right)a\right)$
+\end_inset
+
+, 
+\begin_inset Formula $p(a)=\mathcal{G}(a;k,\theta)$
+\end_inset
+
+ and that 
+\begin_inset Formula $y$
+\end_inset
+
+ is known.
+ Then 
+\begin_inset Formula $p(a|y)$
+\end_inset
+
+ is also a gamma distribution and can be obtained using the Bayes rule 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:BayesConjugate"
+
+\end_inset
+
+, yielding 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaConjugate"
+
+\end_inset
+
+.
+ Note that the transition from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaPreConjugate"
+
+\end_inset
+
+ to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaConjugate"
+
+\end_inset
+
+ makes use of the fact that the whole term in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaPreConjugate"
+
+\end_inset
+
+ is a probability density function, therefore it must integrate to 1; however,
+ the non-constant parts (with regards to quantity 
+\begin_inset Formula $a$
+\end_inset
+
+) have the form of the gamma distribution, therefore the whole term must
+ necessarily be a gamma distribution itself
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+p(a|y) & = & \frac{p(y|a)p(a)}{p(y)}\label{eq:BayesConjugate}\\
+ & = & \frac{1}{p(y)}i\mathcal{G}\left(y;\alpha,\left(\alpha-1\right)a\right)\mathcal{G}(a;k,\theta)\nonumber \\
+ & = & \frac{1}{p(y)}\frac{\left(\left(\alpha-1\right)a\right)^{\alpha}}{\Gamma\left(\alpha\right)}y^{-\alpha-1}\exp\left(-\frac{\left(\alpha-1\right)a}{y}\right)\frac{1}{\theta^{k}\Gamma\left(k\right)}a^{k-1}\exp\left(-\frac{a}{\theta}\right)\nonumber \\
+ & = & \frac{\left(\alpha-1\right)^{\alpha}y^{-\alpha-1}}{p(y)\Gamma\left(\alpha\right)\theta^{k}\Gamma\left(k\right)}a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\nonumber \\
+ & = & C\left(y,\alpha,\theta,k\right)\underbrace{a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)}\label{eq:GammaPreConjugate}\\
+ & = & \mathcal{G}\left(a;\alpha+k,\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)^{-1}\right).\label{eq:GammaConjugate}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In our case 
+\begin_inset Formula $p(y|a)=p(v_{t}|a_{t})=i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $p(a)=p(a_{t}|a_{t-1})=\mathcal{G}(a_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}).$
+\end_inset
+
+ Therefore, conjugate density 
+\begin_inset Formula $p(a_{t}|a_{t-1},v_{t})$
+\end_inset
+
+ has the form 
+\begin_inset Formula $\mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right).$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Wind Direction Conjugate Density
+\end_layout
+
+\begin_layout Standard
+For the choice of Gaussian wind direction transition density 
+\begin_inset Formula $p(b_{t},b_{t-1})=p(\theta_{t}|b_{t},b_{t-1})=\mathcal{N}(b_{t};b_{t-1},\sigma_{b})$
+\end_inset
+
+ and Gaussian wind direction observation density 
+\begin_inset Formula $p(\theta_{t}|b_{t})=\mathcal{N}(\theta_{t};\tilde{\theta}_{t}+b_{t},\sigma_{\theta})$
+\end_inset
+
+, the conjugate proposal can be derived as follows:
+\begin_inset Formula 
+\begin{eqnarray*}
+p(b_{t}|b_{t-1},\theta_{t}) & = & \frac{p(\theta_{t}|b_{t},b_{t-1})p(b_{t}|b_{t-1})}{p(\theta_{t}|b_{t-1})}\\
+ & = & \frac{\mathcal{N}(\theta_{t};\tilde{\theta}_{t}+b_{t},\sigma_{\theta})\mathcal{N}(b_{t};b_{t-1},\sigma_{b})}{p(\theta_{t}|b_{t-1})}\\
+ & = & \frac{1}{p(\theta_{t}|b_{t-1})}\frac{1}{2\pi}\frac{1}{\sigma_{\theta}}\exp\left(-\frac{1}{2}\left(\frac{\theta_{t}-\tilde{\theta}_{t}-b_{t}}{\sigma_{\theta}}\right)^{2}\right)\cdot\\
+ &  & \cdot\;\frac{1}{\sigma_{b}}\exp\left(-\frac{1}{2}\left(\frac{b_{t}-b_{t-1}}{\sigma_{b}}\right)^{2}\right)
+\end{eqnarray*}
 
 \end_inset
 
