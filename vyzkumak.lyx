@@ -45,7 +45,7 @@
 \pdf_backref page
 \pdf_pdfusetitle true
 \papersize a4paper
-\use_geometry false
+\use_geometry true
 \use_amsmath 1
 \use_esint 1
 \use_mhchem 1
@@ -60,8 +60,10 @@
 \shortcut idx
 \color #008000
 \end_index
-\secnumdepth 3
-\tocdepth 3
+\leftmargin 3.5cm
+\rightmargin 2.5cm
+\secnumdepth 2
+\tocdepth 2
 \paragraph_separation indent
 \paragraph_indentation default
 \quotes_language english
@@ -522,6 +524,13 @@ fhkjdhfads
 
 \begin_layout Chapter
 Sequential Monte Carlo Methods
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:SMCMethods"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1230,6 +1239,13 @@ reference "chap:Assimilation"
 
 \begin_layout Chapter
 Atmospheric Radioactive Release Model
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Model"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1725,6 +1741,444 @@ name "chap:Assimilation"
 
 \end_layout
 
+\begin_layout Standard
+In this chapter we finally apply theoretical solution from 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:SMCMethods"
+
+\end_inset
+
+ to assimilation problem described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Model"
+
+\end_inset
+
+.
+ First, we show our choice of measurement (observation) and transition (state)
+ model, the rest is dedicated to discussing choice of the proposal density.
+\end_layout
+
+\begin_layout Section
+Wind Field Corrections
+\end_layout
+
+\begin_layout Standard
+Observation of the wind field is available from 2 sources: 
+\emph on
+i)
+\emph default
+ forecast from the numerical model, here denoted as 
+\begin_inset Formula $\tilde{v}_{t,\mathbf{s}}$
+\end_inset
+
+ for wind speed and 
+\begin_inset Formula $\tilde{\phi}_{t,\mathbf{s}}$
+\end_inset
+
+ for wind direction at time 
+\begin_inset Formula $t$
+\end_inset
+
+ and spatial coordinates 
+\begin_inset Formula $\mathbf{s}$
+\end_inset
+
+, 
+\emph on
+ii)
+\emph default
+ readings from on-site anemometer, whose wind speed measurement is denoted
+ as 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+, wind direction measurement as 
+\begin_inset Formula $\phi_{t}$
+\end_inset
+
+.
+ None of these quantities are perfect, 
+\begin_inset Formula $\tilde{v}_{t,\mathbf{s}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{\phi}_{t,\mathbf{s}}$
+\end_inset
+
+ are computed on a sparse grid and must be interpolated in time and space,
+ they are additionally not well adapted to local conditions such as terrain,
+ while 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi_{t}$
+\end_inset
+
+ are burdened by inevitable measurement error (significant for anemometer)
+ and are less relevant as the distance from the power plant increases.
+ In order to combine both measurements for data assimilation, a popular
+ scheme
+\begin_inset Formula 
+\begin{eqnarray}
+\dot{v}_{t,\mathbf{s}} & = & a_{t}\tilde{v}_{t,\mathbf{s}}\label{eq:AsimV}\\
+\dot{\phi}_{t,\mathbf{s}} & = & b_{t}+\tilde{\phi}_{t,\mathbf{s}}\label{eq:AsimPhi}
+\end{eqnarray}
+
+\end_inset
+
+can be used, where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\dot{v}_{t,\mathbf{s}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\dot{\phi}_{t,\mathbf{s}}$
+\end_inset
+
+ are assimilated (most likely true) wind speed and wind direction, 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ is wind speed correction coefficient estimated from 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ is wind direction correction coefficient estimated using 
+\begin_inset Formula $\phi_{t}$
+\end_inset
+
+.
+ When we assume that both released radioactive activity in each time step
+ and atmospheric Pasquill's stability category are known, 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ and 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ are the only quantities that need to be assimilated, because progress of
+ the model (e.g.
+ puff coordinates and other parameters) is fully deterministic then.
+ Because of that, our state variable 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ for sequential Monte Carlo technique is simply 
+\begin_inset Formula $[a_{t},b_{t}]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Measurement Model
+\end_layout
+
+\begin_layout Standard
+Power plant's radioactive monitoring network is our second (and more important)
+ source of real-world observations.
+ Read-outs of total absorbed dose per fixed time interval (10 minutes in
+ our case) per each receptor are available.
+ Putting it together with previous section, we may define observation vector
+ as 
+\begin_inset Formula $[v_{t},\phi_{t},y_{t,1},\ldots,y_{t,m}]$
+\end_inset
+
+, where 
+\begin_inset Formula $y_{t,i}$
+\end_inset
+
+ is total absorbed dose of 
+\begin_inset Formula $i$
+\end_inset
+
+-th receptor per time slot 
+\begin_inset Formula $t$
+\end_inset
+
+ and 
+\begin_inset Formula $m$
+\end_inset
+
+ is total number of receptors.
+ With state and observation quantities defined, probabilistic description
+ of the observation model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysHt"
+
+\end_inset
+
+ can be expressed as 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimObservationCPdf"
+
+\end_inset
+
+ and factored to conditionally independent densities
+\begin_inset Formula 
+\begin{eqnarray}
+p(v_{t},\phi_{t},y_{t,1},\ldots,y_{t,m}|a_{t},b_{t}) & = & p(v_{t}|a_{t})p(\phi_{t}|b_{t})p(y_{t,1},\ldots,y_{t,m}|a_{t},b_{t}).\label{eq:AsimObservationCPdf}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Anemometer speed measurements usually have non-biased relative error, denoted
+ as 
+\begin_inset Formula $\gamma_{v}$
+\end_inset
+
+ in this text, therefore it should be modeled using a distribution with
+ mean value of 
+\begin_inset Formula $\dot{v}_{t,\mathbf{s}_{0}}$
+\end_inset
+
+ and standard deviation of 
+\begin_inset Formula $\gamma_{v}\dot{v}_{t,\mathbf{s}_{0}}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{s}_{0}$
+\end_inset
+
+ are spacial coordinates of the anemometer.
+ We've used the inverse gamma density 
+\begin_inset Formula $i\mathcal{G}\left(\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)\dot{v}_{t,\mathbf{s}_{0}}\right)$
+\end_inset
+
+ that fulfills the requirements for its favorable properties and positive
+ support, hence
+\begin_inset Formula 
+\begin{equation}
+p(v_{t}|a_{t})=i\mathcal{G}\left(\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)\dot{v}_{t,\mathbf{s}_{0}}\right)=i\mathcal{G}\left(\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t,\mathbf{s}_{0}}\right).\label{eq:AsimVCpdf}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Wind direction is more usually simulated as an unbiased measurement with
+ constant standard deviation 
+\begin_inset Formula $\sigma_{\phi}$
+\end_inset
+
+, so the normal density 
+\begin_inset Formula $\mathcal{N}(\dot{\phi}_{t,\mathbf{s}_{0}},\sigma_{\phi}^{2})$
+\end_inset
+
+ was a natural choice, therefore
+\begin_inset Formula 
+\begin{equation}
+p(\phi_{t}|b_{t})=\mathcal{N}(\dot{\phi}_{t,\mathbf{s}_{0}},\sigma_{\phi}^{2})=\mathcal{N}(b_{t}+\tilde{\phi}_{t,\mathbf{s}_{0}},\sigma_{\phi}^{2}).
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To derive measurement model for radioactive doses, 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p(y_{t,1},\ldots,y_{t,m}|a_{t},b_{t})$
+\end_inset
+
+ can be further factored to conditionally independent densities
+\begin_inset Formula 
+\begin{equation}
+p(y_{t,1},\ldots,y_{t,m}|a_{t},b_{t})=\left(\prod_{i=1}^{m}p(y_{t,i}|d_{t,i})\right)p(d_{t,1},\ldots,d_{t,m}|a_{t},b_{t}),
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $d_{t,i}$
+\end_inset
+
+ is expected dose measured on 
+\begin_inset Formula $i$
+\end_inset
+
+-th receptor in time slot 
+\begin_inset Formula $t$
+\end_inset
+
+.
+ 
+\begin_inset Formula $p(d_{t,1},\ldots,d_{t,m}|a_{t}b_{t})$
+\end_inset
+
+ represents computation of the expected doses using formulas 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:puff_conc"
+
+\end_inset
+
+--
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:fluency_rate"
+
+\end_inset
+
+ (wind wind field substituted from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimV"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:AsimPhi"
+
+\end_inset
+
+) and is therefore fully deterministic (i.e.
+ Dirac delta distribution).
+ Parameters of the 
+\begin_inset Formula $p(y_{t,i}|d_{t,i})$
+\end_inset
+
+ correspond to possibilities of dose measuring devices, and according to
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Thompson:00"
+
+\end_inset
+
+ their error is proportional to the measured dose with constant of proportionali
+ty 
+\begin_inset Formula $\gamma_{y}$
+\end_inset
+
+ usually between 7--20%.
+ Dose measurements were again simulated using inverse gamma distribution,
+\begin_inset Formula 
+\begin{equation}
+p(y_{t,i}|d_{t,i})=i\mathcal{G}\left(\gamma_{y}^{-2}+2,(\gamma_{y}^{-2}+1)d_{t,i}\right).\label{eq:AsimYCPdf}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We conclude that equations 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:AsimObservationCPdf"
+
+\end_inset
+
+--
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:AsimYCPdf"
+
+\end_inset
+
+ fully establish used observation model, where by far the most computationally
+ expensive task is to perform 4D integration to compute expected doses in
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_dose"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluency_rate"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Transition Model
+\end_layout
+
 \begin_layout Section
 Conjugate Proposal
 \end_layout
@@ -1833,7 +2287,7 @@ p(a|y) & = & \frac{p(y|a)p(a)}{p(y)}\label{eq:BayesConjugate}\\
  & = & \frac{1}{p(y)}i\mathcal{G}\left(y;\alpha,\left(\alpha-1\right)a\right)\mathcal{G}(a;k,\theta)\nonumber \\
  & = & \frac{1}{p(y)}\frac{\left(\left(\alpha-1\right)a\right)^{\alpha}}{\Gamma\left(\alpha\right)}y^{-\alpha-1}\exp\left(-\frac{\left(\alpha-1\right)a}{y}\right)\frac{1}{\theta^{k}\Gamma\left(k\right)}a^{k-1}\exp\left(-\frac{a}{\theta}\right)\nonumber \\
  & = & \frac{\left(\alpha-1\right)^{\alpha}y^{-\alpha-1}}{p(y)\Gamma\left(\alpha\right)\theta^{k}\Gamma\left(k\right)}a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\nonumber \\
- & = & C\left(y,\alpha,\theta,k\right)\underbrace{a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)}\label{eq:GammaPreConjugate}\\
+ & = & C\left(y,\alpha,\theta,k\right)a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\label{eq:GammaPreConjugate}\\
  & = & \mathcal{G}\left(a;\alpha+k,\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)^{-1}\right).\label{eq:GammaConjugate}
 \end{eqnarray}
 
@@ -1844,19 +2298,19 @@ p(a|y) & = & \frac{p(y|a)p(a)}{p(y)}\label{eq:BayesConjugate}\\
 
 \begin_layout Standard
 In our case 
-\begin_inset Formula $p(y|a)=p(v_{t}|a_{t})=i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)$
-\end_inset
+\begin_inset Formula 
+\begin{eqnarray*}
+a & = & a_{t}\tilde{v}_{t}\\
+y & = & v_{t}\\
+p(y|a) & = & p(v_{t}|a_{t}\tilde{v}_{t})\\
+ & = & i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)\\
+p(a) & = & p(a_{t}\tilde{v}_{t}|a_{t-1})\\
+ & = & \mathcal{G}(a_{t}\tilde{v}_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}\tilde{v}_{t})\\
+p(a|y) & = & p(a_{t}\tilde{v}_{t}|a_{t-1},v_{t})\\
+ & = & \mathcal{G}\left(a_{t}\tilde{v}_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}+\gamma_{a}^{-2}a_{t-1}^{-1}\tilde{v}_{t}^{-1}\right)^{-1}\right)\\
+p(a_{t}|a_{t-1},v_{t}) & = & \mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right)
+\end{eqnarray*}
 
- and 
-\begin_inset Formula $p(a)=p(a_{t}|a_{t-1})=\mathcal{G}(a_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}).$
-\end_inset
-
- Therefore, conjugate density 
-\begin_inset Formula $p(a_{t}|a_{t-1},v_{t})$
-\end_inset
-
- has the form 
-\begin_inset Formula $\mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right).$
 \end_inset
 
 
