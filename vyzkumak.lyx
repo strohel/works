@@ -2092,7 +2092,11 @@ where
 \begin_inset Formula $t$
 \end_inset
 
-.
+ (including expected natural background dose 
+\begin_inset Formula $y_{nb}$
+\end_inset
+
+).
  
 \begin_inset Formula $p(d_{t,1},\ldots,d_{t,m}|a_{t}b_{t})$
 \end_inset
@@ -2280,7 +2284,7 @@ reference "sec:AsimTransitionModel"
 
  and 
 \begin_inset CommandInset ref
-LatexCommand eqref
+LatexCommand ref
 reference "sec:AsimMeasurementModel"
 
 \end_inset
@@ -2330,7 +2334,7 @@ key "PittShephard:99,SimandlStraka:07"
 \begin_inset Formula $\lambda_{1:N}$
 \end_inset
 
- and modifies sampling step so that 
+ and modifies the sampling step so that 
 \begin_inset Formula $x_{t}^{(i)}$
 \end_inset
 
@@ -2436,7 +2440,7 @@ Adaptive importance sampling, where the proposal density is parametrized
  is estimated using several smaller populations of particles.
 \begin_inset CommandInset citation
 LatexCommand cite
-key "OhBerger:92"
+key "OhBerger:92,SmidlHofman:12"
 
 \end_inset
 
@@ -2762,6 +2766,270 @@ name "chap:Results"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+This chapter starts by constructing so-called 
+\emph on
+twin experiment
+\emph default
+, where the 2 selected Sequential Monte Carlo technique variants are benchmarked
+ on a simulation.
+ We are mainly concerned with computational demands needed to achieve given
+ expectation of accuracy.
+ After experiment results are shown, some remarkable implementation details
+ are mentioned.
+ The chapter is ended by interpretation of the results and suggestion for
+ future improvements, extension and application.
+\end_layout
+
+\begin_layout Section
+Twin Experiment
+\end_layout
+
+\begin_layout Standard
+With complete atmospheric dispersion model in place, we are able to perform
+ the twin experiment.
+ We've used following steps:
+\end_layout
+
+\begin_layout Enumerate
+Choose time step, duration of the experiment 
+\begin_inset Formula $T,\; t\in[1,T]$
+\end_inset
+
+, atmospheric parameters, namely numerical model wind field predictions
+ 
+\begin_inset Formula $\tilde{v}_{1:T,\mathbf{s}},\tilde{\phi}_{1:T,\mathbf{s}}$
+\end_inset
+
+ and local wind field 
+\begin_inset Formula $\dot{v}_{1:T},\dot{\phi}_{1:T}$
+\end_inset
+
+ with slight variations from the global prediction, Pasquill's stability
+ category and finally released radioactive pollutant activities per time
+ slot 
+\begin_inset Formula $Q_{1:T}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Perform simulation with chosen parameters, compute and save simulated absorbed
+ doses per each receptor and time slot 
+\begin_inset Formula $\dot{y}_{t,i}\quad i\in\{1,\ldots,m\}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Add noise to measurements.
+ Simulate anemometer error by drawing 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ from 
+\begin_inset Formula $p(v_{t}|\dot{v}_{t})$
+\end_inset
+
+, 
+\begin_inset Formula $\phi_{t}$
+\end_inset
+
+ from 
+\begin_inset Formula $p(\phi_{t}|\dot{\phi}_{t})$
+\end_inset
+
+; same distributions and parameters as in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimVCpdf"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimThetaCPdf"
+
+\end_inset
+
+ (measurement model) were used, i.e.
+ 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ has relative variance of 
+\begin_inset Formula $\gamma_{v}$
+\end_inset
+
+ around actual value and 
+\begin_inset Formula $\phi_{t}$
+\end_inset
+
+ has standard error 
+\begin_inset Formula $\sigma_{\phi}$
+\end_inset
+
+ around its mean.
+ Add natural background dose per time step 
+\begin_inset Formula $y_{nb}$
+\end_inset
+
+ to dose measurements and simulate receptor noise: sample 
+\begin_inset Formula $y_{t,i}$
+\end_inset
+
+ from 
+\begin_inset Formula $p(y_{t,i}|\dot{y}_{t,i}+y_{nb})$
+\end_inset
+
+ with same parameters as in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimYCPdf"
+
+\end_inset
+
+ --- unbiased measurement with 
+\begin_inset Formula $\gamma_{y}$
+\end_inset
+
+ relative variance.
+\end_layout
+
+\begin_layout Enumerate
+Choose total number of particles 
+\begin_inset Formula $N$
+\end_inset
+
+.
+ Perform assimilation using selected variants of the particle filter.
+ The filter has access to numerically-predicted wind field 
+\begin_inset Formula $\tilde{v}_{1:T,\mathbf{s}},\tilde{\phi}_{1:T,\mathbf{s}}$
+\end_inset
+
+, Pasquill's stability category and released activities 
+\begin_inset Formula $Q_{1:T}$
+\end_inset
+
+, but actual weather and dose measurements are hidden by noisy quantities
+ 
+\begin_inset Formula $v_{t},\phi_{t},y_{t,i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Following properties of filtering techniques were evaluated:
+\end_layout
+
+\begin_layout Itemize
+Convergence to simulated release course.
+ While convergence as 
+\begin_inset Formula $N$
+\end_inset
+
+ approaches infinity is proven, for realistic 
+\begin_inset Formula $N$
+\end_inset
+
+ choices it needs to be checked.
+\end_layout
+
+\begin_layout Itemize
+Number of effective particles for each step 
+\begin_inset Formula $N_{\mathrm{eff}}(t)$
+\end_inset
+
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PFNeff"
+
+\end_inset
+
+.
+ If for example 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $N_{\mathrm{eff}}=0.05\, N$
+\end_inset
+
+, it means that 95% of resources were wasted computing particles with negligible
+ weight (that virtually don't affect resulting posterior density).
+ Certain overhead is inevitable in the particle filter, though.
+\end_layout
+
+\begin_layout Itemize
+Computational costs 
+\begin_inset Formula $C(t)$
+\end_inset
+
+: approximate number of CPU cycles needed to perform assimilation step from
+ 
+\begin_inset Formula $t-1$
+\end_inset
+
+ to 
+\begin_inset Formula $t.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When particle filtering improvements are suggested, a valid question comes
+ to one's mind: Wouldn't simply increasing the particle count 
+\begin_inset Formula $N$
+\end_inset
+
+ have similar effects (increasing 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ and to some extent needed resources) while keeping the simple algorithm?
+ To answer this, we propose to measure 
+\emph on
+computational costs per effective particle
+\emph default
+, i.e.
+ 
+\begin_inset Formula $\frac{C(t)}{N_{\mathrm{eff}}(t)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Assimilation Model Setup
+\end_layout
+
+\begin_layout Section
+Naive vs.
+ Conjugate Proposal
+\end_layout
+
+\begin_layout Section
+Implementation Decisions
+\end_layout
+
+\begin_layout Section
+Discussion
 \end_layout
 
 \begin_layout Standard
