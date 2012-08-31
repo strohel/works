@@ -1758,7 +1758,15 @@ reference "chap:Model"
 
 .
  First, we show our choice of measurement (observation) and transition (state)
- model, the rest is dedicated to discussing choice of the proposal density.
+ model, the rest is dedicated to discussing the choice of the proposal density.
+ Similar models were already proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -1928,13 +1936,20 @@ can be used, where
 
 \begin_layout Section
 Measurement Model
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:AsimMeasurementModel"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 Power plant's radioactive monitoring network is our second (and more important)
  source of real-world observations.
- Read-outs of total absorbed dose per fixed time interval (10 minutes in
- our case) per each receptor are available.
+ Read-outs of total absorbed doses per fixed time interval (10 minutes in
+ our case) from each receptor are available.
  Putting it together with previous section, we may define observation vector
  as 
 \begin_inset Formula $[v_{t},\phi_{t},y_{t,1},\ldots,y_{t,m}]$
@@ -1990,11 +2005,11 @@ Anemometer speed measurements usually have non-biased relative error, denoted
 \end_inset
 
  in this text, therefore it should be modeled using a distribution with
- mean value of 
+ mean value 
 \begin_inset Formula $\dot{v}_{t,\mathbf{s}_{0}}$
 \end_inset
 
- and standard deviation of 
+ and variance 
 \begin_inset Formula $\gamma_{v}\dot{v}_{t,\mathbf{s}_{0}}$
 \end_inset
 
@@ -2002,12 +2017,12 @@ Anemometer speed measurements usually have non-biased relative error, denoted
 \begin_inset Formula $\mathbf{s}_{0}$
 \end_inset
 
- are spacial coordinates of the anemometer.
+ are spatial coordinates of the anemometer.
  We've used the inverse gamma density 
 \begin_inset Formula $i\mathcal{G}\left(\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)\dot{v}_{t,\mathbf{s}_{0}}\right)$
 \end_inset
 
- that fulfills the requirements for its favorable properties and positive
+, that fulfills the requirements, for its favorable properties and positive
  support, hence
 \begin_inset Formula 
 \begin{equation}
@@ -2032,7 +2047,7 @@ Wind direction is more usually simulated as an unbiased measurement with
  was a natural choice, therefore
 \begin_inset Formula 
 \begin{equation}
-p(\phi_{t}|b_{t})=\mathcal{N}(\dot{\phi}_{t,\mathbf{s}_{0}},\sigma_{\phi}^{2})=\mathcal{N}(b_{t}+\tilde{\phi}_{t,\mathbf{s}_{0}},\sigma_{\phi}^{2}).
+p(\phi_{t}|b_{t})=\mathcal{N}(\dot{\phi}_{t,\mathbf{s}_{0}},\sigma_{\phi}^{2})=\mathcal{N}(b_{t}+\tilde{\phi}_{t,\mathbf{s}_{0}},\sigma_{\phi}^{2}).\label{eq:AsimThetaCPdf}
 \end{equation}
 
 \end_inset
@@ -2177,6 +2192,344 @@ reference "eq:fluency_rate"
 
 \begin_layout Section
 Transition Model
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:AsimTransitionModel"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Having only 2 variables in state vector, the transition model is rather
+ simple.
+ Factoring transition density 
+\begin_inset Formula $p(a_{t},b_{t}|a_{t-1}b_{t-1})$
+\end_inset
+
+ into conditionally independent components 
+\begin_inset Formula 
+\begin{eqnarray}
+p(a_{t},b_{t}|a_{t-1}b_{t-1}) & = & p(a_{t}|a_{t-1})p(b_{t}|b_{t-1})\label{eq:AsimTransitionCPdf}\\
+p(a_{t}|a_{t-1}) & = & \mathcal{G}(\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1})\label{eq:AsimTransitionA}\\
+p(b_{t}|b_{t-1}) & = & \mathcal{N}(b_{t-1},\sigma_{b}^{2})\label{eq:AsimTransitionB}
+\end{eqnarray}
+
+\end_inset
+
+we've selected gamma distribution for wind speed correction coefficient
+ with 
+\begin_inset Formula $a_{t-1}$
+\end_inset
+
+ mean and 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\gamma_{a}a_{t-1}$
+\end_inset
+
+ variance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimTransitionA"
+
+\end_inset
+
+, which simulates that the wind speed is distributed around the previous
+ value with relative variance 
+\begin_inset Formula $\gamma_{a}.$
+\end_inset
+
+ Wind direction correction is also assumed to be distributed around the
+ last value, but with constant standard deviation 
+\begin_inset Formula $\sigma_{b}$
+\end_inset
+
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimTransitionB"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Techniques Countering Sample Impoverishment
+\end_layout
+
+\begin_layout Standard
+While transition and observation models as presented in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:AsimTransitionModel"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:AsimMeasurementModel"
+
+\end_inset
+
+ are sufficient input for the bootstrap variant (the one with naive transition
+ density as its proposal) of the particle filter, it may suffer for a problem
+ where very low 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ causes its degeneration.
+ Various techniques to combat this exist, virtually all of which use proposal
+ density 
+\begin_inset Formula $q(x_{t}|x_{t-1},y_{t})$
+\end_inset
+
+ (or its approximation) to optimize sampling phase of the particle filter.
+ This is possible because there's a relative freedom in proposal density
+ choice, as only strict requirement posed on it is that is is not narrower
+ than the actual posterior density.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+i.e.
+ 
+\begin_inset Formula $\mathrm{supp}(q(x_{t}|x_{t-1},y_{t}))\supset\mathrm{supp}(p(x_{t}|y_{1:t}))$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Various techniques exist, to name a few:
+\end_layout
+
+\begin_layout Enumerate
+Auxiliary sampling density
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PittShephard:99,SimandlStraka:07"
+
+\end_inset
+
+, which introduces first-stage weights 
+\begin_inset Formula $\lambda_{1:N}$
+\end_inset
+
+ and modifies sampling step so that 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ is drawn from 
+\begin_inset Formula $\lambda_{i}p(x_{t}|x_{t-1}^{(i)})$
+\end_inset
+
+, where 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+ should correspond to probability of future particle 
+\begin_inset Formula $x_{t}^{(i)}.$
+\end_inset
+
+ Optimal choice for 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+ is said to be 
+\begin_inset Formula $\lambda_{i}=\int p(y_{t}|x_{t})p(x_{t}|x_{t-1}^{(i)})$
+\end_inset
+
+, which can be approximated using 
+\begin_inset Formula $\lambda_{i}\approx p(y_{t}|\mu_{t}^{(i)})$
+\end_inset
+
+, where 
+\begin_inset Formula $\mu_{t}^{(i)}$
+\end_inset
+
+ is mean, mode or other significant value of 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p(x_{t}|x_{t-1}^{(i)})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Gradient-based methods, where 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ is sampled from naive proposal, but before use shifted to a region with
+ higher likelihood.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SimandlStraka:07"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Approximation of the optimal proposal density
+\begin_inset CommandInset citation
+LatexCommand cite
+key "DouFreGor:01"
+
+\end_inset
+
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:SDOptim"
+
+\end_inset
+
+ using Taylor series and its subsequent fitting to a known probability density
+ function.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Adaptive importance sampling, where the proposal density is parametrized
+ as 
+\begin_inset Formula $q(\mathbf{x}_{t}|\mathbf{x}_{t-1},\theta)$
+\end_inset
+
+ and the parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is estimated using several smaller populations of particles.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "OhBerger:92"
+
+\end_inset
+
+ This approach can be called population Monte Carlo method.
+\end_layout
+
+\begin_layout Enumerate
+Analytic derivation of the optimal proposal density 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:SDOptim"
+
+\end_inset
+
+.
+ Often intractable, but it can happen that the transition density 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+ and the observation density 
+\begin_inset Formula $p(y_{t}|x_{t})$
+\end_inset
+
+ are so-called conjugate (under given parametrization), together giving
+ a probability density function from a known family.
+ In this case the denominator of 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SDOptim"
+
+\end_inset
+
+ doesn't need to be computed, because the normalizing constant is known
+ from theory.
+ We call this method a 
+\family default
+\series default
+\shape default
+\size default
+\emph on
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+conjugate
+\emph default
+ proposal density.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+q(\mathbf{x}_{t}|\mathbf{x}_{t-1},\mathbf{y}_{t})=\frac{p(y_{t}|x_{t})p(x_{t}|x_{t-1})}{p(y_{t}|x_{t-1})}=\frac{p(y_{t}|x_{t})p(x_{t}|x_{t-1})}{\int p(y_{t}|x_{t})p(x_{t}|x_{t-1})\mathrm{\, d}x_{t}}\label{eq:SDOptim}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Because our model exhibits favorable conjugate properties (under certain
+ simplification), we've chosen the conjugate proposal density (which in
+ theory gives the best results as other methods are just some kind of its
+ approximation), the form of which is derived below.
+ In 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Results"
+
+\end_inset
+
+ we compare it to the naive proposal, whose undeniable advantage is algorithmic
+ simplicity and straightforward ability to improve accuracy by increasing
+ the number of particles 
+\begin_inset Formula $N$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -2184,15 +2537,72 @@ Conjugate Proposal
 \end_layout
 
 \begin_layout Standard
+For our choice of the gamma transition density for 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimTransitionA"
+
+\end_inset
+
+ coupled with its inverse gamma observation density 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimVCpdf"
+
+\end_inset
+
+, normal transition density for 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimTransitionB"
+
+\end_inset
+
+ coupled with its normal observation density 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimThetaCPdf"
+
+\end_inset
+
+ and ignoring dose measurements 
+\begin_inset Formula $\mathbf{y}_{t}$
+\end_inset
+
+ in the observation, the optimal sampling density can be approximated using
+ formula
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
-\begin{eqnarray*}
-p(x_{t}|x_{t-1},y_{t}) & = & p(a_{t},b_{t}|a_{t-1},b_{t-1},v_{t},\theta_{t},\mathbf{d}_{t})\\
- & \approx & p(a_{t}|a_{t-1}v_{t})p(b_{t}|b_{t-1}\theta_{t})
-\end{eqnarray*}
+\begin{eqnarray}
+q(x_{t}|x_{t-1},y_{t}) & = & p(a_{t},b_{t}|a_{t-1},b_{t-1},v_{t},\phi_{t},\mathbf{y}_{t})\nonumber \\
+ & \approx & p(a_{t}|a_{t-1},v_{t})p(b_{t}|b_{t-1},\phi_{t}).\label{eq:AsimApproxSDOptim}
+\end{eqnarray}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Proposal densities for wind speed correction coefficient and wind direction
+ correction coefficient in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:AsimApproxSDOptim"
+
+\end_inset
+
+ are conditionally independent, and are derived below.
 \end_layout
 
 \begin_layout Subsection
@@ -2321,21 +2731,21 @@ Wind Direction Conjugate Density
 \end_layout
 
 \begin_layout Standard
-For the choice of Gaussian wind direction transition density 
-\begin_inset Formula $p(b_{t},b_{t-1})=p(\theta_{t}|b_{t},b_{t-1})=\mathcal{N}(b_{t};b_{t-1},\sigma_{b})$
+For the choice of wind direction transition density 
+\begin_inset Formula $p(b_{t}|b_{t-1})=p(\phi_{t}|b_{t},b_{t-1})=\mathcal{N}(b_{t};b_{t-1},\sigma_{b})$
 \end_inset
 
- and Gaussian wind direction observation density 
-\begin_inset Formula $p(\theta_{t}|b_{t})=\mathcal{N}(\theta_{t};\tilde{\theta}_{t}+b_{t},\sigma_{\theta})$
+ and wind direction observation density 
+\begin_inset Formula $p(\phi_{t}|b_{t})=\mathcal{N}(\phi_{t};\tilde{\phi}_{t}+b_{t},\sigma_{\theta})$
 \end_inset
 
 , the conjugate proposal can be derived as follows:
 \begin_inset Formula 
 \begin{eqnarray*}
-p(b_{t}|b_{t-1},\theta_{t}) & = & \frac{p(\theta_{t}|b_{t},b_{t-1})p(b_{t}|b_{t-1})}{p(\theta_{t}|b_{t-1})}\\
- & = & \frac{\mathcal{N}(\theta_{t};\tilde{\theta}_{t}+b_{t},\sigma_{\theta})\mathcal{N}(b_{t};b_{t-1},\sigma_{b})}{p(\theta_{t}|b_{t-1})}\\
- & = & \frac{1}{p(\theta_{t}|b_{t-1})}\frac{1}{2\pi}\frac{1}{\sigma_{\theta}}\exp\left(-\frac{1}{2}\left(\frac{\theta_{t}-\tilde{\theta}_{t}-b_{t}}{\sigma_{\theta}}\right)^{2}\right)\cdot\\
- &  & \cdot\;\frac{1}{\sigma_{b}}\exp\left(-\frac{1}{2}\left(\frac{b_{t}-b_{t-1}}{\sigma_{b}}\right)^{2}\right)
+p(b_{t}|b_{t-1},\phi_{t}) & = & \frac{p(\phi_{t}|b_{t},b_{t-1})p(b_{t}|b_{t-1})}{p(\phi_{t}|b_{t-1})}\\
+ & = & \frac{\mathcal{N}(\phi_{t};\tilde{\phi}_{t}+b_{t},\sigma_{\theta})\mathcal{N}(b_{t};b_{t-1},\sigma_{b})}{p(\phi_{t}|b_{t-1})}\\
+ & = & \frac{1}{p(\phi_{t}|b_{t-1})}\frac{1}{2\pi}\frac{1}{\sigma_{\theta}}\exp\left(-\frac{1}{2}\left(\frac{\phi_{t}-\tilde{\phi}_{t}-b_{t}}{\sigma_{\theta}}\right)^{2}\right)\frac{1}{\sigma_{b}}\exp\left(-\frac{1}{2}\left(\frac{b_{t}-b_{t-1}}{\sigma_{b}}\right)^{2}\right)\\
+ & = & \mathcal{N}\left(\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\left(\sigma_{b}^{-2}b_{t-1}+\sigma_{\phi}^{-2}\left(\phi_{t}-\tilde{\phi}_{t}\right)\right),\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\right).
 \end{eqnarray*}
 
 \end_inset
@@ -2345,6 +2755,13 @@ p(b_{t}|b_{t-1},\theta_{t}) & = & \frac{p(\theta_{t}|b_{t},b_{t-1})p(b_{t}|b_{t-
 
 \begin_layout Chapter
 Results
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Results"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
