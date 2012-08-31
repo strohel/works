@@ -1583,7 +1583,7 @@ Using a model described above, simulation was performed to test assimilation
 
  were released at 10-minute intervals.
  Simulated wind field had constant speed of 2 m/s, but slightly varying
- wind direction; Pasquill's stability category was E (neutral).
+ wind direction; Pasquill's stability category was D (neutral).
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2777,10 +2777,10 @@ twin experiment
  on a simulation.
  We are mainly concerned with computational demands needed to achieve given
  expectation of accuracy.
- After experiment results are shown, some remarkable implementation details
- are mentioned.
- The chapter is ended by interpretation of the results and suggestion for
- future improvements, extension and application.
+ After experiment results are shown are interpreted, some remarkable implementat
+ion details are mentioned.
+ The chapter is ended by suggestions for future improvements, extensions
+ and application.
 \end_layout
 
 \begin_layout Section
@@ -2980,8 +2980,18 @@ Computational costs
 \begin_inset Formula $C(t)$
 \end_inset
 
-: approximate number of CPU cycles needed to perform assimilation step from
- 
+: approximate number of CPU seconds
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+a measure provided by the operating system that slightly differs from wall-clock
+ time: it excludes time when given CPU was tasked with different OS processes
+\end_layout
+
+\end_inset
+
+ needed to perform assimilation step from 
 \begin_inset Formula $t-1$
 \end_inset
 
@@ -3002,21 +3012,103 @@ When particle filtering improvements are suggested, a valid question comes
 \begin_inset Formula $N_{\mathrm{eff}}$
 \end_inset
 
- and to some extent needed resources) while keeping the simple algorithm?
+ and to some extent required resources) while keeping the simple algorithm?
  To answer this, we propose to measure 
 \emph on
-computational costs per effective particle
+effective particles per second
 \emph default
 , i.e.
  
-\begin_inset Formula $\frac{C(t)}{N_{\mathrm{eff}}(t)}$
+\begin_inset Formula $\frac{N_{\mathrm{eff}}(t)}{C(t)}$
 \end_inset
 
 .
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Assimilation Model Setup
+\end_layout
+
+\begin_layout Standard
+For our purposes we've chosen assimilation time step of 10 minutes,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+because studied power plant radiation monitoring network measures dose in
+ 10-minute intervals
+\end_layout
+
+\end_inset
+
+ and total simulation length of 4 hours.
+ North-East wind with minor time-varying deviation in direction and with
+ steady 
+\begin_inset Formula $\unitfrac[2]{m}{s}$
+\end_inset
+
+ wind speed was used, while numerical prediction with strictly North-East
+ wind passing at 
+\begin_inset Formula $\unitfrac[2.1]{m}{s}$
+\end_inset
+
+ was assumed.
+ Radioactive release happened through first hour of the simulation with
+ 10-minute activities of 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $[1,5,4,3,2,1]\times10^{16}\, Bq$
+\end_inset
+
+, dispersing in atmosphere according to Pasquill's stability category D
+ (neutral).
+\end_layout
+
+\begin_layout Standard
+Observation model was tuned as follows: anemometer parameters were assumed
+ to be 
+\begin_inset Formula $\gamma_{v}=0.1$
+\end_inset
+
+ (wind direction relative variance) and 
+\begin_inset Formula $\sigma_{\phi}=5{}^{\circ}$
+\end_inset
+
+ standard deviation for wind direction.
+ Relative error of radioactive receptors was chosen as 
+\begin_inset Formula $\gamma_{y}=0.2$
+\end_inset
+
+ in accordance with 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Thompson:00"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For transition model 
+\begin_inset Formula $\gamma_{a}=0.2$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma_{b}=15{}^{\circ}$
+\end_inset
+
+ was employed.
 \end_layout
 
 \begin_layout Section
