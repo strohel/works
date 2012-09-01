@@ -2075,7 +2075,7 @@ To derive measurement model for radioactive doses,
  can be further factored to conditionally independent densities
 \begin_inset Formula 
 \begin{equation}
-p(y_{t,1},\ldots,y_{t,m}|a_{t},b_{t})=\left(\prod_{i=1}^{m}p(y_{t,i}|d_{t,i})\right)p(d_{t,1},\ldots,d_{t,m}|a_{t},b_{t}),
+p(y_{t,1},\ldots,y_{t,m}|a_{t},b_{t})=\left(\prod_{i=1}^{m}p(y_{t,i}|d_{t,i})\right)p(d_{t,1},\ldots,d_{t,m}|a_{t},b_{t}),\label{eq:AsimYCPdf}
 \end{equation}
 
 \end_inset
@@ -2152,7 +2152,7 @@ ty
  Dose measurements were again simulated using inverse gamma distribution,
 \begin_inset Formula 
 \begin{equation}
-p(y_{t,i}|d_{t,i})=i\mathcal{G}\left(\gamma_{y}^{-2}+2,(\gamma_{y}^{-2}+1)d_{t,i}\right).\label{eq:AsimYCPdf}
+p(y_{t,i}|d_{t,i})=i\mathcal{G}\left(\gamma_{y}^{-2}+2,(\gamma_{y}^{-2}+1)d_{t,i}\right).\label{eq:AsimDCPdf}
 \end{equation}
 
 \end_inset
@@ -2171,7 +2171,7 @@ reference "eq:AsimObservationCPdf"
 --
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "eq:AsimYCPdf"
+reference "eq:AsimDCPdf"
 
 \end_inset
 
@@ -2890,7 +2890,7 @@ reference "eq:AsimThetaCPdf"
  with same parameters as in 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:AsimYCPdf"
+reference "eq:AsimDCPdf"
 
 \end_inset
 
@@ -3113,7 +3113,7 @@ For transition model
 \begin_inset Formula $N=1000$
 \end_inset
 
- particles was fixed for all 
+ particles was fixed for all particle filter runs.
 \end_layout
 
 \begin_layout Section
@@ -3122,97 +3122,42 @@ Naive vs.
 \end_layout
 
 \begin_layout Standard
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:AsimNaive"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:AsimConju"
+
+\end_inset
+
+ shows assimilation results for particle filter with naive, respectively
+ conjugate proposal.
+ Only puff trajectories are shown, total ground doses would be straightforward
+ to compute and are not considered; each color represents trajectory of
+ one puff, each line represents one particle in the particle filter, its
+ opacity is proportional to its weight.
+ Thicker bunches of one color at given time therefore signify higher uncertainty
+ (variance) in trajectory estimation of that puff.
+ Comparing assimilated trajectories with simulation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:simulation"
+
+\end_inset
+
+) that was data source for the twin experiment, we can safely state that
+ both assimilation techniques succeeded in tracking the radioactive plume.
+ Furthermore, trajectories obtained using the naive and conjugate proposal
+ are visually indistinguishable.
 \begin_inset Float figure
 wide false
 sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "49col%"
-special "none"
-height "1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename assimilaiton/No dose naive-13800s-14400s.jpg
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Assimilation, naive proposal, dose ignored
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset space \hfill{}
-\end_inset
-
-
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "49col%"
-special "none"
-height "1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename assimilaiton/No dose conjugate-13800s-14400s.jpg
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Assimilation, conjugate proposal, dose ignored
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Float figure
-wide false
-sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Box Frameless
@@ -3240,6 +3185,12 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:AsimNaive"
+
+\end_inset
+
 Assimilation, naive proposal
 \end_layout
 
@@ -3280,6 +3231,12 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:AsimConju"
+
+\end_inset
+
 Assimilation, conjugate proposal
 \end_layout
 
@@ -3296,10 +3253,211 @@ Assimilation, conjugate proposal
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+One interesting effect can be seen on both figures: approximately the first
+ 70 minutes the variance of trajectories is extremely low and both particle
+ filters assign negligible weights to all-but-one one particle.
+ This coincides with the phase when the puffs can be observed using dose
+ measurements from radioactive monitoring network receptors (denoted by
+ blue dots in the figures).
+ Our explanation is that this is due to dose measurement model being extremely
+ non-linear, where a small (tens of meters) shift in puff trajectory causes
+ dramatic change in assigned likelihood.
+ In other words, the dose part of the observation model is extremely tight-peake
+d compared to the transition model.
+ To confirm this claim, we've run the assimilation again, but this time
+ the dose measurements weren't supplied to the filters.
+ Results of these filters are shown in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:AsimNaiveIgn"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:AsimConjuIgn"
+
+\end_inset
+
+.
+ Indeed, trajectory variance raised right from the beginning there and continued
+ to be slightly greater through the rest of the experiment compared to dose-awar
+e assimilation.
 \begin_inset Float figure
 wide false
 sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "49col%"
+special "none"
+height "1in"
+height_special "totalheight"
 status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename assimilaiton/No dose naive-13800s-14400s.jpg
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:AsimNaiveIgn"
+
+\end_inset
+
+Assimilation, naive proposal, dose ignored
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "49col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename assimilaiton/No dose conjugate-13800s-14400s.jpg
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:AsimConjuIgn"
+
+\end_inset
+
+Assimilation, conjugate proposal, dose ignored
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Second examined property was number of effective particles (shown in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:AsimNeff"
+
+\end_inset
+
+) out of 1000 total and number of computed effective particles per second
+ shown in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:AsimPps"
+
+\end_inset
+
+.
+ In the first phase (again lasting around 70 minutes, or 7 time steps) both
+ filters struggle to sample significant number particles to the area where
+ they would gain weight and their 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ is close to 1.
+ Even the filter with conjugate proposal, that takes anemometer measurements
+ into account when drawing particles, suffers from the sample impoverishment
+ problem.
+ We argue that this is because even the improved proposal density has much
+ greater variance than the observation model (dose part of it).
+ The second phase sees sharp rise of the effective particles, which is especiall
+y pronounced for the case of the conjugate proposal.
+ While this is expected, we consider the second figure much more important;
+ indeed, it answers the main question we've posed: 
+\emph on
+conjugate proposal (when given sufficient information)
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+by sufficient information we mean the measurements most significant for
+ the observation model; this was not the case for the first phase
+\end_layout
+
+\end_inset
+
+ yields significantly higher 
+\emph default
+
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+
+\emph on
+ even when additional complexity is accounted for.
+
+\emph default
+ As can be seen, number of effective particles computed per CPU second oscillate
+s roughly around 
+\begin_inset Formula $\unitfrac[200]{p}{s}$
+\end_inset
+
+ for the conjugate variant of the filter, and around 
+\begin_inset Formula $\unitfrac[100]{p}{s}$
+\end_inset
+
+ for the naive variant.
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Box Frameless
@@ -3327,6 +3485,12 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:AsimNeff"
+
+\end_inset
+
 Number of effective particles
 \end_layout
 
@@ -3367,6 +3531,12 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:AsimPps"
+
+\end_inset
+
 Effective particles per second
 \end_layout
 
@@ -3389,8 +3559,79 @@ Effective particles per second
 Implementation Decisions
 \end_layout
 
+\begin_layout Standard
+[TODO: how PyBayes, Cython was user, parallelisation possibilities]
+\end_layout
+
 \begin_layout Section
 Discussion
+\end_layout
+
+\begin_layout Standard
+We've achieved moderate success showing favorable properties of the sequential
+ Monte Carlo technique enhanced with conjugate proposal density.
+ On the other hand, we were unable to attain improvement (with regards to
+ number of effective particles) in the first phase of the experiment where
+ the dose measurements dominate the observation model with our approximation
+ of the optimal proposal density.
+ In our opinion, this is mainly due to the fact that our variant cannot
+ account for dose measurements.
+ We propose following techniques to be studied to improve efficiency:
+\end_layout
+
+\begin_layout Itemize
+incorporating dose observation into proposal density.
+ This natural approach is not straightforward to achieve, as inverting dose
+ observation model 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:AsimYCPdf"
+
+\end_inset
+
+ is not analytically tractable in contrast to the wind field model.
+ We propose extending the proposal density with gradient techniques for
+ finding local maxima of the dose observation density.
+\end_layout
+
+\begin_layout Itemize
+shortening the assimilation time step.
+ In our view the 10-minute step is too rough and variance in wind direction
+ causes poor results when simulated doses are compared against measured
+ ones.
+ This approach is unfortunately unachievable with current monitoring network
+ infrastructure, and furthermore its gains questionable given that shorter
+ time step could cause greater error in receptor read-outs.
+\end_layout
+
+\begin_layout Standard
+It should be further noted that assimilation problem described here is a
+ rather simplified version of the problem faced in real life.
+ We assume that released activities, atmospheric stability category and
+ distribution of radionuclides in the release is known.
+ This is not the case in most situations.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+ already adds released activity 
+\begin_inset Formula $Q$
+\end_inset
+
+ to the list of assimilated quantities.
+\end_layout
+
+\begin_layout Standard
+Another outcome of this text is the finding that the radioactive monitoring
+ network provides the most valuable information for tracking the toxic plume.
+ On the other hand, dose receptors are laid very scarcely in areas more
+ distant from the nuclear site.
+ If there were more sensors in the area, our uncertainty about the plume
+ trajectory would be much lower.
+ [TODO: cite NetworkOptimisation for work in this area]
 \end_layout
 
 \begin_layout Standard
