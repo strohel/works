@@ -130,8 +130,7 @@ Notation
 \end_layout
 
 \begin_layout Standard
-Following notation is used throughout this text: TODO: decide whether leave
- this or just define each item when first used
+Following notation is used throughout this text:
 \end_layout
 
 \begin_layout Standard
@@ -144,7 +143,7 @@ Following notation is used throughout this text: TODO: decide whether leave
 \begin_layout Standard
 \noindent
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="2">
+<lyxtabular version="3" rows="12" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0">
 <column alignment="left" valignment="top" width="85text%">
@@ -399,7 +398,7 @@ conditional probability density function of quantity
 
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -466,7 +465,69 @@ multivariate normal (Gaussian) probability density function with mean vector
 
 \end_inset
 
- 
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathcal{G}(k,\theta)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gamma probability density function with shape parameter 
+\begin_inset Formula $k$
+\end_inset
+
+ and scale parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $i\mathcal{G}(\alpha,\beta)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+inverse gamma probability density function with shape parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and scale parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -684,7 +745,7 @@ reference "eq:DynSysHt"
 prior
 \emph default
  probability density function 
-\begin_inset Formula $p(x_{t}|y_{t-1})$
+\begin_inset Formula $p(x_{t}|y_{1:t-1})$
 \end_inset
 
  can be expressed using only known densities by applying reverse marginalization
@@ -704,9 +765,9 @@ prior
  
 \begin_inset Formula 
 \begin{align}
-p(x_{t}|y_{t-1}) & =\int p(x_{t},x_{t-1}|y_{t-1})\;\mathrm{d}x_{t-1}\nonumber \\
-p(x_{t}|y_{t-1}) & =\int p(x_{t}|x_{t-1},y_{t-1})p(x_{t-1}|y_{t-1})\;\mathrm{d}x_{t-1}\nonumber \\
-p(x_{t}|y_{t-1}) & =\int p(x_{t}|x_{t-1})p(x_{t-1}|y_{t-1})\;\mathrm{d}x_{t-1}.\label{eq:PriorPdf}
+p(x_{t}|y_{1:t-1}) & =\int p(x_{t},x_{t-1}|y_{1:t-1})\;\mathrm{d}x_{t-1}\nonumber \\
+p(x_{t}|y_{1:t-1}) & =\int p(x_{t}|x_{t-1},y_{1:t-1})p(x_{t-1}|y_{1:t-1})\;\mathrm{d}x_{t-1}\nonumber \\
+p(x_{t}|y_{1:t-1}) & =\int p(x_{t}|x_{t-1})p(x_{t-1}|y_{1:t-1})\;\mathrm{d}x_{t-1}.\label{eq:PriorPdf}
 \end{align}
 
 \end_inset
@@ -720,7 +781,7 @@ Next straightforward step in the solution is to derive
 posterior
 \emph default
  probability density function 
-\begin_inset Formula $p(x_{t}|y_{t})$
+\begin_inset Formula $p(x_{t}|y_{1:t})$
 \end_inset
 
 , which is done by applying the Bayes' theorem and taking the fact that
@@ -733,14 +794,14 @@ posterior
 \end_inset
 
  so that 
-\begin_inset Formula $p(y_{t}|x_{t},y_{t-1})=p(y_{t}|x_{t})$
+\begin_inset Formula $p(y_{t}|x_{t},y_{1:t-1})=p(y_{t}|x_{t})$
 \end_inset
 
 
 \begin_inset Formula 
 \begin{align}
-p(x_{t}|y_{t}) & =\frac{p(y_{t}|x_{t},y_{t-1})p(x_{t}|y_{t-1})}{p(y_{t}|y_{t-1})}\nonumber \\
-p(x_{t}|y_{t}) & =\frac{p(y_{t}|x_{t})p(x_{t}|y_{t-1})}{p(y_{t}|y_{t-1})},\label{eq:PosteriorPdf}
+p(x_{t}|y_{1:t}) & =\frac{p(y_{t}|x_{t},y_{1:t-1})p(x_{t}|y_{1:t-1})}{p(y_{t}|y_{1:t-1})}\nonumber \\
+p(x_{t}|y_{1:t}) & =\frac{p(y_{t}|x_{t})p(x_{t}|y_{1:t-1})}{p(y_{t}|y_{1:t-1})},\label{eq:PosteriorPdf}
 \end{align}
 
 \end_inset
@@ -788,8 +849,8 @@ reference "eq:PriorPdf"
 \end_inset
 
 , unless tractable analytically, constitutes a major computational challenge.
- The situation when the analytical solution is known is represented by the
- famous Kalman filter
+ The situation when the analytical solution is known is represented mainly
+ by the famous Kalman filter
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Kalman:60"
@@ -1193,7 +1254,13 @@ reference "eq:PFNeff"
 \end_inset
 
 .
- TODO: citation
+\begin_inset CommandInset citation
+LatexCommand cite
+key "DouFreGor:01"
+
+\end_inset
+
+
 \begin_inset Formula 
 \begin{equation}
 N_{\mathrm{eff}}(t)\approx\left(\sum_{i=1}^{N}\left(\omega_{t}^{(i)}\right)^{2}\right)^{-1},\qquad1\leq N_{\mathrm{eff}}\leq N.\label{eq:PFNeff}
@@ -3560,7 +3627,586 @@ Implementation Decisions
 \end_layout
 
 \begin_layout Standard
-[TODO: how PyBayes, Cython was user, parallelisation possibilities]
+One of the goals of this work was to establish a solid software framework
+ for assimilation of the radioactive pollutant release, a basis for planned
+ future research in this field and projects such as web-based assimilation
+ lab accessible by interested public or ultimately a real-time continuous
+ assimilation using actual real-world meteorologic forecast and measurements
+ from power plant radioactive monitoring network and meteorologic station.
+ Object-oriented approach using the Python Programming Language
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "www.python.org"
+target "http://www.python.org/"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ was employed along with Cython
+\begin_inset CommandInset citation
+LatexCommand cite
+key "BehBraCitDalSelSmi:11"
+
+\end_inset
+
+ to optimize performance-critical code paths.
+ For discussion surrounding this decision see 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Laitl11"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The software project was named 
+\emph on
+Asim
+\emph default
+, it's source tree and API documentation are available on the enclosed DVD-ROM,
+ see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:DVD-ROM"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Dispersion Model
+\end_layout
+
+\begin_layout Standard
+Task of the dispersion model is to simulate atmospheric release and compute
+ quantities such as absorbed dose or pollutant concentration at given spatial
+ coordinates; it needs to work with various sources of wind field data and
+ pollutant release data.
+ We propose following interface:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+DispersionModel
+\family default
+ stateful class tracking radioactive plume in the atmosphere.
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+propagate(meteo_model,
+\begin_inset space ~
+\end_inset
+
+source_model)
+\family default
+ transition from 
+\begin_inset Formula $t-1$
+\end_inset
+
+ time step to 
+\begin_inset Formula $t$
+\end_inset
+
+ according to meteorological situation passed through 
+\family typewriter
+meteo_model
+\family default
+ and released activity passed through 
+\family typewriter
+source_model
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+vector
+\begin_inset space ~
+\end_inset
+
+concentration_at(loc)
+\family default
+ compute per-nuclide concentration at given coordinates 
+\family typewriter
+loc
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+vector
+\begin_inset space ~
+\end_inset
+
+dose_at(loc)
+\family default
+ compute per-nuclide absorbed dose at coordinates 
+\family typewriter
+loc
+\family default
+.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\family typewriter
+MeteoModel
+\family default
+ stateless class describing meteorologic situation.
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+real
+\begin_inset space ~
+\end_inset
+
+wind_speed_at(loc,
+\begin_inset space ~
+\end_inset
+
+time)
+\family default
+ return wind speed at given location and time.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+real
+\begin_inset space ~
+\end_inset
+
+wind_direction_at(loc,
+\begin_inset space ~
+\end_inset
+
+time)
+\family default
+ return wind speed at given location and time.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+real
+\begin_inset space ~
+\end_inset
+
+dispersion_xy(loc,
+\begin_inset space ~
+\end_inset
+
+time,
+\begin_inset space ~
+\end_inset
+
+total_distance)
+\family default
+ return horizontal dispersion coefficients (
+\begin_inset Formula $\sigma_{x},\sigma_{y}$
+\end_inset
+
+ in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_conc"
+
+\end_inset
+
+) for a plume that has already flown 
+\family typewriter
+total_distance
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+real
+\begin_inset space ~
+\end_inset
+
+dispertion_z(loc,
+\begin_inset space ~
+\end_inset
+
+time,
+\begin_inset space ~
+\end_inset
+
+total_distance)
+\family default
+ return vertical dispersion coefficient (
+\begin_inset Formula $\sigma_{z}$
+\end_inset
+
+ in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_conc"
+
+\end_inset
+
+) for a plume that has already flown 
+\family typewriter
+total_distance
+\family default
+.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\family typewriter
+SourceModel
+\family default
+ stateless class describing source term of the radioactive release.
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+list[Nuclide]
+\begin_inset space ~
+\end_inset
+
+inventory()
+\family default
+ return a list of radionuclides contained in the release.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+vector
+\begin_inset space ~
+\end_inset
+
+release_rate(time)
+\family default
+ return release rate in Bq/s per each radionuclide in inventory at given
+ 
+\family typewriter
+time
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+Location
+\begin_inset space ~
+\end_inset
+
+location()
+\family default
+ return coordinates of the release source.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\family typewriter
+Nuclide
+\family default
+ container for parameters of a radionuclide such as half-life.
+\end_layout
+
+\begin_layout Standard
+Dispersion model was then implemented using the mathematical puff model
+ in 2 classes: 
+\family typewriter
+Puff
+\family default
+ (
+\family typewriter
+DispersionModel
+\family default
+ subclass) that describes one puff in the plume; 
+\family typewriter
+concentration_at()
+\family default
+ is implemented using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_conc"
+
+\end_inset
+
+ and dose_at() using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_dose"
+
+\end_inset
+
+.
+ 
+\family typewriter
+PuffModel
+\family default
+ (also 
+\family typewriter
+DispersionModel
+\family default
+ subclass) is then a collection of puffs with additive implementation of
+ 
+\family typewriter
+concentration_at()
+\family default
+ an 
+\family typewriter
+dose_at()
+\family default
+ enriched with the logic to create new puffs when non-zero activity is released
+ and destroy old puffs whose activity has fallen below a certain threshold.
+ For the purpose of simulation, 
+\family typewriter
+MeteoModel
+\family default
+ and 
+\family typewriter
+SourceModel
+\family default
+ implementations that return precomputed values were made use of.
+\end_layout
+
+\begin_layout Subsection
+Assimilation
+\end_layout
+
+\begin_layout Standard
+Data assimilation was implemented on top of the PyBayes library.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+freely available from 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/strohel/PyBayes"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Laitl11"
+
+\end_inset
+
+ For this the PyBayes library was extended with implementation of the gamma
+ distribution, inverse gamma distribution and common conditional variants
+ thereof.
+ Additionally, the particle filter from PyBayes was taught to make use of
+ the proposal distribution in form of another Bayesian filter.
+ Motivation for this is 2-sided: 
+\emph on
+a)
+\emph default
+ the proposal density has the form 
+\begin_inset Formula $q(x_{t}|x_{t-1},y_{t})$
+\end_inset
+
+, which coincides with the posterior density of a Bayesian filter 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PosteriorPdf"
+
+\end_inset
+
+; it has sense to plug the posterior density of for example a Kalman filter
+ as a proposal density approximation into the particle filter, 
+\emph on
+b)
+\emph default
+ another option would be to pass a conditional probability density function
+ directly, but that would involve (potentially expensive) double evaluation
+ of its condition under current PyBayes constraints.
+\end_layout
+
+\begin_layout Standard
+The side of the Asim project consisted of creating custom conditional probabilit
+y density functions for the observation model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimObservationCPdf"
+
+\end_inset
+
+ and transition model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimTransitionCPdf"
+
+\end_inset
+
+ to be used by PyBayes' particle filter.
+ This involved creating 
+\family typewriter
+AssimilationMeteoModel
+\family default
+ (
+\family typewriter
+MeteoModel
+\family default
+ subclass), which performs transformations 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimV"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimPhi"
+
+\end_inset
+
+.
+ 
+\family typewriter
+SourceModel
+\family default
+ from simulation was reused, but once released activity 
+\begin_inset Formula $Q$
+\end_inset
+
+ is assimilated, it will be replaced by 
+\family typewriter
+AssimilationSourceModel
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Optimization Using Cython
+\end_layout
+
+\begin_layout Standard
+While programmer convenience, fast prototyping and availability of many
+ supplemental 3rd party packages are appreciated when Python is used, it
+ is well-known fact that Python itself is badly suited for expensive numerical
+ computations.
+ The Cython project allows one to compile Python code into C code which
+ can subsequently be compiled into binary Python extension modules (technically
+ dynamically-loaded libraries: .so files on UNIX and .dll files on Windows
+ platforms) that behave very similarly to interpreted .py modules, but needn't
+ be interpreted by the Python interpreter.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "BehBraCitDalSelSmi:11"
+
+\end_inset
+
+ This provides moderate speedup of 0% to 300% because it eliminates the
+ interpreter overhead.
+ However, much more dramatic improvement can by achieved by statically typing
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Python itself is a dynamically-typed language: a variable can arise with
+ different incompatible data types throughout its lifetime
+\end_layout
+
+\end_inset
+
+ variables that are part of the critical code paths.
+\end_layout
+
+\begin_layout Standard
+Static typing is usually achieved by extending the Python language, which
+ breaks compatibility.
+ However, Cython offers so-called pure Python mode, where the implementation
+ is written in strict Python language and 
+\emph on
+augmented
+\emph default
+ using .pxd files that contain static typing declarations.
+ This allows the programmer to prototype quickly using Python (perhaps testing
+ on a reduced-size problem) and once happy with the algorithm, use Cython
+ to achieve required performance.
+\end_layout
+
+\begin_layout Standard
+Profiling our code we've identified that over 97% of the time was spent
+ computing the 4D integration 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_dose"
+
+\end_inset
+
+.
+ All involved variables were statically typed, and after compiling using
+ Cython, we've noted execution time drop from 
+\begin_inset Formula $\unit[651]{s}$
+\end_inset
+
+ to mere 
+\begin_inset Formula $\unit[3.53]{s}$
+\end_inset
+
+, a 
+\begin_inset Formula $\unit[184]{\times}$
+\end_inset
+
+ speedup.
+ This is especially pronounced in the assimilation experiment, where the
+ simulation is run 
+\begin_inset Formula $N$
+\end_inset
+
+ times with 
+\begin_inset Formula $N=1000$
+\end_inset
+
+ in our case; this is the reason why assimilation wasn't even tested under
+ the pure Python mode.
+\end_layout
+
+\begin_layout Standard
+It has been showed that Cython-optimized numerical code performance is comparabl
+e to equivalent C code.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Laitl11"
+
+\end_inset
+
+ The PyBayes project already comes with a Cython version.
 \end_layout
 
 \begin_layout Section
@@ -3631,7 +4277,15 @@ Another outcome of this text is the finding that the radioactive monitoring
  distant from the nuclear site.
  If there were more sensors in the area, our uncertainty about the plume
  trajectory would be much lower.
- [TODO: cite NetworkOptimisation for work in this area]
+\end_layout
+
+\begin_layout Standard
+Finally, we've implemented presented algorithms using clean object-oriented
+ approach with future extensions in mind.
+ Existing PyBayes library that was developed earlier was used for algorithms
+ of Bayesian estimation, and Cython Python-to-C compiler was employed with
+ great success to increase performance of the Python code to levels comparable
+ with low-level languages.
 \end_layout
 
 \begin_layout Standard
@@ -3737,6 +4391,66 @@ options "bibtotoc,plain"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Chapter
+\start_of_appendix
+Contents of the Enclosed DVD-ROM
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:DVD-ROM"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+asim/ source code tree of the Asim project
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+assimilaiton/ folder with implementation of the assimilation model and related
+ classes; pure Python version of this module was not tested because of substanti
+al time demands
+\end_layout
+
+\begin_layout Description
+dispmodel/ folder with dispersion model interfaces and puff model implementation
+\end_layout
+
+\begin_layout Description
+doc/ documentation source code
+\end_layout
+
+\begin_layout Description
+simulation/ implementation of the pollutant release simulation
+\end_layout
+
+\begin_layout Description
+support/ folder with supportive code such as graph plotters and math routines
+\end_layout
+
+\begin_layout Description
+README text file with instructions how to build and run the project
+\end_layout
+
+\begin_layout Description
+setup.py Python distutils script used to build/install the project
+\end_layout
+
+\end_deeper
+\begin_layout Description
+asim-doc.pdf API documentation for the Asim project in PDF format
+\end_layout
+
+\begin_layout Description
+PyBayes/ source code tree of the PyBayes project, bundled for convenience
+\end_layout
+
+\begin_layout Description
+PyBayes-doc.pdf PyBayes API documentation in PDF format, bundled for convenience
 \end_layout
 
 \end_body
