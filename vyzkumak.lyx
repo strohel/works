@@ -575,12 +575,93 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-TODO: motivation for radioactive release assimilation, viability of Bayesian
- statistics (cite what Technometrics cites) GAGA 
-\lang british
-fhkjdhfads
-\lang english
- kj
+Recursive Bayesian estimation of dynamic systems is a vital field that is
+ commonly associated with robotics, object-tracking and the like as demonstrated
+ for example by 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Gus:02,ThrBurFox:05"
+
+\end_inset
+
+.
+ Sequential Monte Carlo methods (also referred to as the SIR
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Sequential Importance Resampling
+\end_layout
+
+\end_inset
+
+ filter or the particle filter) is a broad Bayesian estimation subfield
+ attractive mainly when the posed problem doesn't offer analytical Bayesian
+ solution.
+ Among other publications, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HofSmiPech:09,HofSmi:09"
+
+\end_inset
+
+ have shown that SMC techniques can be successfully applied to tracking
+ of the radioactive plume in the early phase
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+hours within the start of the release
+\end_layout
+
+\end_inset
+
+ of an atmospheric radioactive pollutant release accident.
+ Should the research result in a self-contained and reliable tool, it would,
+ in our opinion, significantly help personnel involved with the accident
+ in making informed decisions, as SMC can effectively combine various noisy
+ data sources into one coherent estimation of the situation.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+which can be further extended to give future prediction
+\end_layout
+
+\end_inset
+
+ This text aims to be a one step among many towards this goal.
+ Specifically, we're concerned with computational efficiency of variations
+ of the SMC technique in the first place, and secondly we've set up a goal
+ of implementing basics of the desired tool.
+\end_layout
+
+\begin_layout Standard
+This text is organized as follows:
+\end_layout
+
+\begin_layout Enumerate
+In the first chapter the theoretical foundations of the Bayesian estimation
+ are reviewed and algorithm of the particle filter is described and briefly
+ discussed.
+\end_layout
+
+\begin_layout Enumerate
+Second chapter presents physical background of the pollutant release and
+ model we've used.
+\end_layout
+
+\begin_layout Enumerate
+Chapter 3 combines previous chapters to form complete assimilation technique
+ adapted to radioactive release.
+ Proposal distribution possibilities are discussed and 2 are chosen to be
+ benchmarked.
+\end_layout
+
+\begin_layout Enumerate
+Finally, results from the comparison are presented.
+ Furthermore our approach implementing the assimilation software is described
+ and Cython is used to dramatically speed up Python code.
 \end_layout
 
 \begin_layout Chapter
@@ -3693,7 +3774,7 @@ Task of the dispersion model is to simulate atmospheric release and compute
  quantities such as absorbed dose or pollutant concentration at given spatial
  coordinates; it needs to work with various sources of wind field data and
  pollutant release data.
- We propose following interface:
+ We propose following interface (simplified, only important methods shown):
 \end_layout
 
 \begin_layout Description
@@ -4323,6 +4404,98 @@ Conclusion
 \end_layout
 
 \begin_layout Standard
+After starting with a brief review of some known results from the recursive
+ Bayesian estimation with accent on the particle filter (sequential Monte
+ Carlo method), we've presented hypothetical but realistic scenario of an
+ atmospheric radioactive pollutant release.
+ The puff model was chosen to simulate it for its relative simplicity and
+ adequateness for particle filter estimation, and is briefly described.
+\end_layout
+
+\begin_layout Standard
+In the next chapter, assimilation model is inferred using the release scenario
+ and described in more detail.
+ Continues a discussion about techniques to fight the sample impoverishment
+ problem, a phenomenon that degrades quality of the estimation especially
+ noticeable in situations where the transition model (probability density
+ function thereof) is significantly broader than the observation model ---
+ the case we've faced.
+ The problem is most usually solved using appropriate choice of the proposal
+ density: the naive proposal was set to be benchmarked against a so-called
+ conjugate proposal, whose form was subsequently derived for our choice
+ of the wind field transition and observation model.
+\end_layout
+
+\begin_layout Standard
+Then it was shown that both particle filter variants are able to successfully
+ track the plume trajectory, however the emphasis was put on computational
+ resources needed by the filter variants to achieve a certain level of accuracy
+ expectation.
+ For this purpose a measure of effective particles per second was suggested.
+ The conjugate proposal technique was recorded to achieve roughly double
+ the rate during the second phase of the assimilation, and declared well
+ worth the complexity it adds.
+ On the other hand, both variants suffered equally from the sample impoverishmen
+t problem within approximately first 70 minutes of the simulated release;
+ discussion that followed pointed to ignorance of the dose measurements
+ in the chosen proposal as the main cause.
+\end_layout
+
+\begin_layout Standard
+Finally, some implementation details are revealed and interface of the core
+ classes employed in an object-oriented software design is shown; these
+ form the basis of the Asim software project whose implementation was started.
+ A notable speedup of the code written in Python was achieved by engaging
+ the Cython Python-to-C compiler.
+\end_layout
+
+\begin_layout Standard
+If we were to identify 2 main contributions of this work, it would be according
+ to us:
+\end_layout
+
+\begin_layout Itemize
+Performed comparison of the naive and conjugate particle filter proposal
+ densities with regards to resources needed to compute one 
+\begin_inset Quotes eld
+\end_inset
+
+effective particle
+\begin_inset Quotes erd
+\end_inset
+
+ performed under a realistic and demanding dispersion model assimilation.
+\end_layout
+
+\begin_layout Itemize
+The implementation of the radioactive release assimilation and simulation
+ framework itself (coupled with enhancements of the PyBayes library).
+ We believe that it can be extended painlessly in future to cope with larger-sca
+le problems.
+\end_layout
+
+\begin_layout Standard
+Speaking about future work, we suggest to extend the assimilation to more
+ quantities to be more useful for actual emergency situations.
+ This includes assimilation of released activities (already shown in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+) and distribution of the radionuclides within the release.
+ Furthermore the model of weather-related variables as presented here was
+ rather simplistic.
+\end_layout
+
+\begin_layout Standard
+While the performance of the assimilation seems near-optimal on a uniprocessor
+ machine thanks to Cython, parallelization is still being worked on and
+ was not yet employed in results shown in this text.
+\end_layout
+
+\begin_layout Standard
 \begin_inset ERT
 status open
 
@@ -4413,7 +4586,7 @@ asim/ source code tree of the Asim project
 \begin_layout Description
 assimilaiton/ folder with implementation of the assimilation model and related
  classes; pure Python version of this module was not tested because of substanti
-al time demands
+al time requirements it would cosume
 \end_layout
 
 \begin_layout Description
@@ -4451,6 +4624,10 @@ PyBayes/ source code tree of the PyBayes project, bundled for convenience
 
 \begin_layout Description
 PyBayes-doc.pdf PyBayes API documentation in PDF format, bundled for convenience
+\end_layout
+
+\begin_layout Description
+text.pdf this text itself in navigable form
 \end_layout
 
 \end_body
