@@ -4606,7 +4606,7 @@ support/ folder with supportive code such as graph plotters and math routines
 \end_layout
 
 \begin_layout Description
-README text file with instructions how to build and run the project
+README.rst text file with instructions how to build and run the project
 \end_layout
 
 \begin_layout Description

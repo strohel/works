@@ -18,11 +18,25 @@
 	Ústav teorie informace a automatizace \\
 	Akademie věd České republiky}
 
-\newcommand{\klicova}{TODO, TODO}
-\newcommand{\keyword}{TODO, TODO}
+\newcommand{\klicova}{asimilace, Bayesovská filtrace, sekvenční Monte Carlo, radioaktivní únik}
+\newcommand{\keyword}{assimilation, Bayesian estimation, sequential Monte Carlo, radioactive
+release}
 % Abstrakt práce: (cca 7 vět, min. 80 slov)
-\newcommand{\abstrCZ}{TODO.}
-\newcommand{\abstrEN}{TODO.}
+\newcommand{\abstrCZ}{Práce pojednává o asimilaci atmosférického radioaktivního úniku pomocí metod
+sekvenčního Monte Carlo vzorkování, což je relativně neprozkoumaná aplikace známé metodiky.
+Nejprve jsou prezentovány zmíněné metody a jejich aplikace na daný problém, následně se práce
+zaměřuje na volbu tzv. ``proposal'' funkce MC metody. Naivní a tzv. sdružená proposal funkce
+jsou následně porovnány, z čehož technika sdruženého proposalu vychází jako jasný vítěz, i když se
+uvažuje složitost, kterou do algoritmu vnáší. Práce je zakončena rozebráním několika
+implementačních detailů, z nichž nejzajímavější je 184-násobné urychlení Python kódu nástrojem
+Cython.}
+\newcommand{\abstrEN}{The text deals with assimilation of an atmospheric radioactive release using
+the sequential Monte Carlo technique, which is a rather unexplored application of the well-known
+framework. The methods and their application to the given problem is presented and then the stress
+it put on the choice of the proposal density of the particle filter. Naive and conjugate proposals
+are then compared side-by-side, with conjugate proposal being shown as superior even accounting for
+its relative complexity. Implementation details are discussed and \(\unit[184]{\times}\) speed-up
+of the Python code is achieved using Cython.}
 
 %%% zde zacina kresleni dokumentu
 
@@ -98,7 +112,10 @@ literaturu.
 {\noindent}{\LARGE Poděkování}
 
 \vspace{5mm}
-Děkuji Ing.\ Václavu Šmídlovi, Ph.D. za vedení mé práce, TODO.
+Děkuji Ing.\ Václavu Šmídlovi, Ph.D. za vedení mé práce, četné konzultace a trpělivé vysvětlování
+matematických struktur problému, které vedlo k lepšímu návrhu softwarové implementace. Dále děkuji
+Ing.\ Radku Hofmanovi, Ph.D. za konzultace a ukázku implementace puff modelu, která dovolila ověřit
+správnost vlastního programu.
 
 \begin{flushright}
 \autor
