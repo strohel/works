@@ -3305,7 +3305,7 @@ reference "fig:simulation"
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Box Frameless
@@ -3323,7 +3323,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename assimilaiton/Naive proposal-13800s-14400s.jpg
+	filename assimilation/Naive proposal-13800s-14400s.jpg
 	lyxscale 50
 	width 100col%
 
@@ -3369,7 +3369,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename assimilaiton/Conjugate proposal-13800s-14400s.jpg
+	filename assimilation/Conjugate proposal-13800s-14400s.jpg
 	lyxscale 50
 	width 100col%
 
@@ -3438,7 +3438,7 @@ e assimilation.
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Box Frameless
@@ -3456,7 +3456,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename assimilaiton/No dose naive-13800s-14400s.jpg
+	filename assimilation/No dose naive-13800s-14400s.jpg
 	lyxscale 50
 	width 100col%
 
@@ -3502,7 +3502,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename assimilaiton/No dose conjugate-13800s-14400s.jpg
+	filename assimilation/No dose conjugate-13800s-14400s.jpg
 	lyxscale 50
 	width 100col%
 
@@ -3605,7 +3605,7 @@ s roughly around
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Box Frameless
@@ -3623,7 +3623,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename assimilaiton/effective-particles.pdf
+	filename assimilation/effective-particles.pdf
 	lyxscale 50
 	width 100col%
 
@@ -3669,7 +3669,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename assimilaiton/effective-particles-per-second.pdf
+	filename assimilation/effective-particles-per-second.pdf
 	lyxscale 50
 	width 100col%
 
