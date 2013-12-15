@@ -986,16 +986,6 @@ implementace: rozšiřitelná, rychlá, usnadňuje budoucí výzkum
 
 \end_deeper
 \begin_layout Itemize
-problémy:
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-měření větru pro vzorkovací distribuci v extrémních případech nestačí
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
 rozšíření do budoucna:
 \end_layout
 
