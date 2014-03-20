@@ -136,5 +136,53 @@ Notation
 Following notation is used throughout this text:
 \end_layout
 
+\begin_layout Standard
+TODO: mostly copy what is referenced in vyzkumak
+\end_layout
+
+\begin_layout Chapter*
+Introduction
+\end_layout
+
+\begin_layout Standard
+TODO: motivation, previous works, need for performance, results peek
+\end_layout
+
+\begin_layout Chapter
+Assimilation Principles, Atmospheric and Leakage Model
+\end_layout
+
+\begin_layout Chapter
+Software Analysis: Solution Structure
+\end_layout
+
+\begin_layout Standard
+TODO: lots of UML diagrams, rationale for this design
+\end_layout
+
+\begin_layout Chapter
+Implementation, Integration of Sub-Projects
+\end_layout
+
+\begin_layout Standard
+TODO: how PyBayes, asim and Ceygen fit together
+\end_layout
+
+\begin_layout Chapter
+Performance Tuning
+\end_layout
+
+\begin_layout Standard
+Mainly about Ceygen and how it improves software efficiency
+\end_layout
+
+\begin_layout Chapter
+Results: Benchmark on Real-World Scenario
+\end_layout
+
+\begin_layout Chapter*
+Conclusion
+\end_layout
+
 \end_body
 \end_document
