@@ -583,7 +583,317 @@ TODO: motivation, previous works, need for performance, results peek
 \end_layout
 
 \begin_layout Chapter
-Assimilation Principles, Atmospheric and Leakage Model
+Dispersion Model Assimilation
+\end_layout
+
+\begin_layout Standard
+We are concerned with assimilation of radioactive pollutants as they disperse
+ in the atmosphere; that is to give the best estimate of the pollutant distribut
+ion in the environment and its progress in time, given a set of measurements
+ with varying degree of accuracy.
+ The problem is approached using the mathematical framework of recursive
+ Bayesian estimation, which is briefly presented in the first section.
+ This general problem statement and solution is then followed by description
+ of a so-called Particle Filter,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+also known as the Sequential Importance resampling (SIR) or Sequential Monte
+ Carlo method
+\end_layout
+
+\end_inset
+
+ a variant of which is employed to perform the assimilation.
+ The chapter continues with description of models representing actual phenomena:
+ release model, TODO.
+\end_layout
+
+\begin_layout Section
+Recursive Bayesian Estimation
+\end_layout
+
+\begin_layout Standard
+Recursive Bayesian estimation yields an estimate (in form of probability
+ density functions) of a sequence of hidden state vectors 
+\begin_inset Formula $x_{1:t}$
+\end_inset
+
+ at discrete time steps 
+\begin_inset Formula $1:t$
+\end_inset
+
+ given sequence of available measurements (observations) 
+\begin_inset Formula $y_{1:t}$
+\end_inset
+
+, known (or assumed) noisy state model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysFt"
+
+\end_inset
+
+ and known (or assumed) noisy observation model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysHt"
+
+\end_inset
+
+.
+ State model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysFt"
+
+\end_inset
+
+ describes how state evolves in time; more precisely it prescribes that
+ state 
+\begin_inset Formula $x$
+\end_inset
+
+ at time 
+\begin_inset Formula $t$
+\end_inset
+
+, 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+, depends on previous state 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+ and random state noise 
+\begin_inset Formula $v_{t-1}$
+\end_inset
+
+ (whose statistical properties need to be known) through the means of function
+ 
+\begin_inset Formula $f_{t}$
+\end_inset
+
+, which often does not vary with time and is therefore labeled just 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ Similarly, measurement model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysHt"
+
+\end_inset
+
+ prescribes that visible measurements 
+\begin_inset Formula $y$
+\end_inset
+
+ at time 
+\begin_inset Formula $t$
+\end_inset
+
+, 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+, depend via function 
+\begin_inset Formula $h_{t}$
+\end_inset
+
+ (often just time-independent 
+\begin_inset Formula $h$
+\end_inset
+
+) on hidden state 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ and random observation noise 
+\begin_inset Formula $w_{t}$
+\end_inset
+
+, probability density function of which is likewise known.
+ Summarising this, we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+x_{t} & =f_{t}(x_{t-1},v_{t-1})\label{eq:DynSysFt}\\
+y_{t} & =h_{t}(x_{t},w_{t}).\label{eq:DynSysHt}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Bayesian solution can now be derived.
+ Both 
+\begin_inset Formula $x_{t}\;(\forall t)$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{r}\;(\forall t)$
+\end_inset
+
+ are treated as (multivariate) random variables from now on.
+ First, let us observe that the state probability density function 
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+ can be derived from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysFt"
+
+\end_inset
+
+ and the observation probability density function 
+\begin_inset Formula $p(y_{t}|x_{t})$
+\end_inset
+
+ can be derived from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysHt"
+
+\end_inset
+
+ likewise.
+ So-called 
+\emph on
+prior
+\emph default
+ probability density function 
+\begin_inset Formula $p(x_{t}|y_{1:t-1})$
+\end_inset
+
+ can be expressed using only known densities by applying reverse marginalization
+ over 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+, applying chain rule for probability density functions and finally taking
+ into account that 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ doesn't depend on 
+\begin_inset Formula $y_{t-1}$
+\end_inset
+
+ when already conditioned on 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+ (i.e.
+ we assume Markov property) 
+\begin_inset Formula 
+\begin{align}
+p(x_{t}|y_{1:t-1}) & =\int p(x_{t},x_{t-1}|y_{1:t-1})\;\mathrm{d}x_{t-1}\nonumber \\
+p(x_{t}|y_{1:t-1}) & =\int p(x_{t}|x_{t-1},y_{1:t-1})p(x_{t-1}|y_{1:t-1})\;\mathrm{d}x_{t-1}\nonumber \\
+p(x_{t}|y_{1:t-1}) & =\int p(x_{t}|x_{t-1})p(x_{t-1}|y_{1:t-1})\;\mathrm{d}x_{t-1}.\label{eq:PriorPdf}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Next straightforward step in the solution is to derive 
+\emph on
+posterior
+\emph default
+ probability density function 
+\begin_inset Formula $p(x_{t}|y_{1:t})$
+\end_inset
+
+, which is done by applying the Bayes' theorem and taking the fact that
+ observation 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ depends only on the newest state 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ so that 
+\begin_inset Formula $p(y_{t}|x_{t},y_{1:t-1})=p(y_{t}|x_{t})$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+p(x_{t}|y_{1:t}) & =\frac{p(y_{t}|x_{t},y_{1:t-1})p(x_{t}|y_{1:t-1})}{p(y_{t}|y_{1:t-1})}\nonumber \\
+p(x_{t}|y_{1:t}) & =\frac{p(y_{t}|x_{t})p(x_{t}|y_{1:t-1})}{p(y_{t}|y_{1:t-1})},\label{eq:PosteriorPdf}
+\end{align}
+
+\end_inset
+
+where the denominator of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PosteriorPdf"
+
+\end_inset
+
+ can be computed using marginalization over 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ or not at all, because it doesn't depend on 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ and serves only the purpose of a normalization constant.
+ Formulas 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PriorPdf"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PosteriorPdf"
+
+\end_inset
+
+ together form the solution of the problem posed above.
+\end_layout
+
+\begin_layout Standard
+On the other hand, this solution in its general form has only limited applicatio
+n, because the integral 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:PriorPdf"
+
+\end_inset
+
+, unless tractable analytically, constitutes a major computational challenge.
+ The situation when the analytical solution is known is represented mainly
+ by the famous Kalman filter
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman:60"
+
+\end_inset
+
+ and its variants, which applies when state and observation models are linear
+ and noises are normally distributed.
+ If these models are highly non-linear (which is our case in radioactive
+ release assimilation), one of the viable approaches is to resort to some
+ kind of approximation of the solution.
+ One such approximation is the particle filter described below.
 \end_layout
 
 \begin_layout Chapter
