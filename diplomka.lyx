@@ -133,11 +133,445 @@ Notation
 \end_layout
 
 \begin_layout Standard
-Following notation is used throughout this text:
+[TODO: check for unused things] Following notation is used throughout this
+ text:
 \end_layout
 
 \begin_layout Standard
-TODO: mostly copy what is referenced in vyzkumak
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="85text%">
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathbb{N}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+set of natural numbers excluding zero
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathbb{N}_{0}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+set of natural numbers including zero
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathbb{R}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+set of real numbers
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{t}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+discrete time moment; 
+\begin_inset Formula \ensuremath{t\in\mathbb{N}_{0}}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{a_{t}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value of quantity 
+\begin_inset Formula \ensuremath{a}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t}
+
+\end_inset
+
+; 
+\begin_inset Formula \ensuremath{a_{t}\in\mathbb{R}^{n},n\in\mathbb{N}}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{a_{t:t'}}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sequence of quantities 
+\begin_inset Formula \ensuremath{(a_{t},a_{t+1},\dotsc,a_{t'-1},a_{t'})}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{p(a_{t})}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+probability density function of quantity 
+\begin_inset Formula \ensuremath{a}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t;}
+
+\end_inset
+
+for the purpose of this text, probability density function 
+\begin_inset Formula \ensuremath{p}
+
+\end_inset
+
+ is multivariate non-negative function 
+\begin_inset Formula \ensuremath{\mathbb{R}^{n}\rightarrow\mathbb{R};\;\int_{\mathrm{supp\,}p}p(x_{1},x_{2},\dotsc,x_{n})\;\mathrm{d}x_{1}\mathrm{d}x_{2}\dotsb\mathrm{d}x_{n}=1}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{p(a_{t}|b_{t'})}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+conditional probability density function of quantity 
+\begin_inset Formula \ensuremath{a}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t}
+
+\end_inset
+
+ given value of quantity 
+\begin_inset Formula \ensuremath{b}
+
+\end_inset
+
+ at time 
+\begin_inset Formula \ensuremath{t'}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\delta(a)}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dirac delta function; used exclusively in context of probability density
+ functions to denote discrete distribution within framework of continuous
+ distributions, so that 
+\begin_inset Formula \ensuremath{\int_{-\infty}^{\infty}f(x)\delta(x-\mu)\;\mathrm{d}x=f(\mu)}
+
+\end_inset
+
+ and more complex expressions can be derived using integral linearity and
+ Fubini's theorem
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{\mathcal{N}(\mu,\Sigma)}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multivariate normal (Gaussian) probability density function with mean vector
+ 
+\begin_inset Formula \ensuremath{\mu}
+
+\end_inset
+
+ and covariance matrix 
+\begin_inset Formula \ensuremath{\Sigma}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathcal{G}(k,\theta)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gamma probability density function with shape parameter 
+\begin_inset Formula $k$
+\end_inset
+
+ and scale parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $i\mathcal{G}(\alpha,\beta)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+inverse gamma probability density function with shape parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and scale parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{Introduction}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*
@@ -180,8 +614,109 @@ Mainly about Ceygen and how it improves software efficiency
 Results: Benchmark on Real-World Scenario
 \end_layout
 
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{Conclusion}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Chapter*
 Conclusion
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{
+\backslash
+listfigurename}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FloatList figure
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "/home/strohel/skola/prace/bibliography"
+options "bibtotoc,plain"
+
+\end_inset
+
+
 \end_layout
 
 \end_body
