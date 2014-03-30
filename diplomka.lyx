@@ -1121,7 +1121,7 @@ reference "eq:PFweight"
  is the observation,
 \begin_inset Formula 
 \begin{equation}
-\omega_{t}^{(i)}:=\frac{p(y_{t}|x_{t})p(x_{t}|x_{t-1})}{q(x_{t}|x_{t-1},y_{t})}\omega_{t-1}^{(i)}.\label{eq:PFweight}
+\tilde{\omega}_{t}^{(i)}:=\frac{p(y_{t}|x_{t})p(x_{t}|x_{t-1})}{q(x_{t}|x_{t-1},y_{t})}\omega_{t-1}^{(i)}.\label{eq:PFweight}
 \end{equation}
 
 \end_inset
@@ -1136,7 +1136,11 @@ for each
 \end_inset
 
  normalize weights according to 
-\begin_inset Formula $\omega_{t}^{(i)}:=\frac{\omega_{t}^{(i)}}{\sum_{j=1}^{N}\omega_{t}^{(j)}}.$
+\begin_inset Formula 
+\[
+\omega_{t}^{(i)}:=\frac{\tilde{\omega}_{t}^{(i)}}{\sum_{j=1}^{N}\tilde{\omega}_{t}^{(j)}}.
+\]
+
 \end_inset
 
 
@@ -1177,8 +1181,55 @@ Recursive update of the particle filter
 
 \end_inset
 
-Apart from probability density functions that come directly from the Bayesian
- filtering (the state density 
+
+\end_layout
+
+\begin_layout Standard
+First part of step 1.
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "alg:PF"
+
+\end_inset
+
+ is usually called 
+\emph on
+prediction
+\emph default
+ as it foresees potential value of 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ based on previous value 
+\begin_inset Formula $x_{t-1}^{(i)}$
+\end_inset
+
+ and, in general case, observation 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+.
+ Second part of step 1.
+ performs 
+\emph on
+update
+\emph default
+ of the predicted posterior probability density function through the means
+ of adjusting weight 
+\begin_inset Formula $\omega_{t}^{(i)}$
+\end_inset
+
+ based on the actual observation and its probability density function 
+\begin_inset Formula $p(y_{t}|x_{t})$
+\end_inset
+
+, taking into account likelihood of the prediction made by a so-called 
+\emph on
+proposal
+\emph default
+ density --- apart from probability density functions that come directly
+ from the Bayesian filtering (the state density 
 \begin_inset Formula $p(x_{t}|x_{t-1})$
 \end_inset
 
@@ -1186,11 +1237,7 @@ Apart from probability density functions that come directly from the Bayesian
 \begin_inset Formula $p(y_{t}|x_{t})$
 \end_inset
 
-), the algorithm makes use of a concept of a so-called 
-\emph on
-proposal
-\emph default
- density 
+), the algorithm makes use of a concept of the proposal density 
 \begin_inset Formula $q(x_{t}|x_{t-1},y_{t})$
 \end_inset
 
@@ -1276,7 +1323,7 @@ bootstrap filter
 \begin_inset Formula $y_{t}$
 \end_inset
 
-, possible the source of most valuable information, can degrade the efficiency
+, possibly the source of most valuable information, can degrade the efficiency
  of the algorithm in a very severe way for certain systems.
  Our problem of atmospheric assimilation is an example of one such system
  as it is prohibitively computationally demanding without the help of carefully
@@ -1331,9 +1378,10 @@ sample impoverishment
 \emph default
  phenomenon.
  It is described as a tendency of the weights of all-but-one particle to
- drop to zero as time progresses (unless counter-measured).
+ drop to zero as time progresses (unless counter-measured), i.e.
+ the variance of the weights tends to raise without bounds.
  Untreated, this property effectively degenerates the posterior density
- to a single Dirac delta function, making the filer anything but useful.
+ to a single Dirac delta function, making the filter anything but useful.
  Common approach to eliminate this is the resampling described in step 3.
  of the 
 \begin_inset CommandInset ref
@@ -1412,6 +1460,275 @@ effective
  In accordance with literature, our tests have shown that careful choice
  of the proposal density can render sample impoverishment much more subtle
  problem.
+\end_layout
+
+\begin_layout Section
+Marginal Particle Filter
+\end_layout
+
+\begin_layout Standard
+Numerous techniques to address shortcomings of the particle filter have
+ been described in literature, we have found it interesting to pick up the
+ 
+\emph on
+Marginal Particle Filter
+\emph default
+ proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "KlaFreDou:12"
+
+\end_inset
+
+.
+ It is a modification of the particle filter where filtering is done directly
+ on the marginal distribution 
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+, more precisely on its estimate 
+\begin_inset Formula $\sum_{i\text{=1}}^{N}\omega_{t-1}^{(i)}p(x_{t}|x_{t-1}^{(i)})$
+\end_inset
+
+.
+ The authors suggest proposal probability density function in a similar
+ form 
+\begin_inset Formula $q(x_{t}|y_{1:t})=\sum_{i\text{=1}}^{N}\omega_{t-1}^{(i)}q(x_{t}|y_{t},x_{t-1}^{(i)})$
+\end_inset
+
+, where 
+\begin_inset Formula $q(x_{t}|y_{t},x_{t-1}^{(i)})$
+\end_inset
+
+ would be the proposal density normally used in the original particle filter
+ design.
+ Along with adapted updating step, Marginal Particle Filter is characterized
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "alg:MPF"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+wide false
+sideways false
+status open
+
+\begin_layout Enumerate
+for each 
+\begin_inset Formula $i$
+\end_inset
+
+ in 
+\begin_inset Formula $\{1,\ldots,N\}$
+\end_inset
+
+ do:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+draw 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ from the modified proposal density 
+\begin_inset Formula $\sum_{i\text{=1}}^{N}\omega_{t-1}^{(i)}q(x_{t}|y_{t},x_{t-1}^{(i)})$
+\end_inset
+
+ using stratified sampling, where 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ is the observation.
+\end_layout
+
+\begin_layout Itemize
+update weight using
+\begin_inset Formula 
+\[
+\tilde{\omega}_{t}^{(i)}:=\frac{p(y_{t}|x_{t})\sum_{i\text{=1}}^{N}\omega_{t-1}^{(i)}p(x_{t}|x_{t-1}^{(i)})}{\sum_{i\text{=1}}^{N}\omega_{t-1}^{(i)}q(x_{t}|y_{t},x_{t-1}^{(i)})}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+for each 
+\begin_inset Formula $i$
+\end_inset
+
+ normalize weights according to 
+\begin_inset Formula 
+\[
+\omega_{t}^{(i)}:=\frac{\tilde{\omega}_{t}^{(i)}}{\sum_{j=1}^{N}\tilde{\omega}_{t}^{(j)}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "alg:MPF"
+
+\end_inset
+
+Recursive update of the Marginal Particle Filter
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The authors argue that sampling from a more complete proposal density (that
+ takes other weighted particles into account) effectively fights the sample
+ impoverishment problem and relieves the need to perform the resampling
+ step.
+ These claims are supported by comparisons of the Marginal Particle Filter
+ against its precursor on synthetic and real-world examples that indeed
+ confirm improvement in 
+\emph on
+unique particle count
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+a measure similar to 
+\size normal
+\emph on
+number of effective particles
+\emph default
+ used in this text
+\end_layout
+
+\end_inset
+
+ and variance of the weights.
+ Additionally it is shown (in the case of Auxiliary Marginal Particle Filter,
+ an analogous extension of the auxiliary variable particle filter) that
+ variance of the weights can be only less or equal than in non-marginal
+ variant.
+ It should be noted that when 
+\emph on
+naive
+\emph default
+ proposal is used, Marginal Particle Filter is equivalent to the traditional
+ particle filter described above.
+\end_layout
+
+\begin_layout Standard
+On the other hand, the presented method comes with its own drawback, which
+ lies in 
+\begin_inset Formula $O(N^{2})$
+\end_inset
+
+ algorithmic complexity
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+where 
+\begin_inset Formula $N$
+\end_inset
+
+ is the total number of particles
+\end_layout
+
+\end_inset
+
+ caused by the need to evaluate the proposal 
+\begin_inset Formula $N$
+\end_inset
+
+ times 
+\emph on
+for each particle
+\emph default
+.
+ This is a serious performance hit compared to 
+\begin_inset Formula $O(N)$
+\end_inset
+
+ complexity of the traditional particle filter.
+ Given that one can compensate unsuitably low number of effective particles
+ simply by increasing 
+\begin_inset Formula $N$
+\end_inset
+
+, any method that improves accuracy (which directly relates to the number
+ of effective particles) at the cost of increased complexity of the algorithm
+ must, in our opinion, prove that it brings an improvement even when this
+ trade-off is taken into account.
+ We suggest using 
+\emph on
+effective particles per second
+\emph default
+ (or per another unit of a limited resource) measure to give accurate notion
+ of its usefulness.
+ The authors of the Marginal Particle Filter suggest using approximate methods
+ from N-body learning that can reduce the cost to 
+\begin_inset Formula $O(N\, log(N))$
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+or even to 
+\begin_inset Formula $O(N)$
+\end_inset
+
+ when some favorable conditions are met
+\end_layout
+
+\end_inset
+
+ and argue that additional error introduced by this approximation can be
+ made insignificant with regards to inherent Monte Carlo error while still
+ offering substantial performance improvement.
+\end_layout
+
+\begin_layout Standard
+Marginal Particle Filter should not be confused with so-called 
+\emph on
+marginalized particle filter
+\emph default
+, a different technique more commonly known as the 
+\emph on
+Rao-Blackwell particle filter
+\emph default
+ that exploits cases when the transition density 
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+ can be expressed as a (conditional) product of two or more participating
+ densities, some of which can be estimated using using more specific and
+ efficient Bayesian filtering methods, e.g.
+ using the Kalman filter.
 \end_layout
 
 \begin_layout Section
