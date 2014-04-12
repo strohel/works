@@ -90,6 +90,43 @@ filename "diplomka-startpages.tex"
 \end_layout
 
 \begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+setcounter{page}{1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage % so that table of contents mentions correct page
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phantomsection % so that hyperref makes correct reference
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addcontentsline{toc}{chapter}{Contents}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset toc
 LatexCommand tableofcontents
 
@@ -580,6 +617,12 @@ Introduction
 
 \begin_layout Standard
 TODO: motivation, previous works, need for performance, results peek
+\end_layout
+
+\begin_layout Standard
+TODO: Our goal is to estimate absorbed ionizing radiation doses at points
+ of interest using available environmental measurements and to predict future
+ development of the radioactive plume and related irradiation
 \end_layout
 
 \begin_layout Standard
@@ -1476,7 +1519,7 @@ Marginal Particle Filter
  proposed in 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "KlaFreDou:12"
+key "KlaFreDou:05"
 
 \end_inset
 
@@ -1732,7 +1775,246 @@ Rao-Blackwell particle filter
 \end_layout
 
 \begin_layout Section
-TODO: Models
+Release and Dispersion Model
+\end_layout
+
+\begin_layout Standard
+We use a model described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+, which in turn builds on a state-space representation presented in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Johannesson:05"
+
+\end_inset
+
+, with only slight modifications in order to perform the assimilation in
+ an early phase of an atmospheric radioactive pollutant release from a facility
+ that contains radioactive material.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+we use a nuclear power plan Temelín as an example of such facility in this
+ text
+\end_layout
+
+\end_inset
+
+ The model assumes that so-called 
+\emph on
+puffs
+\emph default
+ containing varying levels of the pollutant are periodically released from
+ an approximately known location within the facility.
+ Such puffs are then carried by the wind and disperse according to atmospheric
+ conditions; more specifically, the spatial concentration of the pollutant
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_conc"
+
+\end_inset
+
+, which is expressed in terms of total radioactive activity in our case,
+ is assumed to be 3D Gaussian distributed around its center,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+C(\mathbf{s},\,\tau)=\frac{Q_{\tau}}{(2\pi)^{\frac{3}{2}}\sigma_{x}\sigma_{y}\sigma_{z}}\exp\left[-\frac{\left(s_{x}-l_{x,\tau}\right)}{2\sigma_{x}^{2}}^{2}-\frac{\left(s_{y}-l_{y,\tau}\right)^{2}}{2\sigma_{y}^{2}}-\frac{\left(s_{z}-l_{z,\tau}\right)^{2}}{2\sigma_{z}^{2}}\right],\label{eq:puff_conc}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{s}=(s_{x},s_{y},s_{z})$
+\end_inset
+
+ denotes spatial coordinates, 
+\begin_inset Formula $\mathbf{l_{\mathbf{\tau}}}=(l_{x,\tau},l_{y,\tau},l_{z,\tau})$
+\end_inset
+
+ coordinates of the puff center at time 
+\begin_inset Formula $\tau$
+\end_inset
+
+, 
+\begin_inset Formula $Q_{\tau}$
+\end_inset
+
+ [Bq] total puff activity at given time.
+ The dispersion manifests as growth of the 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ parameters.
+ The rate of growth depends on total distance flown by the puff and on current
+ Pasquill's stability category.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+a meteorologic measure of atmospheric turbulence, an important factor affecting
+ dispersion
+\end_layout
+
+\end_inset
+
+ In case of radioactive release the total puff activity decreases over time
+ by radioactive decay.
+ The frequency of puff release must be carefully chosen, it must be high
+ enough so that the effects of a series of puffs approximate effects of
+ a contiguous plume well enough, but the higher the value the greater computatio
+nal power is needed and, more importantly, release frequency greater than
+ the one of important measuring devices would introduce harmful ambiguity
+ and should be, in our belief, avoided.
+ In our case, a radioactive monitoring network around the facility, the
+ most critical source of the pollutant release rate information, measures
+ time-integrated dose in 10-minute intervals, we therefore set release interval
+ to 10 minutes in our experiments.
+\end_layout
+
+\begin_layout Standard
+Note that this model can be considered too simplistic for a serious simulation,
+ however this is much less a concern for assimilation, where real-world
+ measurements constantly correct imperfections of the model.
+\end_layout
+
+\begin_layout Section
+Measurement Model
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename vyzkumak-temelin-receptory.pdf
+	lyxscale 50
+	height 30pheight%
+	BoundingBox 460bp 120bp 835bp 520bp
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Temelin"
+
+\end_inset
+
+Temelín power plant and adjacent monitoring network.
+ Assumed source of release is marked by red circle, blue circles represent
+ dose receptors.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As atmospheric activity concentration is not feasibly directly measurable,
+ it needs to be observed indirectly using radioactive monitoring network,
+ which in our scenario consists of 24 on-line absorbed ionizing dose sensors
+ laid out in a circle around the facility plus additional such devices scattered
+ in nearby villages.
+ These receptors, which are marked using blue circles in the 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Temelin"
+
+\end_inset
+
+, periodically send out their readouts.
+ Given spatial pollutant concentration from our model, the dose at given
+ receptor location 
+\begin_inset Formula $\mathbf{s}_{r}$
+\end_inset
+
+ can be calculated using
+\begin_inset Formula 
+\begin{equation}
+D(\mathbf{s}_{r},t_{1},t_{2})=K_{c}\int_{t_{1}}^{t_{2}}\Phi(\mathbf{s}_{r},\tau)\:\mathrm{d}\tau,\label{eq:puff_dose}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K_{c}$
+\end_inset
+
+ is a physical constant depending on the radionuclide and 
+\begin_inset Formula $\Phi(\mathbf{s}_{R_{j}},\tau)$
+\end_inset
+
+ fluency rate that can be computed using
+\begin_inset Formula 
+\begin{equation}
+\Phi(\mathbf{s}_{r},\tau)=\int_{\Omega}\frac{C(\mathbf{s},\,\tau)\,(1+k\,\mu r)\exp(-\mu r)}{4\pi r^{2}}\:\mathrm{d}\mathbf{s}.\label{eq:fluency_rate}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $k$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ are physical constants, 
+\begin_inset Formula $r=||\mathbf{s}_{r}-\mathbf{s}||$
+\end_inset
+
+ distance from receptor and 
+\begin_inset Formula $\Omega$
+\end_inset
+
+ is the volume in which there is not-negligible concentration.
+ Both dose and concentration from a series of puffs is additive.
+ It should be noted that analytical solution of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluency_rate"
+
+\end_inset
+
+ is not known and must be evaluated numerically and presents the most resource-d
+emanding part of the model even if techniques to reduce problem size.
+ Integral in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_dose"
+
+\end_inset
+
+ is computed as a simple addition of the element of integration at chosen
+ time sub-steps.
 \end_layout
 
 \begin_layout Chapter
