@@ -1837,7 +1837,8 @@ where
 \begin_inset Formula $\mathbf{s}=(s_{x},s_{y},s_{z})$
 \end_inset
 
- denotes spatial coordinates, 
+ denotes spatial coordinates where the concentration is to be determined,
+ 
 \begin_inset Formula $\mathbf{l_{\mathbf{\tau}}}=(l_{x,\tau},l_{y,\tau},l_{z,\tau})$
 \end_inset
 
@@ -1882,9 +1883,90 @@ nal power is needed and, more importantly, release frequency greater than
 \end_layout
 
 \begin_layout Standard
+To summarise trajectory development of each puff, its coordinates 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\mathbf{l}_{t+1}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ at time step 
+\begin_inset Formula $t+1$
+\end_inset
+
+ given previous coordinates 
+\begin_inset Formula $\mathbf{l}_{t}$
+\end_inset
+
+ and wind field are given by
+\begin_inset Formula 
+\begin{align*}
+l_{x,t+1} & =l_{x,t}-\Delta t\, v_{t}(\mathbf{l}_{t})\sin(\phi_{t}(\mathbf{l}_{t})),\\
+l_{y,t+1} & =l_{y,t}-\Delta t\, v_{t}(\mathbf{l}_{t})\cos(\phi_{t}(\mathbf{l}_{t})),\\
+l_{z,t+1} & =l_{3,\kappa,t}\:,
+\end{align*}
+
+\end_inset
+
+where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\phi_{t}(\mathbf{s})$
+\end_inset
+
+ denotes given wind direction at time 
+\begin_inset Formula $t$
+\end_inset
+
+ and spatial coordinates 
+\begin_inset Formula $\mathbf{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{t}(\mathbf{s})$
+\end_inset
+
+ wind speed.
+\end_layout
+
+\begin_layout Standard
 Note that this model can be considered too simplistic for a serious simulation,
  however this is much less a concern for assimilation, where real-world
  measurements constantly correct imperfections of the model.
+ As this model is only one of the many practical ones, we aim to abstract
+ out its details where feasible in software design so that it can be replaced
+ without need to adapt other parts of the resulting software stack.
 \end_layout
 
 \begin_layout Section
@@ -2005,7 +2087,8 @@ reference "eq:fluency_rate"
 \end_inset
 
  is not known and must be evaluated numerically and presents the most resource-d
-emanding part of the model even if techniques to reduce problem size.
+emanding part of the model even if techniques to reduce problem size are
+ employed.
  Integral in 
 \begin_inset CommandInset ref
 LatexCommand eqref
