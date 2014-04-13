@@ -184,7 +184,7 @@ Notation
 \begin_layout Standard
 \noindent
 \begin_inset Tabular
-<lyxtabular version="3" rows="12" columns="2">
+<lyxtabular version="3" rows="15" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0">
 <column alignment="left" valignment="top" width="85text%">
@@ -261,6 +261,29 @@ set of real numbers
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbb{R}_{0}^{+}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+set of non-negative real numbers
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
@@ -323,6 +346,29 @@ value of quantity
 \end_inset
 
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbf{s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+vector quantities are emphasized where it improves readability
 \end_layout
 
 \end_inset
@@ -504,6 +550,42 @@ multivariate normal (Gaussian) probability density function with mean vector
  and covariance matrix 
 \begin_inset Formula \ensuremath{\Sigma}
 
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula \ensuremath{t\mathcal{N}\left(\mu,\sigma^{2},\left\langle a,b\right\rangle \right)}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+normal probability density function with original mean value 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and variance 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ truncated to interval 
+\begin_inset Formula $\left\langle a,b\right\rangle $
 \end_inset
 
 
@@ -796,7 +878,7 @@ reference "eq:DynSysHt"
 \end_inset
 
 , probability density function of which is likewise known.
- Summarising this, we have
+ Summarizing this, we have
 \end_layout
 
 \begin_layout Standard
@@ -1775,7 +1857,7 @@ Rao-Blackwell particle filter
 \end_layout
 
 \begin_layout Section
-Release and Dispersion Model
+Dispersion Model
 \end_layout
 
 \begin_layout Standard
@@ -1922,8 +2004,8 @@ To summarise trajectory development of each puff, its coordinates
  and wind field are given by
 \begin_inset Formula 
 \begin{align*}
-l_{x,t+1} & =l_{x,t}-\Delta t\, v_{t}(\mathbf{l}_{t})\sin(\phi_{t}(\mathbf{l}_{t})),\\
-l_{y,t+1} & =l_{y,t}-\Delta t\, v_{t}(\mathbf{l}_{t})\cos(\phi_{t}(\mathbf{l}_{t})),\\
+l_{x,t+1} & =l_{x,t}-\Delta t\,\dot{v}_{t}(\mathbf{l}_{t})\sin(\dot{\phi}_{t}(\mathbf{l}_{t})),\\
+l_{y,t+1} & =l_{y,t}-\Delta t\,\dot{v}_{t}(\mathbf{l}_{t})\cos(\dot{\phi}_{t}(\mathbf{l}_{t})),\\
 l_{z,t+1} & =l_{3,\kappa,t}\:,
 \end{align*}
 
@@ -1942,7 +2024,7 @@ where
 \noun off
 \color none
 
-\begin_inset Formula $\phi_{t}(\mathbf{s})$
+\begin_inset Formula $\dot{\phi}_{t}(\mathbf{s})$
 \end_inset
 
  denotes given wind direction at time 
@@ -1954,7 +2036,7 @@ where
 \end_inset
 
  and 
-\begin_inset Formula $v_{t}(\mathbf{s})$
+\begin_inset Formula $\dot{v}_{t}(\mathbf{s})$
 \end_inset
 
  wind speed.
@@ -2050,7 +2132,7 @@ where
 \end_inset
 
  is a physical constant depending on the radionuclide and 
-\begin_inset Formula $\Phi(\mathbf{s}_{R_{j}},\tau)$
+\begin_inset Formula $\Phi(\mathbf{s}_{r},\tau)$
 \end_inset
 
  fluency rate that can be computed using
@@ -2098,6 +2180,245 @@ reference "eq:puff_dose"
 
  is computed as a simple addition of the element of integration at chosen
  time sub-steps.
+\end_layout
+
+\begin_layout Standard
+Meteorologic situation is another category of measurements.
+ We assume that forecasts from a numerical model are available and denote
+ wind speed and direction prognoses by 
+\begin_inset Formula $\tilde{v}_{t}(\mathbf{s})$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{\phi}_{t}(\mathbf{s})$
+\end_inset
+
+ respectively, where 
+\begin_inset Formula $t$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{s}$
+\end_inset
+
+ have their usual meaning in this text of time and spatial coordinates.
+ Inspired by real-world constraints, we assume that meteorologic forecasts
+ are computed on a rather sparse grid both temporally and time-wise
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+in our tests we have used a source with 9
+\begin_inset space ~
+\end_inset
+
+km spatial and 1
+\begin_inset space ~
+\end_inset
+
+hour temporal grid step
+\end_layout
+
+\end_inset
+
+ and, because we are concerned with an early phase of a pollutant release,
+ that local wind field deviations in the vicinity of the facility are important,
+ we take another observation into account: an anemometer located in the
+ facility that measures wind speed, denoted as 
+\begin_inset Formula $v_{t}(\mathbf{s})$
+\end_inset
+
+ in this text, and wind direction, denoted as 
+\begin_inset Formula $\phi_{t}(\mathbf{s})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Assimilation
+\end_layout
+
+\begin_layout Standard
+With mathematical assimilation apparatus and physical models being set,
+ last step is to combine them.
+ This section, which again sources from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+, formulates the assimilation of the atmospheric pollutant release in the
+ terms of recursive Bayesian estimation, i.e.
+ we construct the state variable 
+\begin_inset Formula $\mathbf{x}_{t}$
+\end_inset
+
+ with its transition density 
+\begin_inset Formula $p(\mathbf{x}_{t}|\mathbf{x}_{t-1})$
+\end_inset
+
+ and observation variable 
+\begin_inset Formula $\mathbf{y}_{t}$
+\end_inset
+
+ along with observation density 
+\begin_inset Formula $p(\mathbf{y}_{t}|\mathbf{x}_{t})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Wind Field Corrections
+\end_layout
+
+\begin_layout Standard
+A simple scheme seen in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HieKarDij:11"
+
+\end_inset
+
+ to combine local measurements with numerical forecast was employed, the
+ corrected wind speed and direction 
+\begin_inset Formula $\dot{v}_{t}(\mathbf{s})$
+\end_inset
+
+ and 
+\begin_inset Formula $\dot{\phi}_{t}(\mathbf{s})$
+\end_inset
+
+ respectively are given by
+\begin_inset Formula 
+\begin{eqnarray}
+\dot{v}_{t,\mathbf{s}} & = & a_{t}\tilde{v}_{t,\mathbf{s}},\label{eq:AsimV}\\
+\dot{\phi}_{t,\mathbf{s}} & = & b_{t}+\tilde{\phi}_{t,\mathbf{s}},\label{eq:AsimPhi}
+\end{eqnarray}
+
+\end_inset
+
+where 
+\begin_inset Formula $a_{t}\in\mathbb{R}_{0}^{+}$
+\end_inset
+
+ and 
+\begin_inset Formula $b_{t}\in\mathbb{R}$
+\end_inset
+
+ are biases (the former being relative, the latter additive) of the forecast,
+ hidden artificial dimensionless random variables that are assimilated.
+ All mentioned quantities are time-dependent.
+ Both 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ random variables are expected to have mean value of their previous realization,
+ i.e.
+ 
+\begin_inset Formula $\mathrm{mean}(a_{t})=a_{t-1},\quad\mathrm{mean}(b_{t})=b_{t-1}$
+\end_inset
+
+, with 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ having relative standard deviation 
+\begin_inset Formula $\gamma_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ having standard deviation of 
+\begin_inset Formula $\sigma_{b}$
+\end_inset
+
+.
+ Example conforming distributions with additional favorable properties could
+ be
+\begin_inset Formula 
+\begin{eqnarray*}
+p(a_{t}|a_{t-1}) & = & \mathcal{G}(\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}),\\
+p(b_{t}|b_{t-1}) & = & t\mathcal{N}\left(b_{t-1},\sigma_{b}^{2},\left\langle b_{t-1}-\pi,b_{t-1}+\pi\right\rangle \right).
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The favorable properties lie in availability of so-called conjugate priors
+ (shown later in this text) in analytical forms for these probability density
+ functions; truncated normal distribution chosen for 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ is in fact only an approximation of formally more appropriate wrapped normal
+ distribution.
+ We argue that truncated normal distribution is a good approximation for
+ practical choices of 
+\begin_inset Formula $\sigma_{b}\leq\nicefrac{\pi}{6}$
+\end_inset
+
+; for significantly larger deviations a closer approximation in form of
+ von Misses distribution could be employed.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+although not effortlessly as this would invalidate conjugate prior for 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Release Model and State Model Summary
+\end_layout
+
+\begin_layout Standard
+While many previous works assume temporally correlated release rate, where
+ released pollutant quantity 
+\begin_inset Formula $Q_{t}$
+\end_inset
+
+ depends on quantity 
+\begin_inset Formula $Q_{t-1}$
+\end_inset
+
+ released in the previous step, we consider them to be uncorrelated, allowing
+ us to assume
+\begin_inset Formula 
+\[
+p(Q_{t}|Q_{t-1})=p(Q_{t})=\mathcal{G}\left(\alpha_{Q},\beta_{Q}\right),
+\]
+
+\end_inset
+
+where the choice of 
+\begin_inset Formula $\alpha_{Q}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta_{Q}\rightarrow0$
+\end_inset
+
+ TODO
 \end_layout
 
 \begin_layout Chapter
