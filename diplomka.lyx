@@ -1838,6 +1838,21 @@ or even to
 \end_layout
 
 \begin_layout Standard
+TODO: explain rationale with having 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+ already integrated in weight update and reference 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmiHof:13"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 Marginal Particle Filter should not be confused with so-called 
 \emph on
 marginalized particle filter
