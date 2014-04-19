@@ -1980,7 +1980,7 @@ nal power is needed and, more importantly, release frequency greater than
 \end_layout
 
 \begin_layout Standard
-To summarise trajectory development of each puff, its coordinates 
+To summarize trajectory development of each puff, its coordinates 
 \family roman
 \series medium
 \shape up
@@ -2018,11 +2018,11 @@ To summarise trajectory development of each puff, its coordinates
 
  and wind field are given by
 \begin_inset Formula 
-\begin{align*}
-l_{x,t+1} & =l_{x,t}-\Delta t\,\dot{v}_{t}(\mathbf{l}_{t})\sin(\dot{\phi}_{t}(\mathbf{l}_{t})),\\
-l_{y,t+1} & =l_{y,t}-\Delta t\,\dot{v}_{t}(\mathbf{l}_{t})\cos(\dot{\phi}_{t}(\mathbf{l}_{t})),\\
-l_{z,t+1} & =l_{3,\kappa,t}\:,
-\end{align*}
+\begin{align}
+l_{x,t+1} & =l_{x,t}-\Delta t\,\dot{v}_{t}(\mathbf{l}_{t})\sin(\dot{\phi}_{t}(\mathbf{l}_{t})),\nonumber \\
+l_{y,t+1} & =l_{y,t}-\Delta t\,\dot{v}_{t}(\mathbf{l}_{t})\cos(\dot{\phi}_{t}(\mathbf{l}_{t})),\label{eq:puff_l}\\
+l_{z,t+1} & =l_{3,\kappa,t}\:,\nonumber 
+\end{align}
 
 \end_inset
 
@@ -2309,8 +2309,8 @@ key "HieKarDij:11"
  respectively are given by
 \begin_inset Formula 
 \begin{eqnarray}
-\dot{v}_{t,\mathbf{s}} & = & a_{t}\tilde{v}_{t,\mathbf{s}},\label{eq:AsimV}\\
-\dot{\phi}_{t,\mathbf{s}} & = & b_{t}+\tilde{\phi}_{t,\mathbf{s}},\label{eq:AsimPhi}
+\dot{v}_{t}(\mathbf{s}) & = & a_{t}\tilde{v}_{t}(\mathbf{s}),\label{eq:AsimV}\\
+\dot{\phi}_{t}(\mathbf{s}) & = & b_{t}+\tilde{\phi}_{t}(\mathbf{s}),\label{eq:AsimPhi}
 \end{eqnarray}
 
 \end_inset
@@ -2416,8 +2416,9 @@ While many previous works assume temporally correlated release rate, where
 \begin_inset Formula $Q_{t-1}$
 \end_inset
 
- released in the previous step, we consider them to be uncorrelated, allowing
- us to assume
+ released in the previous step, we consider them to be uncorrelated.
+ Among suitable probability density functions with non-negative support,
+ Gamma distribution was used so that
 \begin_inset Formula 
 \[
 p(Q_{t}|Q_{t-1})=p(Q_{t})=\mathcal{G}\left(\alpha_{Q},\beta_{Q}\right),
@@ -2433,7 +2434,202 @@ where the choice of
 \begin_inset Formula $\beta_{Q}\rightarrow0$
 \end_inset
 
- TODO
+ serves the purpose of making this an uninformative prior, the one that
+ assumes as little as possible about the system apart from objective constrains
+ such as non-negativeness or continuousness.
+ In our case this can be done without impacting the feasibility of the assimilat
+ion because the measurements supply enough information.
+\end_layout
+
+\begin_layout Standard
+To conclude construction of the state variable, we need to add the rest
+ of quantities that fully represent the state of pollutant dispersion in
+ the atmosphere --- the locations of individual puffs, their dispersion
+ parameters and activities, hence
+\begin_inset Formula 
+\begin{equation}
+\mathbf{x}_{t\,\mathrm{full}}=\left(a_{t},b_{t},Q_{t},\; Q_{1,t},\mathbf{l}_{1,t},d_{1,t},\boldsymbol{\sigma}_{1,t},\; Q_{2,t},\mathbf{l}_{2,t},d_{2,t},\boldsymbol{\sigma}_{2,t},\ldots,Q_{K,t},\mathbf{l}_{K,t},d_{K,t},\boldsymbol{\sigma}_{K,t}\right),\label{eq:x_t_full}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K$
+\end_inset
+
+ stands for total puff count and 
+\begin_inset Formula $k^{\mathrm{th}}$
+\end_inset
+
+ puff at time 
+\begin_inset Formula $t$
+\end_inset
+
+ is characterized by its activity 
+\begin_inset Formula $Q_{k,t},$
+\end_inset
+
+ spatial coordinates 
+\begin_inset Formula $\mathbf{l}_{k,t},$
+\end_inset
+
+ total flown distance 
+\begin_inset Formula $d_{k,t}$
+\end_inset
+
+ and spatial dispersion coefficients 
+\begin_inset Formula $\boldsymbol{\sigma}_{k,t}.$
+\end_inset
+
+ Under this formalism, the state space is extremely high-dimensional (for
+ the purpose of Monte Carlo sampling) and its dimension grows without bounds
+ in time as new puffs are released.
+ Neither of these properties pose a real problem in practice, because
+\end_layout
+
+\begin_layout Enumerate
+puffs can be discarded when certain criteria are met and their contribution
+ to the environment is negligible, usually residual activity when radioactive
+ decay is taken into account, distance from the area of interest and total
+ dispersion can be considered; with this mechanism, no puffs are simulated
+ under normal conditions where no pollutant release occurs in continuous
+ monitoring scenario,
+\end_layout
+
+\begin_layout Enumerate
+apart from the 
+\begin_inset Formula $\left(a_{t},b_{t},Q_{t}\right)$
+\end_inset
+
+ triplet, all other quantities in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:x_t_full"
+
+\end_inset
+
+ are deterministic given the triplet, previous state and variables considered
+ external such as wind field forecast and Pasquill's stability category.
+ In particular, assuming puff number 
+\begin_inset Formula $K$
+\end_inset
+
+ is to be released in time step 
+\begin_inset Formula $t$
+\end_inset
+
+, its variables could be put as
+\begin_inset Formula 
+\begin{eqnarray*}
+Q_{K,t} & = & Q_{t},\\
+\mathbf{l}_{K,t} & \text{=} & \mathbf{l}_{\mathrm{facility}},\\
+d_{K,t} & = & 0\\
+\boldsymbol{\sigma}_{K,t} & = & \left(0,0,0\right),
+\end{eqnarray*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{l}_{\mathrm{facility}}$
+\end_inset
+
+ is expected location of the release within the facility.
+ Similarly, location of an already flying puff (numbered 
+\begin_inset Formula $k$
+\end_inset
+
+) is updated according to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_l"
+
+\end_inset
+
+ which in turn uses wind field 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimV"
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimPhi"
+
+\end_inset
+
+ corrected using 
+\begin_inset Formula $a_{t},$
+\end_inset
+
+ 
+\begin_inset Formula $b_{t};$
+\end_inset
+
+ activity, distance and dispersion coefficients are given by
+\begin_inset Formula 
+\begin{eqnarray*}
+Q_{k,t} & = & e^{-\lambda\Delta t}Q_{k,t-1},\\
+d_{k,t} & = & d_{k,t-1}+\left\Vert \mathbf{l}_{k,t}-\mathbf{l}_{k,t-1}\right\Vert ,\\
+\boldsymbol{\sigma}_{k,t} & = & \boldsymbol{\sigma}(t-k,d_{k,t},\mathbf{l}_{k,t}),
+\end{eqnarray*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is exponential decay constant
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+given half-life 
+\begin_inset Formula $t_{\nicefrac{1}{2}}$
+\end_inset
+
+ exponential decay constant is 
+\begin_inset Formula $\lambda=\frac{t_{\nicefrac{1}{2}}}{\ln2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ of the radionuclide causing the pollution and 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ time since the last step.
+\end_layout
+
+\begin_layout Standard
+Given the deterministic property of large part of the full state, we can
+ shrink the state space for the purposes of assimilation into 
+\begin_inset Formula 
+\begin{eqnarray*}
+\mathbf{x}_{t} & = & (a_{t},b_{t},Q_{t})
+\end{eqnarray*}
+
+\end_inset
+
+along with the transition density
+\begin_inset Formula 
+\begin{eqnarray*}
+p(\mathbf{x}_{t}|\mathbf{x}_{t-1}) & = & p(Q_{t})p(a_{t}|a_{t-1})p(b_{t}|b_{t-1}),
+\end{eqnarray*}
+
+\end_inset
+
+which makes this a more conceivable task for sequential Monte Carlo estimation.
+\end_layout
+
+\begin_layout Standard
+Still, the full state needs to be accounted for when implementing actual
+ representation of the model for assimilation.
 \end_layout
 
 \begin_layout Chapter
