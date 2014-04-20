@@ -2067,7 +2067,7 @@ Note that this model can be considered too simplistic for a serious simulation,
 \end_layout
 
 \begin_layout Section
-Measurement Model
+Dose and Wind Field Measurements
 \end_layout
 
 \begin_layout Standard
@@ -2186,6 +2186,48 @@ reference "eq:fluency_rate"
  is not known and must be evaluated numerically and presents the most resource-d
 emanding part of the model even if techniques to reduce problem size are
  employed.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+in particular, we have employed approximation using Gauss quadratures
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GolWel:69"
+
+\end_inset
+
+ and a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\begin_inset Formula $n/\mu$
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+ problem-reduction technique
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PechHof:11"
+
+\end_inset
+
+ when computing 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluency_rate"
+
+\end_inset
+
+ in our test runs
+\end_layout
+
+\end_inset
+
  Integral in 
 \begin_inset CommandInset ref
 LatexCommand eqref
@@ -2309,8 +2351,8 @@ key "HieKarDij:11"
  respectively are given by
 \begin_inset Formula 
 \begin{eqnarray}
-\dot{v}_{t}(\mathbf{s}) & = & a_{t}\tilde{v}_{t}(\mathbf{s}),\label{eq:AsimV}\\
-\dot{\phi}_{t}(\mathbf{s}) & = & b_{t}+\tilde{\phi}_{t}(\mathbf{s}),\label{eq:AsimPhi}
+\dot{v}_{t}(\mathbf{s}) & = & a_{t}\tilde{v}_{t}\left(\mathbf{s}\right),\label{eq:AsimV}\\
+\dot{\phi}_{t}(\mathbf{s}) & = & b_{t}+\tilde{\phi}_{t}\left(\mathbf{s}\right),\label{eq:AsimPhi}
 \end{eqnarray}
 
 \end_inset
@@ -2403,7 +2445,7 @@ although not effortlessly as this would invalidate conjugate prior for
 \end_layout
 
 \begin_layout Subsection
-Release Model and State Model Summary
+Release Model
 \end_layout
 
 \begin_layout Standard
@@ -2439,6 +2481,10 @@ where the choice of
  such as non-negativeness or continuousness.
  In our case this can be done without impacting the feasibility of the assimilat
 ion because the measurements supply enough information.
+\end_layout
+
+\begin_layout Subsection
+State Model Summary
 \end_layout
 
 \begin_layout Standard
@@ -2630,6 +2676,250 @@ which makes this a more conceivable task for sequential Monte Carlo estimation.
 \begin_layout Standard
 Still, the full state needs to be accounted for when implementing actual
  representation of the model for assimilation.
+\end_layout
+
+\begin_layout Subsection
+Measurement Model
+\end_layout
+
+\begin_layout Standard
+Defining the observation vector 
+\begin_inset Formula $\mathbf{y}_{t}$
+\end_inset
+
+ takes more straightforward path, as it is just a concatenation of available
+ measurements, we may state that
+\begin_inset Formula 
+\[
+\mathbf{y}_{t}=(v_{t},\phi_{t},y_{t,1},\ldots,y_{t,M}),
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi_{t}$
+\end_inset
+
+ are wind speed and wind direction anemometer measurements, 
+\begin_inset Formula $M$
+\end_inset
+
+ total number of radioactive dose receptors and 
+\begin_inset Formula $y_{t,k}$
+\end_inset
+
+ is total dose detected by the 
+\begin_inset Formula $k^{\mathrm{th}}$
+\end_inset
+
+ receptor in time interval 
+\begin_inset Formula $\left[t-1,t\right].$
+\end_inset
+
+ With state and observation quantities defined, probabilistic description
+ of the observation model 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:DynSysHt"
+
+\end_inset
+
+ can be factored to conditionally independent densities and expressed as
+ 
+\begin_inset Formula 
+\begin{eqnarray}
+p(v_{t},\phi_{t},y_{t,1},\ldots,y_{t,M}|a_{t},b_{t}) & = & p(v_{t}|a_{t})p(\phi_{t}|b_{t})p(y_{t,1},\ldots,y_{t,M}|a_{t},b_{t}).\label{eq:AsimObservationCPdf}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Wind Field Measurement Model
+\end_layout
+
+\begin_layout Standard
+We assume that anemometer velocity measurements have non-biased relative
+ error, denoted as 
+\begin_inset Formula $\gamma_{v}$
+\end_inset
+
+ in this text, therefore it can be modeled using a probability density function
+ with non-negative support, mean value 
+\begin_inset Formula $\dot{v}_{t}\left(\mathbf{s}_{0}\right)$
+\end_inset
+
+ and standard error 
+\begin_inset Formula $\gamma_{v}\dot{v}_{t}\left(\mathbf{s}_{0}\right),$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{s}_{0}$
+\end_inset
+
+ are spatial coordinates of the anemometer.
+ For its favorable properties, we have used the inverse gamma distribution
+ 
+\begin_inset Formula $i\mathcal{G}\left(\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)\dot{v}_{t}\left(\mathbf{s}_{0}\right)\right)$
+\end_inset
+
+ that fulfills these demands, hence, taking 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimV"
+
+\end_inset
+
+ into account,
+\begin_inset Formula 
+\begin{equation}
+p(v_{t}|a_{t})=i\mathcal{G}\left(\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)\dot{v}_{t}\left(\mathbf{s}_{0}\right)\right)=i\mathcal{G}\left(\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\left(\mathbf{s}_{0}\right)\right).\label{eq:AsimVCpdf}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Wind direction was decided to be treated as an unbiased measurement with
+ constant standard deviation 
+\begin_inset Formula $\sigma_{\phi}.$
+\end_inset
+
+ The natural choice for for such situations being the normal density 
+\begin_inset Formula $\mathcal{N}(\dot{\phi}_{t}\left(\mathbf{s}_{0}\right),\sigma_{\phi}^{2}),$
+\end_inset
+
+ substituting wind direction corrections 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimPhi"
+
+\end_inset
+
+ we have
+\begin_inset Formula 
+\begin{equation}
+p(\phi_{t}|b_{t})=\mathcal{N}(\dot{\phi}_{t}\left(\mathbf{s}_{0}\right),\sigma_{\phi}^{2})=\mathcal{N}(b_{t}+\tilde{\phi}_{t}\left(\mathbf{s}_{0}\right),\sigma_{\phi}^{2}).\label{eq:AsimThetaCPdf}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Dose Measurement Model
+\end_layout
+
+\begin_layout Standard
+To derive measurement model for radioactive doses, 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p(y_{t,1},\ldots,y_{t,M}|a_{t},b_{t})$
+\end_inset
+
+ can be further factored into conditionally independent densities
+\begin_inset Formula 
+\begin{equation}
+p(y_{t,1},\ldots,y_{t,M}|a_{t},b_{t})=\left(\prod_{i=1}^{M}p(y_{t,i}|d_{t,i})\right)p(d_{t,1},\ldots,d_{t,M}|a_{t},b_{t}),\label{eq:AsimYCPdf}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $d_{t,i}$
+\end_inset
+
+ is expected dose measured on 
+\begin_inset Formula $i$
+\end_inset
+
+-th receptor in time slot 
+\begin_inset Formula $t$
+\end_inset
+
+ (including expected natural background dose 
+\begin_inset Formula $y_{nb}$
+\end_inset
+
+).
+ 
+\begin_inset Formula $p(d_{t,1},\ldots,d_{t,M}|a_{t}b_{t})$
+\end_inset
+
+ represents computation of the expected doses using formulas 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_dose"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluency_rate"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_conc"
+
+\end_inset
+
+.
+ 
+\begin_inset Formula $p(d_{t,1},\ldots,d_{t,M}|a_{t}b_{t})$
+\end_inset
+
+ is therefore fully deterministic (i.e.
+ Dirac delta distribution).
+ Parameters of each of the 
+\begin_inset Formula $p(y_{t,i}|d_{t,i})$
+\end_inset
+
+ correspond to possibilities of dose measuring devices, and according to
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Thompson:00"
+
+\end_inset
+
+ their error is proportional to the measured dose with constant of proportionali
+ty 
+\begin_inset Formula $\gamma_{y}$
+\end_inset
+
+ usually between 7--20%.
+ Dose measurements were again simulated using inverse gamma distribution,
+\begin_inset Formula 
+\begin{equation}
+\forall i\in1,\ldots,M\qquad p(y_{t,i}|d_{t,i})=i\mathcal{G}\left(\gamma_{y}^{-2}+2,(\gamma_{y}^{-2}+1)d_{t,i}\right).\label{eq:AsimDCPdf}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
