@@ -184,7 +184,7 @@ Notation
 \begin_layout Standard
 \noindent
 \begin_inset Tabular
-<lyxtabular version="3" rows="15" columns="2">
+<lyxtabular version="3" rows="16" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0">
 <column alignment="left" valignment="top" width="85text%">
@@ -553,6 +553,49 @@ multivariate normal (Gaussian) probability density function with mean vector
 \end_inset
 
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $\ensuremath{\mathcal{N}(x;\mu,\Sigma)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+random variable 
+\begin_inset Formula $\left(x\right)$
+\end_inset
+
+ is explicitly mentioned along with distribution parameters 
+\begin_inset Formula $\left(\mu,\Sigma\right)$
+\end_inset
+
+ where it is not clear from the context
 \end_layout
 
 \end_inset
@@ -1066,7 +1109,7 @@ key "Kalman:60"
 \end_layout
 
 \begin_layout Section
-The Particle Filter
+Particle Filter
 \end_layout
 
 \begin_layout Standard
@@ -1353,8 +1396,9 @@ update
 \emph on
 proposal
 \emph default
- density --- apart from probability density functions that come directly
- from the Bayesian filtering (the state density 
+ density.
+ --- Apart from probability density functions that come directly from the
+ Bayesian filtering (the state density 
 \begin_inset Formula $p(x_{t}|x_{t-1})$
 \end_inset
 
@@ -1362,7 +1406,7 @@ proposal
 \begin_inset Formula $p(y_{t}|x_{t})$
 \end_inset
 
-), the algorithm makes use of a concept of the proposal density 
+), the algorithm makes use of the proposal density 
 \begin_inset Formula $q(x_{t}|x_{t-1},y_{t})$
 \end_inset
 
@@ -1872,7 +1916,7 @@ Rao-Blackwell particle filter
 \end_layout
 
 \begin_layout Section
-Dispersion Model
+Atmospheric Dispersion Simulation
 \end_layout
 
 \begin_layout Standard
@@ -1883,16 +1927,16 @@ key "SmidlHofman:12"
 
 \end_inset
 
-, which in turn builds on a state-space representation presented in 
+ (which in turn builds on a state-space representation presented in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Johannesson:05"
 
 \end_inset
 
-, with only slight modifications in order to perform the assimilation in
- an early phase of an atmospheric radioactive pollutant release from a facility
- that contains radioactive material.
+) with only slight modifications in order to perform the assimilation in
+ the early phase of an atmospheric radioactive pollutant release from a
+ facility that contains radioactive material.
 \begin_inset Foot
 status open
 
@@ -2432,7 +2476,8 @@ The favorable properties lie in availability of so-called conjugate priors
 status open
 
 \begin_layout Plain Layout
-although not effortlessly as this would invalidate conjugate prior for 
+although not effortlessly as this would invalidate our derivation of conjugate
+ prior for 
 \begin_inset Formula $b_{t}$
 \end_inset
 
@@ -2485,6 +2530,13 @@ ion because the measurements supply enough information.
 
 \begin_layout Subsection
 State Model Summary
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:State-Model-Summary"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2675,11 +2727,21 @@ which makes this a more conceivable task for sequential Monte Carlo estimation.
 
 \begin_layout Standard
 Still, the full state needs to be accounted for when implementing actual
- representation of the model for assimilation.
+ representation of the model for assimilation or when strictly adhering
+ to mathematical formalism.
+ The rest of this text will usually omit deterministic part of the state
+ vector for the sake of simplicity.
 \end_layout
 
 \begin_layout Subsection
 Measurement Model
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Measurement-Model"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2886,7 +2948,16 @@ reference "eq:puff_conc"
 
 \end_inset
 
-.
+, where puff trajectories develop according to corrected wind field model
+ (this is where 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ enter the calculation).
  
 \begin_inset Formula $p(d_{t,1},\ldots,d_{t,M}|a_{t}b_{t})$
 \end_inset
@@ -2920,6 +2991,302 @@ ty
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Problem-specific Proposal Density
+\end_layout
+
+\begin_layout Standard
+The densities defined in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:State-Model-Summary"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Measurement-Model"
+
+\end_inset
+
+ fully describe a recursive Bayesian estimation problem.
+ As however mentioned earlier, our task of environmental assimilation is
+ a very demanding task for Monte Carlo estimation, mainly because our observatio
+n density is extremely narrow compared to transition density, which must
+ be wide enough to account for rapid changes of weather or release rate.
+ If we applied the bootstrap variant of the particle filter, we would end
+ up with overwhelming majority of particles being sampled into areas where
+ whey would be assigned negligible likelihoods by the observation model.
+ In other words, we would face severe case of the sample impoverishment
+ problem.
+\end_layout
+
+\begin_layout Standard
+It is therefore of great benefit to steer particle sampling into regions
+ with better overlap with the observation density.
+ This can be done by employing better-suited proposal density 
+\begin_inset Formula $q(\mathbf{x}_{t}|\mathbf{x}_{t-1},\mathbf{y}_{t})$
+\end_inset
+
+.
+ As shown in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Lai:12"
+
+\end_inset
+
+ on a somewhat simpler problem with the same measurement model, it is undoubtedl
+y advantageous to spend resources on generation of 
+\begin_inset Quotes eld
+\end_inset
+
+better
+\begin_inset Quotes erd
+\end_inset
+
+ particles than to simply increase the number of particles in the particle
+ filter.
+ Such claim does not hold universally for all uses of sequential Monte Carlo
+ sampling, but holds in our case because analytically intractable time-spatial
+ integration in the measurement model greatly overweights complexity introduced
+ by more elaborate particle sampling.
+\end_layout
+
+\begin_layout Standard
+We start construction of our proposal density by assuming conditional independen
+ce of some variables (this assumption is an approximation, it is conceivable
+ because of loose requirements posed on proposal density),
+\begin_inset Formula 
+\begin{eqnarray}
+q(\mathbf{x}_{t}|\mathbf{x}_{t-1},\mathbf{y}_{t}) & = & p(a_{t},b_{t},Q_{t}|a_{t-1},b_{t-1},Q_{t-1},v_{t},\phi_{t},y_{t,1},\ldots,y_{t,M})\nonumber \\
+ & \approx & p(Q_{t}|a_{t},b_{t},y_{t,1},\ldots,y_{t,M})p(a_{t}|a_{t-1},v_{t})p(b_{t}|b_{t-1},\phi_{t}).\label{eq:AsimApproxSDOptim}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As can be seen, wind field variables are made conditional on the most informativ
+e measurements --- wind direction correction 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ depends on measured direction 
+\begin_inset Formula $\phi_{t}$
+\end_inset
+
+ and speed correction 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ likewise depends on observed velocity 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+.
+ Released dose expectation takes receptor read-outs into account while simultane
+ously coping with proposed wind field.
+ Forms of individual proposal factors are derived below for completeness.
+\end_layout
+
+\begin_layout Subsection
+Wind Direction Conjugate Proposal Density
+\end_layout
+
+\begin_layout Standard
+For the choice of wind direction transition density 
+\begin_inset Formula $p(b_{t}|b_{t-1})=\mathcal{N}(b_{t};b_{t-1},\sigma_{b})$
+\end_inset
+
+ and wind direction observation density 
+\begin_inset Formula $p(\phi_{t}|b_{t})=\mathcal{N}(\phi_{t};\tilde{\phi}_{t}+b_{t},\sigma_{\theta})$
+\end_inset
+
+, the conjugate proposal can be derived as follows:
+\begin_inset Formula 
+\begin{eqnarray}
+p(b_{t}|b_{t-1},\phi_{t}) & = & \frac{p(\phi_{t}|b_{t},b_{t-1})p(b_{t}|b_{t-1})}{p(\phi_{t}|b_{t-1})}\label{eq:BBayesConjugate}\\
+ & = & \frac{\mathcal{N}(\phi_{t};\tilde{\phi}_{t}+b_{t},\sigma_{\theta})\mathcal{N}(b_{t};b_{t-1},\sigma_{b})}{p(\phi_{t}|b_{t-1})}\nonumber \\
+ & = & \frac{1}{p(\phi_{t}|b_{t-1})}\frac{1}{2\pi}\frac{1}{\sigma_{\theta}}\exp\left(-\frac{1}{2}\left(\frac{\phi_{t}-\tilde{\phi}_{t}-b_{t}}{\sigma_{\theta}}\right)^{2}\right)\frac{1}{\sigma_{b}}\exp\left(-\frac{1}{2}\left(\frac{b_{t}-b_{t-1}}{\sigma_{b}}\right)^{2}\right)\nonumber \\
+ & = & \mathcal{N}\left(\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\left(\sigma_{b}^{-2}b_{t-1}+\sigma_{\phi}^{-2}\left(\phi_{t}-\tilde{\phi}_{t}\right)\right),\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\right).\label{eq:NormalConjugate}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:BBayesConjugate"
+
+\end_inset
+
+ is obtained by applying Bayes rule and that 
+\begin_inset Formula $p(\phi_{t}|b_{t-1})$
+\end_inset
+
+ does not have to be computed at all because it serves as a normalizing
+ constant in a distribution with well-known (Gaussian) form.
+ 
+\begin_inset Formula $\tilde{\phi}_{t}$
+\end_inset
+
+ was used instead of 
+\begin_inset Formula $\tilde{\phi}_{t}\left(\mathbf{s}_{0}\right)$
+\end_inset
+
+ to denote wind direction forecast at time 
+\begin_inset Formula $t$
+\end_inset
+
+ and location of the anemometer for brevity.
+\end_layout
+
+\begin_layout Subsection
+Wind Speed Conjugate Proposal Density
+\end_layout
+
+\begin_layout Standard
+In order to derive formula for 
+\begin_inset Formula $p(a_{t}|a_{t-1},v_{t}),$
+\end_inset
+
+ let us first show general (and well known) result for for inverse gamma
+ density and gamma density pair with appropriate parametrization.
+ Suppose that 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p(y|a)=i\mathcal{G}\left(y;\alpha,\left(\alpha-1\right)a\right)$
+\end_inset
+
+, 
+\begin_inset Formula $p(a)=\mathcal{G}(a;k,\theta)$
+\end_inset
+
+ and that 
+\begin_inset Formula $y$
+\end_inset
+
+ is known.
+ Then 
+\begin_inset Formula $p(a|y)$
+\end_inset
+
+ is also a gamma distribution and can be again obtained using the Bayes
+ rule 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:BayesConjugate"
+
+\end_inset
+
+, yielding 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaConjugate"
+
+\end_inset
+
+.
+ The transition from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaPreConjugate"
+
+\end_inset
+
+ to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaConjugate"
+
+\end_inset
+
+ makes use of the fact that the whole term in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaPreConjugate"
+
+\end_inset
+
+ is a probability density function, therefore it must integrate to 1; however,
+ the non-constant parts (with regards to quantity 
+\begin_inset Formula $a$
+\end_inset
+
+) have the form of the gamma distribution, therefore the whole term must
+ necessarily be a gamma distribution itself
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+p(a|y) & = & \frac{p(y|a)p(a)}{p(y)}\label{eq:BayesConjugate}\\
+ & = & \frac{1}{p(y)}i\mathcal{G}\left(y;\alpha,\left(\alpha-1\right)a\right)\mathcal{G}(a;k,\theta)\nonumber \\
+ & = & \frac{1}{p(y)}\frac{\left(\left(\alpha-1\right)a\right)^{\alpha}}{\Gamma\left(\alpha\right)}y^{-\alpha-1}\exp\left(-\frac{\left(\alpha-1\right)a}{y}\right)\frac{1}{\theta^{k}\Gamma\left(k\right)}a^{k-1}\exp\left(-\frac{a}{\theta}\right)\nonumber \\
+ & = & \frac{\left(\alpha-1\right)^{\alpha}y^{-\alpha-1}}{p(y)\Gamma\left(\alpha\right)\theta^{k}\Gamma\left(k\right)}a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\nonumber \\
+ & = & C\left(y,\alpha,\theta,k\right)a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\label{eq:GammaPreConjugate}\\
+ & = & \mathcal{G}\left(a;\alpha+k,\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)^{-1}\right).\label{eq:GammaConjugate}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In our case (again with 
+\begin_inset Formula $\tilde{v}_{t}\left(\mathbf{s}_{0}\right)$
+\end_inset
+
+ forecast being denoted simply as 
+\begin_inset Formula $\tilde{v}_{t}$
+\end_inset
+
+): 
+\begin_inset Formula 
+\begin{eqnarray*}
+a & = & a_{t}\tilde{v}_{t}\\
+y & = & v_{t}\\
+p(y|a) & = & p(v_{t}|a_{t}\tilde{v}_{t})\\
+ & = & i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)\\
+p(a) & = & p(a_{t}\tilde{v}_{t}|a_{t-1})\\
+ & = & \mathcal{G}(a_{t}\tilde{v}_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}\tilde{v}_{t})\\
+p(a|y) & = & p(a_{t}\tilde{v}_{t}|a_{t-1},v_{t})\\
+ & = & \mathcal{G}\left(a_{t}\tilde{v}_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}+\gamma_{a}^{-2}a_{t-1}^{-1}\tilde{v}_{t}^{-1}\right)^{-1}\right)\\
+p(a_{t}|a_{t-1},v_{t}) & = & \mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right).
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Released Dose Proposal Density
+\end_layout
+
+\begin_layout Standard
+TODO.
 \end_layout
 
 \begin_layout Chapter
