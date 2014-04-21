@@ -1920,7 +1920,9 @@ Atmospheric Dispersion Simulation
 \end_layout
 
 \begin_layout Standard
-We use a model described in 
+This section is concerned with the means of representing pollutant dispersion
+ in atmosphere.
+ We use a model described in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "SmidlHofman:12"
@@ -2369,6 +2371,7 @@ key "SmidlHofman:12"
 \end_inset
 
 .
+ We also derive proposal densities for particle filter specific to our problem.
 \end_layout
 
 \begin_layout Subsection
@@ -2507,9 +2510,9 @@ While many previous works assume temporally correlated release rate, where
  Among suitable probability density functions with non-negative support,
  Gamma distribution was used so that
 \begin_inset Formula 
-\[
-p(Q_{t}|Q_{t-1})=p(Q_{t})=\mathcal{G}\left(\alpha_{Q},\beta_{Q}\right),
-\]
+\begin{equation}
+p(Q_{t}|Q_{t-1})=p(Q_{t})=\mathcal{G}\left(\alpha_{Q},\beta_{Q}\right),\label{eq:p_Q}
+\end{equation}
 
 \end_inset
 
@@ -3014,12 +3017,13 @@ reference "sub:Measurement-Model"
 
  fully describe a recursive Bayesian estimation problem.
  As however mentioned earlier, our task of environmental assimilation is
- a very demanding task for Monte Carlo estimation, mainly because our observatio
-n density is extremely narrow compared to transition density, which must
+ a very demanding one for Monte Carlo estimation, mainly because our observation
+ density is extremely narrow compared to transition density, which must
  be wide enough to account for rapid changes of weather or release rate.
- If we applied the bootstrap variant of the particle filter, we would end
- up with overwhelming majority of particles being sampled into areas where
- whey would be assigned negligible likelihoods by the observation model.
+ If we used the bootstrap variant of the particle filter directly, we would
+ end up with overwhelming majority of particles being sampled into areas
+ where whey would be assigned negligible likelihoods by the observation
+ model.
  In other words, we would face severe case of the sample impoverishment
  problem.
 \end_layout
@@ -3027,7 +3031,7 @@ n density is extremely narrow compared to transition density, which must
 \begin_layout Standard
 It is therefore of great benefit to steer particle sampling into regions
  with better overlap with the observation density.
- This can be done by employing better-suited proposal density 
+ This can be done by employing a better-suited proposal density 
 \begin_inset Formula $q(\mathbf{x}_{t}|\mathbf{x}_{t-1},\mathbf{y}_{t})$
 \end_inset
 
@@ -3110,12 +3114,12 @@ For the choice of wind direction transition density
 
 , the conjugate proposal can be derived as follows:
 \begin_inset Formula 
-\begin{eqnarray}
-p(b_{t}|b_{t-1},\phi_{t}) & = & \frac{p(\phi_{t}|b_{t},b_{t-1})p(b_{t}|b_{t-1})}{p(\phi_{t}|b_{t-1})}\label{eq:BBayesConjugate}\\
- & = & \frac{\mathcal{N}(\phi_{t};\tilde{\phi}_{t}+b_{t},\sigma_{\theta})\mathcal{N}(b_{t};b_{t-1},\sigma_{b})}{p(\phi_{t}|b_{t-1})}\nonumber \\
- & = & \frac{1}{p(\phi_{t}|b_{t-1})}\frac{1}{2\pi}\frac{1}{\sigma_{\theta}}\exp\left(-\frac{1}{2}\left(\frac{\phi_{t}-\tilde{\phi}_{t}-b_{t}}{\sigma_{\theta}}\right)^{2}\right)\frac{1}{\sigma_{b}}\exp\left(-\frac{1}{2}\left(\frac{b_{t}-b_{t-1}}{\sigma_{b}}\right)^{2}\right)\nonumber \\
- & = & \mathcal{N}\left(\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\left(\sigma_{b}^{-2}b_{t-1}+\sigma_{\phi}^{-2}\left(\phi_{t}-\tilde{\phi}_{t}\right)\right),\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\right).\label{eq:NormalConjugate}
-\end{eqnarray}
+\begin{align}
+p(b_{t}|b_{t-1},\phi_{t}) & =\frac{p(\phi_{t}|b_{t},b_{t-1})p(b_{t}|b_{t-1})}{p(\phi_{t}|b_{t-1})}\label{eq:BBayesConjugate}\\
+ & =\frac{\mathcal{N}(\phi_{t};\tilde{\phi}_{t}+b_{t},\sigma_{\theta})\mathcal{N}(b_{t};b_{t-1},\sigma_{b})}{p(\phi_{t}|b_{t-1})}\nonumber \\
+ & =\frac{1}{p(\phi_{t}|b_{t-1})}\frac{1}{2\pi}\frac{1}{\sigma_{\theta}}\exp\left(-\frac{1}{2}\left(\frac{\phi_{t}-\tilde{\phi}_{t}-b_{t}}{\sigma_{\theta}}\right)^{2}\right)\frac{1}{\sigma_{b}}\exp\left(-\frac{1}{2}\left(\frac{b_{t}-b_{t-1}}{\sigma_{b}}\right)^{2}\right)\nonumber \\
+ & =\mathcal{N}\left(\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\left(\sigma_{b}^{-2}b_{t-1}+\sigma_{\phi}^{-2}\left(\phi_{t}-\tilde{\phi}_{t}\right)\right),\left(\sigma_{b}^{-2}+\sigma_{\phi}^{-2}\right){}^{-1}\right).\label{eq:NormalConjugate}
+\end{align}
 
 \end_inset
 
@@ -3239,14 +3243,14 @@ reference "eq:GammaPreConjugate"
 
 \begin_layout Standard
 \begin_inset Formula 
-\begin{eqnarray}
-p(a|y) & = & \frac{p(y|a)p(a)}{p(y)}\label{eq:BayesConjugate}\\
- & = & \frac{1}{p(y)}i\mathcal{G}\left(y;\alpha,\left(\alpha-1\right)a\right)\mathcal{G}(a;k,\theta)\nonumber \\
- & = & \frac{1}{p(y)}\frac{\left(\left(\alpha-1\right)a\right)^{\alpha}}{\Gamma\left(\alpha\right)}y^{-\alpha-1}\exp\left(-\frac{\left(\alpha-1\right)a}{y}\right)\frac{1}{\theta^{k}\Gamma\left(k\right)}a^{k-1}\exp\left(-\frac{a}{\theta}\right)\nonumber \\
- & = & \frac{\left(\alpha-1\right)^{\alpha}y^{-\alpha-1}}{p(y)\Gamma\left(\alpha\right)\theta^{k}\Gamma\left(k\right)}a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\nonumber \\
- & = & C\left(y,\alpha,\theta,k\right)a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\label{eq:GammaPreConjugate}\\
- & = & \mathcal{G}\left(a;\alpha+k,\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)^{-1}\right).\label{eq:GammaConjugate}
-\end{eqnarray}
+\begin{align}
+p(a|y) & =\frac{p(y|a)p(a)}{p(y)}\label{eq:BayesConjugate}\\
+ & =\frac{1}{p(y)}i\mathcal{G}\left(y;\alpha,\left(\alpha-1\right)a\right)\mathcal{G}(a;k,\theta)\nonumber \\
+ & =\frac{1}{p(y)}\frac{\left(\left(\alpha-1\right)a\right)^{\alpha}}{\Gamma\left(\alpha\right)}y^{-\alpha-1}\exp\left(-\frac{\left(\alpha-1\right)a}{y}\right)\frac{1}{\theta^{k}\Gamma\left(k\right)}a^{k-1}\exp\left(-\frac{a}{\theta}\right)\nonumber \\
+ & =\frac{\left(\alpha-1\right)^{\alpha}y^{-\alpha-1}}{p(y)\Gamma\left(\alpha\right)\theta^{k}\Gamma\left(k\right)}a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\nonumber \\
+ & =C\left(y,\alpha,\theta,k\right)a^{\alpha+k-1}\exp\left(-a\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)\right)\label{eq:GammaPreConjugate}\\
+ & =\mathcal{G}\left(a;\alpha+k,\left(\left(\alpha-1\right)y^{-1}+\theta^{-1}\right)^{-1}\right).\label{eq:GammaConjugate}
+\end{align}
 
 \end_inset
 
@@ -3264,17 +3268,17 @@ In our case (again with
 
 ): 
 \begin_inset Formula 
-\begin{eqnarray*}
-a & = & a_{t}\tilde{v}_{t}\\
-y & = & v_{t}\\
-p(y|a) & = & p(v_{t}|a_{t}\tilde{v}_{t})\\
- & = & i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)\\
-p(a) & = & p(a_{t}\tilde{v}_{t}|a_{t-1})\\
- & = & \mathcal{G}(a_{t}\tilde{v}_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}\tilde{v}_{t})\\
-p(a|y) & = & p(a_{t}\tilde{v}_{t}|a_{t-1},v_{t})\\
- & = & \mathcal{G}\left(a_{t}\tilde{v}_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}+\gamma_{a}^{-2}a_{t-1}^{-1}\tilde{v}_{t}^{-1}\right)^{-1}\right)\\
-p(a_{t}|a_{t-1},v_{t}) & = & \mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right).
-\end{eqnarray*}
+\begin{align*}
+a & =a_{t}\tilde{v}_{t}\\
+y & =v_{t}\\
+p(y|a) & =p(v_{t}|a_{t}\tilde{v}_{t})\\
+ & =i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)\\
+p(a) & =p(a_{t}\tilde{v}_{t}|a_{t-1})\\
+ & =\mathcal{G}(a_{t}\tilde{v}_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}\tilde{v}_{t})\\
+p(a|y) & =p(a_{t}\tilde{v}_{t}|a_{t-1},v_{t})\\
+ & =\mathcal{G}\left(a_{t}\tilde{v}_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}+\gamma_{a}^{-2}a_{t-1}^{-1}\tilde{v}_{t}^{-1}\right)^{-1}\right)\\
+p(a_{t}|a_{t-1},v_{t}) & =\mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right).
+\end{align*}
 
 \end_inset
 
@@ -3286,7 +3290,206 @@ Released Dose Proposal Density
 \end_layout
 
 \begin_layout Standard
-TODO.
+Derivation of the approximation of the proposal factor 
+\begin_inset Formula $p(Q_{t}|a_{t},b_{t},y_{t,1},\ldots,y_{t,M})$
+\end_inset
+
+ is less straightforward.
+ Let us reformulate the
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\begin_inset Formula $\prod_{i=1}^{M}p(y_{t,i}|d_{t,i})$
+\end_inset
+
+ part of dose measurement density 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimYCPdf"
+
+\end_inset
+
+.
+ We
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ extract activity
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+this is possible because 
+\begin_inset Formula $\forall i\; d_{t,i}$
+\end_inset
+
+ depends on linear combination of puff activities
+\end_layout
+
+\end_inset
+
+ of the just released puff 
+\begin_inset Formula $Q{}_{t}$
+\end_inset
+
+ (marked simply as 
+\begin_inset Formula $Q$
+\end_inset
+
+ in this subsection for simplicity) from expected doses 
+\begin_inset Formula $d_{t,i}$
+\end_inset
+
+ and fix other parameters (such as activities of other puffs and wind field)
+ so that
+\begin_inset Formula 
+\begin{eqnarray}
+\prod_{i=1}^{M}p(y_{t,i}|d_{t,i}) & = & \prod_{i=1}^{M}i\mathcal{G}\left(\gamma_{y}^{-2}+2,(\gamma_{y}^{-2}+1)d_{t,i}\right)=\nonumber \\
+=p(y_{t,1},\ldots,y_{t,M}|Q) & = & \prod_{i=1}^{M}i\mathcal{G}\left(\alpha_{i},\beta_{i}Q+m_{i}\right).\label{eq:p_y_Q_proposal}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Applying Bayes rule to 
+\begin_inset Formula $p(Q_{t}|a_{t},b_{t},y_{t,1},\ldots,y_{t,M})$
+\end_inset
+
+ and fixing 
+\begin_inset Formula $a_{t},$
+\end_inset
+
+ 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ parameters we get
+\begin_inset Formula 
+\begin{align}
+p(Q|y_{t,1:M}) & =\frac{p(y_{t,1:M}|Q)p(Q)}{p(y_{t,1:M})}\nonumber \\
+ & \propto Q^{\alpha_{Q}-1}\exp\left(-\beta_{Q}Q\right)\prod_{i=1}^{M}(\beta_{i}Q+m_{i})^{\alpha_{i}}y_{t,i}^{-\alpha_{i}-1}\exp\left(-\frac{\beta_{i}Q+m_{i}}{y_{t,i}}\right),\label{eq:p_y_Q_explicit}
+\end{align}
+
+\end_inset
+
+where we have substituted from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_y_Q_proposal"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_Q"
+
+\end_inset
+
+.
+ Since this density has no standard known form, the normalization factor
+ cannot be inferred analytically, as it was done above.
+ We can approximate it using normal distribution
+\begin_inset Formula 
+\begin{equation}
+p(Q|y_{t,1:M})\approx\mathcal{N}(\mu_{Q},\sigma_{Q}^{2}),\label{eq:p_Q_y_proposal_approx}
+\end{equation}
+
+\end_inset
+
+whose parameters are obtained using Laplace's method.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "KasRaf:95"
+
+\end_inset
+
+ Its mean 
+\begin_inset Formula $\mu_{Q}$
+\end_inset
+
+ is aligned with local maxima, denoted as 
+\begin_inset Formula $\hat{Q}$
+\end_inset
+
+, of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_y_Q_explicit"
+
+\end_inset
+
+, which is obtained by computing derivative of its logarithm
+\begin_inset Formula 
+\begin{align}
+\frac{d\log(p(Q|y_{t,1:M}))}{dQ} & =\frac{d}{dQ}\left(\sum_{i=1}^{M}\left[\alpha_{i}\log(\beta_{i}Q+m_{i})-\frac{\beta_{i}Q+m_{i}}{y_{t,i}}\right]+(\alpha_{Q}-1)\log Q-\beta_{Q}Q\right)\nonumber \\
+ & =\sum_{i=1}^{M}\left[\frac{\alpha_{i}\beta_{i}}{\beta_{i}Q+m_{i}}-\frac{\beta_{i}}{y_{t,i}}\right]+\frac{\alpha_{Q}-1}{Q}-\beta_{Q},\label{eq:ig-d-log}
+\end{align}
+
+\end_inset
+
+which yields a sum of decreasing rational functions, allowing us to find
+ the only possible zero crossing using efficient numerical methods.
+ Second derivative of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ig-d-log"
+
+\end_inset
+
+ is then computed and made equal to inverse covariance matrix of the approximate
+d normal distribution 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_Q_y_proposal_approx"
+
+\end_inset
+
+ at point of its maxima,
+\begin_inset Formula 
+\[
+\frac{1}{2}\sigma_{Q}^{-2}=\sum_{i=1}^{M}\left[\frac{\alpha_{i}\beta_{i}^{2}}{(\beta_{i}\hat{Q}+m_{i})^{2}}\right]+\frac{\alpha_{Q}-1}{\hat{Q}^{2}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As negative released activity is nonsensical, the activity proposal approximatio
+n 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_Q_y_proposal_approx"
+
+\end_inset
+
+ is truncated to 
+\begin_inset Formula $\mathbb{R}_{0}^{+}$
+\end_inset
+
+ before it is sampled from.
 \end_layout
 
 \begin_layout Chapter
