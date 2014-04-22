@@ -756,13 +756,53 @@ TODO: Our goal is to estimate absorbed ionizing radiation doses at points
 Chapter 1
 \emph default
  presents a general mathematical apparatus that our solution is based on
- (the recursive Bayesian estimation) along with more specific method that
- can be viewed as an application of the framework.
+ (the recursive Bayesian estimation) along with more specific method, particle
+ filtering, that can be viewed as an application of the framework.
  Their inclusion in this text serves two purposes: completeness and forming
  a basis for the software design presented later, which happily borrows
  concepts from the underlying mathematics.
- The chapter continues with description of models used to represent real-world
- problem within the framework.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Chapter 2
+\emph default
+ describes how the simulation of the atmospheric pollutant dispersion is
+ modeled and how it can be measured for assimilation purposes.
+ Later it constructs the task of assimilation using the mathematical language
+ from chapter 1.
+ It also devoted some space to presentation of a technique employed to optimize
+ efficiency of particle filtering.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Chapter 3
+\emph default
+ is devoted to software analysis.
+ After discussion of requirements posed on desired software solution it
+ summarizes available projects and frameworks and suggests how these can
+ be combined.
+ It continues by presentation of the implemented software project, its structure
+ and rationale behind it.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Chapter 4
+\emph default
+ is concerned with computational efficiency of the resulting software stack
+ and describes methods used to improve it.
+ It shows how the Cython Python-to-C compiler was used to eliminate interpreter
+ and dynamic-typing overhead of Python.
+ Large part of it presents the 
+\emph on
+Ceygen
+\emph default
+ project, a linear algebra library developed as part of this work.
 \end_layout
 
 \begin_layout Standard
@@ -770,10 +810,10 @@ TODO
 \end_layout
 
 \begin_layout Chapter
-Dispersion Model Assimilation
+Sequential Monte Carlo Methods
 \begin_inset CommandInset label
 LatexCommand label
-name "chap:Model"
+name "chap:SequentialMC"
 
 \end_inset
 
@@ -800,8 +840,8 @@ also known as the Sequential Importance resampling (SIR) or Sequential Monte
 \end_inset
 
  a variant of which is employed to perform the assimilation.
- The chapter continues with description of models representing actual phenomena:
- release model, TODO.
+ We also briefly discuss the Marginal Particle Filter, a derivate which
+ is designed to counter some inherent problems of Bayesian particle filtering.
 \end_layout
 
 \begin_layout Section
@@ -1882,11 +1922,13 @@ or even to
 \end_layout
 
 \begin_layout Standard
-TODO: explain rationale with having 
+For some cases it is however advantageous to have the dependency on 
 \begin_inset Formula $x_{t-1}$
 \end_inset
 
- already integrated in weight update and reference 
+ integrated out in sampling and weight update step, especially when the
+ proposal density is complex.
+ Such approach applied to atmospheric assimilation is studied in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "SmiHof:13"
@@ -1910,9 +1952,42 @@ Rao-Blackwell particle filter
 \end_inset
 
  can be expressed as a (conditional) product of two or more participating
- densities, some of which can be estimated using using more specific and
+ densities, some of which can be estimated using using more tailored and
  efficient Bayesian filtering methods, e.g.
  using the Kalman filter.
+\end_layout
+
+\begin_layout Chapter
+Dispersion Model Assimilation
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:DispersionModel"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This chapter formulates the mathematical model of physical phenomena we
+ are concerned with and how it is applied to recursive Bayesian estimation.
+ After summarizing the models, it continues by construction of assimilation
+ methodology.
+ State space with its transition density along with measurement model with
+ its observation density are defined.
+ It finished by derivation of proposal densities for the particle filtering
+ methods tailored to this specific problem.
+\end_layout
+
+\begin_layout Standard
+Unless noted otherwise, this whole chapter is based on 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -1922,21 +1997,14 @@ Atmospheric Dispersion Simulation
 \begin_layout Standard
 This section is concerned with the means of representing pollutant dispersion
  in atmosphere.
- We use a model described in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "SmidlHofman:12"
-
-\end_inset
-
- (which in turn builds on a state-space representation presented in 
+ We use a model based on a state-space representation presented in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Johannesson:05"
 
 \end_inset
 
-) with only slight modifications in order to perform the assimilation in
+ with only slight modifications in order to perform the assimilation in
  the early phase of an atmospheric radioactive pollutant release from a
  facility that contains radioactive material.
 \begin_inset Foot
@@ -2146,14 +2214,13 @@ name "fig:Temelin"
 
 \end_inset
 
-Temelín power plant and adjacent monitoring network.
- Assumed source of release is marked by red circle, blue circles represent
- dose receptors.
+Temelín power plant and adjacent monitoring network
 \end_layout
 
 \end_inset
 
-
+Assumed source of release is marked by red circle, blue circles represent
+ dose receptors.
 \end_layout
 
 \end_inset
@@ -2339,21 +2406,14 @@ hour temporal grid step
 \end_layout
 
 \begin_layout Section
-Assimilation
+Assimilation: The State Model
 \end_layout
 
 \begin_layout Standard
 With mathematical assimilation apparatus and physical models being set,
  last step is to combine them.
- This section, which again sources from 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "SmidlHofman:12"
-
-\end_inset
-
-, formulates the assimilation of the atmospheric pollutant release in the
- terms of recursive Bayesian estimation, i.e.
+ This section formulates the assimilation of the atmospheric pollutant release
+ in the terms of recursive Bayesian estimation, i.e.
  we construct the state variable 
 \begin_inset Formula $\mathbf{x}_{t}$
 \end_inset
@@ -2362,7 +2422,8 @@ key "SmidlHofman:12"
 \begin_inset Formula $p(\mathbf{x}_{t}|\mathbf{x}_{t-1})$
 \end_inset
 
- and observation variable 
+.
+ In later sections the observation variable 
 \begin_inset Formula $\mathbf{y}_{t}$
 \end_inset
 
@@ -2370,8 +2431,9 @@ key "SmidlHofman:12"
 \begin_inset Formula $p(\mathbf{y}_{t}|\mathbf{x}_{t})$
 \end_inset
 
-.
- We also derive proposal densities for particle filter specific to our problem.
+ is build.
+ Finally we also derive proposal densities for particle filter specific
+ to our problem.
 \end_layout
 
 \begin_layout Subsection
@@ -2736,7 +2798,7 @@ Still, the full state needs to be accounted for when implementing actual
  vector for the sake of simplicity.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Measurement Model
 \begin_inset CommandInset label
 LatexCommand label
@@ -2996,7 +3058,7 @@ ty
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Problem-specific Proposal Density
 \end_layout
 
@@ -3493,19 +3555,32 @@ reference "eq:p_Q_y_proposal_approx"
 \end_layout
 
 \begin_layout Chapter
-Software Analysis: Solution Structure
+Software Analysis
+\end_layout
+
+\begin_layout Standard
+This chapter is devoted to analysis of suitable software solution for performing
+ assimilation of atmospheric dispersion models such as the one presented
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:DispersionModel"
+
+\end_inset
+
+ using (a variant of) sequential Monte Carlo methods described in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "chap:SequentialMC"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
 TODO: lots of UML diagrams, rationale for this design
-\end_layout
-
-\begin_layout Chapter
-Implementation, Integration of Sub-Projects
-\end_layout
-
-\begin_layout Standard
-TODO: how PyBayes, asim and Ceygen fit together
 \end_layout
 
 \begin_layout Chapter
