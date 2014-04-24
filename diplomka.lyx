@@ -7,6 +7,8 @@
 \usepackage{epsfig}
 \AtBeginDocument{\renewcommand{\ref}[1]{\mbox{\autoref{#1}}}}
 \addto\extrasenglish{\renewcommand*{\equationautorefname}[1]{}}
+
+\parskip=6pt   % mezera mezi odstavci
 \end_preamble
 \options 12pt
 \use_default_options true
@@ -3570,17 +3572,227 @@ reference "chap:DispersionModel"
 
  using (a variant of) sequential Monte Carlo methods described in 
 \begin_inset CommandInset ref
-LatexCommand eqref
+LatexCommand ref
 reference "chap:SequentialMC"
 
 \end_inset
 
 .
- 
+ Requirements posed on such solution (including foreseen use cases) are
+ discussed first so that we can consult them when making software design
+ decisions.
+ The chapter continues by overview of existing projects that were deemed
+ useful as building blocks of the desired software stack; the Python software
+ environment enhanced by Cython Python-to-C compiler is described.
+ What follows is actual software analysis, where object-oriented structure
+ of individual components along with their interaction with external and
+ internal parts is presented and justified.
+ A project called 
+\noun on
+asim
+\noun default
+ was implemented according to the analysis, so this chapter also describes
+ the actual implementation.
+\end_layout
+
+\begin_layout Section
+Requirements
 \end_layout
 
 \begin_layout Standard
-TODO: lots of UML diagrams, rationale for this design
+We are concerned with designing and developing software stack to perform
+ assimilation according to theoretical chapters above.
+ Intended uses of such stack include (but are not limited to):
+\end_layout
+
+\begin_layout Description
+Research
+\begin_inset space ~
+\end_inset
+
+platform The 
+\noun on
+asim
+\noun default
+ project, when paired with suggested components, should form a solid environment
+ for rapid prototyping and validating new variants of assimilation methods
+ and/or dispersion models.
+ This has implications on the used development language and development
+ iteration time, which needs to be rather low.
+\end_layout
+
+\begin_layout Description
+Continuous
+\begin_inset space ~
+\end_inset
+
+monitoring
+\begin_inset space ~
+\end_inset
+
+tool The desired software should allow to be adapted to serve as a computational
+ back-end for hypothetical tool dedicated to continuous monitoring of pollutant
+ releases; such tool would form additional information source for decision-maker
+s in the early phase of a radioactive release accident.
+\end_layout
+
+\begin_layout Description
+Distributed
+\begin_inset space ~
+\end_inset
+
+system
+\begin_inset space ~
+\end_inset
+
+worker It is desired for 
+\noun on
+asim
+\noun default
+ to be usable as a worker in a distributed web-based assimilation simulation
+ system, which is currently being developed.
+ The user interface allowing to specify simulation parameters runs in a
+ web server, which in turn distributes the work to computing nodes.
+\end_layout
+
+\begin_layout Standard
+With these use-cases in mind, we can infer general requirements on the desired
+ solution:
+\end_layout
+
+\begin_layout Description
+High-Level
+\begin_inset space ~
+\end_inset
+
+Language The need for ability to rapidly prototype new variants of assimilation
+ and environmental modeling methods calls for use of a high-productivity
+ programming language.
+ Such language should be easy to learn or well-known so that is is attractive
+ also for researchers without firm programing background.
+\end_layout
+
+\begin_layout Description
+Documentation Up-to-date, complete and readable API
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Application Programming Interface, a set of rules defining how a software
+ library is used
+\end_layout
+
+\end_inset
+
+ is needed so that the software can be used by anyone, not just its author.
+ Such documentation can assume that users already have mathematical understandin
+g of the problem.
+\end_layout
+
+\begin_layout Description
+Efficiency Uses such as continuous monitoring or batch processing in distributed
+ system dictate for high performance given available hardware resources.
+ Inherent property of Monte Carlo methods is that additional resources can
+ be converted to more samples, which in turn increases accuracy.
+ More efficient computation therefore means ability to achieve better justified
+ results, therefore efficiency should be high on the requirements list.
+\end_layout
+
+\begin_layout Description
+Interoperability The desired software stack should allow for effortless
+ cooperation with supportive software.
+ This includes for example data visualization utilities or tools that prepare
+ inputs.
+ On other words, well-known formats should be used for data exchange.
+\end_layout
+
+\begin_layout Description
+Portability The software should build and run on major server and desktop
+ platforms: GNU/Linux (compatibility with other UNIX-like systems being
+ a plus) and Microsoft Windows.
+ Installation of the library on modern systems should be straightforward,
+ no non-standard components should be required.
+\end_layout
+
+\begin_layout Description
+Openness Self-contained and reusable parts of the software solution should
+ be released to public under open-source license.
+ The authors believe that this approach leads to highest-quality software
+ in the long run.
+ This requirement is not applied to problem-specific parts of the software
+ stack if they are not considered reusable.
+\end_layout
+
+\begin_layout Standard
+It should be noted that many of the demands are in direct conflict with
+ each other, the most prominent example being high programmer productivity
+ and computational efficiency (to be achieved at the same time).
+ Because of significant overlap with demands described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Laitl11"
+
+\end_inset
+
+, we will reuse programming language feasibility analysis performed there
+ for the PyBayes library.
+ The authors chose 
+\noun on
+Python
+\noun default
+ as the preferred implementation environment for its developer convenience,
+ readability, availability of 3rd party topical software, interoperability
+ with C and MATLAB and dynamic and interpreted nature.
+ It was shown that 
+\noun on
+Cython
+\noun default
+ compiler can mask-out drawbacks of Python, which was mainly poor out-of-the-box
+ performance.
+\end_layout
+
+\begin_layout Section
+Foundations
+\end_layout
+
+\begin_layout Subsection
+PyBayes
+\end_layout
+
+\begin_layout Subsection
+Python
+\end_layout
+
+\begin_layout Subsection
+Cython
+\end_layout
+
+\begin_layout Section
+Analysis
+\end_layout
+
+\begin_layout Subsection
+Dispersion Model Prototype
+\end_layout
+
+\begin_layout Subsection
+Puff-based Dispersion Model
+\end_layout
+
+\begin_layout Subsection
+Assimilation
+\end_layout
+
+\begin_layout Subsection
+Interaction With PyBayes
+\end_layout
+
+\begin_layout Section
+Implementation (?)
+\end_layout
+
+\begin_layout Subsection
+Documentation
 \end_layout
 
 \begin_layout Chapter
