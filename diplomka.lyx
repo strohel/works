@@ -4917,8 +4917,10 @@ Eigen::Matrix
  type has six template parameters (many of them implicit if unspecified)
  and allows programmer to specify individual dimensions either statically
  (at compile time) or dynamically (at runtime).
- Dimensionality (tensor order) is always specified statically, as in Cython
- memoryviews.
+ Base scalar type and dimensionality (tensor order) are always specified
+ statically, as in Cython memoryviews.
+ Convenience subclasses are provided for row and column vectors (that simply
+ fix row or column count to 1, respectively).
  To share code without the overhead of virtual C++ methods, Eigen exploits
  so-called 
 \emph on
@@ -5060,6 +5062,139 @@ http://developer.amd.com/tools-and-sdks/cpu-development/amd-core-math-library-ac
  more efficiently using it.
 \end_layout
 
+\begin_layout Subsubsection
+Mapping Type
+\end_layout
+
+\begin_layout Standard
+For our potential use of implementing linear algebra on top of Cython memoryview
+s, a subclass of the fundamental 
+\family typewriter
+Eigen::Matrix
+\family default
+ type comes into mind: the 
+\family typewriter
+Eigen::Map
+\family default
+ class enables one to use any piece of memory anywhere where 
+\family typewriter
+Eigen::Matrix
+\family default
+ is accepted if storage layout of the underlying numeric array is known.
+ Eigen::Map has the following signature:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+template<typename PlainObjectType, int MapOptions,
+\end_layout
+
+\begin_layout Plain Layout
+
+         typename StrideType> class Map
+\end_layout
+
+\begin_layout Plain Layout
+
+    : public MapBase<Map<PlainObjectType, MapOptions,
+\end_layout
+
+\begin_layout Plain Layout
+
+                         StrideType> >,
+\end_layout
+
+\end_inset
+
+where 
+\family typewriter
+PlainObjectType
+\family default
+ is the base scalar type, 
+\family typewriter
+MapOptions
+\family default
+ allow to specify additional flags like alignment constraints and 
+\family typewriter
+StrideType
+\family default
+ determines layout of the stored data.
+ To illustrate: when a matrix element at row 
+\begin_inset Formula $i$
+\end_inset
+
+ and column 
+\begin_inset Formula $j$
+\end_inset
+
+ is to be accessed, 
+\family typewriter
+data
+\family default
+ is a pointer to first element of the array and 
+\family typewriter
+inner
+\family default
+, 
+\family typewriter
+outer
+\family default
+ being inner, respectively outer strides, following code holds:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+PlainObjectType *data;
+\end_layout
+
+\begin_layout Plain Layout
+
+(...)
+\end_layout
+
+\begin_layout Plain Layout
+
+PlainObjectType element = data[outer*i + inner*j];
+\end_layout
+
+\end_inset
+
+This example applies to row-major (C-style) matrices.
+ Eigen again allows its users to specify inner and outer stride statically
+ or dynamically (independently from each other).
+\end_layout
+
+\begin_layout Standard
+Important special cases exist: when the inner stride is 1, the array is
+ said to be C-contiguous (neighboring elements in a row are adjacent to
+ each other in memory); when outer stride is 1, the array is said to be
+ Fortran-contiguous (neighboring elements in a row are adjacent to each
+ other in memory).
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+in fact, Eigen allows to express whether the storage order is row-major
+ or column major, specifying the other storage variant has the same effect
+ as swapping inner and outer stride
+\end_layout
+
+\end_inset
+
+ Computations using Eigen are only efficient in case of C- or Fortran-contiguous
+ arrays whose inner, respectively outer, stride is statically specified
+ (to 1).
+ This is an inherent limitation of the vectorization support in processors
+ and cache locality principle; Eigen merely allows the general case of non-conti
+guous arrays.
+ We note that this maps perfectly to Cython memoryviews that can also be
+ non-contiguous.
+\end_layout
+
 \begin_layout Subsection
 PyBayes
 \end_layout
@@ -5074,7 +5209,24 @@ key "Laitl11"
 \end_inset
 
  and actively maintained since.
- PyBayes is developed publicly using git
+ 
+\emph on
+This section describes state of PyBayes 
+\emph default
+at the time when work on this thesis began
+\emph on
+.
+
+\emph default
+ It was modified and enhanced as part of this thesis, so this section is
+ necessarily outdated.
+ Changes that have been done to PyBayes are presented in later sections;
+ past tense is used here for statements that no longer hold in their entirety
+ as a result of these modifications.
+\end_layout
+
+\begin_layout Standard
+PyBayes is developed publicly using git
 \begin_inset Foot
 status open
 
@@ -5094,27 +5246,8 @@ http://git-scm.com/
 
 \end_inset
 
- version control system on GitHub
-\begin_inset Foot
-status open
-
-\begin_layout Plain Layout
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-https://github.com/
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- project hosting service at the address 
+ version control system on GitHub project hosting service at the address
+ 
 \begin_inset Flex URL
 status collapsed
 
@@ -5126,16 +5259,335 @@ https://github.com/strohel/PyBayes
 \end_inset
 
 .
+ PyBayes is completely documented,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://strohel.github.io/PyBayes-doc/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ and extensively unit-tested
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://travis-ci.org/strohel/PyBayes
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ (with a total of 124 unit test at the time of writing this; the test-suite
+ is auto-run on public Travis CI
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Continuous Integration
+\end_layout
+
+\end_inset
+
+ server upon every git push).
+ PyBayes released under the GNU GPL
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+GNU General Public License, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://www.gnu.org/licenses/gpl-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ v2+ strong copyleft open-source license and is compatible with both Python
+ 2 and Python 3.
 \end_layout
 
 \begin_layout Standard
-TODO: It should be noted that development of PyBayes predates introduction
- of memoryviews; the legacy 
+As mentioned earlier, PyBayes can be used in two ways:
+\end_layout
+
+\begin_layout Enumerate
+as an ordinary Python library with very simple installation and no dependencies
+ apart from NumPy, or
+\end_layout
+
+\begin_layout Enumerate
+compiled using Cython into optimized binary Python modules, which makes
+ installation slightly more complicated, but brought 30% to 200% speed improveme
+nts (depending on methods used and problem sizes).
+\end_layout
+
+\begin_layout Standard
+This dual behavior is achieved without code duplication using the 
+\emph on
+pure Python
+\emph default
+ Cython mode, where implementation is put into valid and functional 
+\family typewriter
+.py
+\family default
+ files (Python modules) and extra declarations that allow Cython to do its
+ optimizations are separated in corresponding 
+\family typewriter
+.pxd
+\family default
+ augmenting files.
+ Such approach not only lowers the barrier of trying and getting started
+ with PyBayes, but perhaps more importantly it preserves compatibility with
+ tools that expect Python source code, in particular the 
+\emph on
+coverage
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://nedbatchelder.com/code/coverage/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ test coverage analysis tool and the 
+\emph on
+Sphinx
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://sphinx-doc.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ documentation generation system.
+\end_layout
+
+\begin_layout Standard
+The Python build uses NumPy 
 \family typewriter
 ndarray
 \family default
- syntax was used in its Cython builds before it was ported as part of the
- work on this text.
+ of Python 
+\family typewriter
+float
+\family default
+s
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Python 
+\family typewriter
+float
+\family default
+ type corresponds to C 
+\family typewriter
+double
+\family default
+ type
+\end_layout
+
+\end_inset
+
+ is its base type, while the Cython build used the legacy direct Cython
+ support for NumPy 
+\family typewriter
+ndarray
+\family default
+s as its fundamental type --- development of PyBayes predates introduction
+ of memoryviews, so no viable alternative was available at the time.
+ Efficient algebra with the fundamental type of the Cython build was implemented
+ using the 
+\emph on
+Tokyo
+\emph default
+ BLACS/LAPACK wrapper, which was bundled as a git submodule in the source
+ code repository for convenience.
+\end_layout
+
+\begin_layout Standard
+We continue by brief presentation of actual functionality that the PyBayes
+ library offers for solving problems of recursive Bayesian estimation: the
+ way how random variables are represented and why, the framework of probability
+ density functions and finally the available Bayesian filtering methods.
+\end_layout
+
+\begin_layout Subsubsection
+Random Variable Meta-Representation
+\end_layout
+
+\begin_layout Standard
+While PyBayes was designed to avoid symbolic computing where feasible, general
+ probability density function products like
+\begin_inset Formula 
+\[
+p(a,b|c)=p(a|b)p(b|c)
+\]
+
+\end_inset
+
+had to be expressed.
+ A concept of random vectors and their components was designed to facilitate
+ this:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+RVComp
+\family default
+ class represents a component of a random variable, for example 
+\begin_inset Formula $a$
+\end_inset
+
+ in the example above.
+ It has one mandatory parameter, 
+\family typewriter
+dimension
+\family default
+ (integer), which denotes dimension of this component and an optional parameter
+ 
+\family typewriter
+name
+\family default
+ (string), which is only used for display purposes.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+RV
+\family default
+ class represents a random variable, and is in fact just a sequence of 
+\family typewriter
+RVComp
+\family default
+s coupled with convenience attributes 
+\family typewriter
+name
+\family default
+ and 
+\family typewriter
+dimension
+\family default
+ that cumulate child components.
+ It also provides a couple of helper methods:
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+contains(component)
+\family default
+ returns true when component is part of this random variable.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+contains_all(components),
+\begin_inset space ~
+\end_inset
+
+contains_any(components)
+\family default
+ convenience extensions of 
+\family typewriter
+contains()
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+contained_in(components)
+\family default
+ method dual to 
+\family typewriter
+contains()
+\family default
+, return true if this random variable is entirely contained in 
+\family typewriter
+components
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+indexed_in(super_rv)
+\family default
+ returns index array that can be used to select all components in this random
+ variable within 
+\family typewriter
+super_rv
+\family default
+, which must be its superset.
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+TODO: instance-based comparisons.
 \end_layout
 
 \begin_layout Section
