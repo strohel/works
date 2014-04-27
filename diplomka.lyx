@@ -3673,6 +3673,29 @@ Language The need for ability to rapidly prototype new variants of assimilation
 \end_layout
 
 \begin_layout Description
+Extensibility While we implement methods as described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:SequentialMC"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:DispersionModel"
+
+\end_inset
+
+ (with some insignificant details being omitted the the theoretical chapters
+ for clarity), the software should expect that improvements to the methodology
+ will arise and should allow them to be incorporated.
+ It should allow to use implemented assimilation methods with a different
+ suitable dispersion model, allow user to plug in custom weather forecast
+ source etc.
+\end_layout
+
+\begin_layout Description
 Documentation Up-to-date, complete and readable API
 \begin_inset Foot
 status open
@@ -3684,7 +3707,8 @@ Application Programming Interface, a set of rules defining how a software
 
 \end_inset
 
- is needed so that the software can be used by anyone, not just its author.
+ documentation is needed so that the software can be used and enhanced by
+ anyone, not just its author.
  Such documentation can assume that users already have mathematical understandin
 g of the problem.
 \end_layout
@@ -3703,7 +3727,7 @@ Interoperability The desired software stack should allow for effortless
  cooperation with supportive software.
  This includes for example data visualization utilities or tools that prepare
  inputs.
- On other words, well-known formats should be used for data exchange.
+ Well-known or standardized formats should be used for data exchange.
 \end_layout
 
 \begin_layout Description
@@ -3727,7 +3751,13 @@ Openness Self-contained and reusable parts of the software solution should
 It should be noted that many of the demands are in direct conflict with
  each other, the most prominent example being high programmer productivity
  and computational efficiency (to be achieved at the same time).
- Because of significant overlap with demands described in 
+ The task of following analysis is to find reasonable trade-off between
+ these conflicting requirements or to propose innovative solutions that
+ remove the conflict to some extent.
+\end_layout
+
+\begin_layout Standard
+Because of significant overlap with demands described in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Laitl11"
@@ -3736,35 +3766,922 @@ key "Laitl11"
 
 , we will reuse programming language feasibility analysis performed there
  for the PyBayes library.
- The authors chose 
-\noun on
-Python
-\noun default
- as the preferred implementation environment for its developer convenience,
- readability, availability of 3rd party topical software, interoperability
- with C and MATLAB and dynamic and interpreted nature.
- It was shown that 
-\noun on
-Cython
-\noun default
- compiler can mask-out drawbacks of Python, which was mainly poor out-of-the-box
- performance.
+ The authors chose Python as the preferred implementation environment.
+ The rationale is its developer convenience, readability of code, interoperabili
+ty with C and MATLAB, availability of 3rd party topical software and dynamic
+ and interpreted nature.
+ It was shown that Cython compiler can mask the only significant draw-back
+ of Python, which is poor performance of CPU-intensive code.
+ This implementation environment is presented in the next section.
 \end_layout
 
 \begin_layout Section
 Foundations
 \end_layout
 
-\begin_layout Subsection
-PyBayes
+\begin_layout Standard
+The desired software is not built on a green field, we base it on existing
+ environments and projects to form a complete and usable stack.
+ This section presents these projects so that proper design of their interaction
+ can be developed later on.
+ We ascend from the lower-level parts, the Python language and software
+ ecosystem surrounding it, the Cython compiler and a newly incorporated
+ project Eigen, a C++ template library for linear algebra, to the employed
+ library for Bayesian filtering, PyBayes.
 \end_layout
 
 \begin_layout Subsection
 Python
 \end_layout
 
+\begin_layout Standard
+Python
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://www.python.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ is a very high-level language actively developed by the community of volunteers
+ and professionals centered around the Python Software Foundation.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://www.python.org/psf/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Python encourages object-oriented programming paradigm, incorporates many
+ concepts of functional programming and is quick to adopt emerging constructs.
+ It is strongly but dynamically-typed
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+types are bound to values, not variables; one variable can assume multiple
+ non-covariant types during its lifetime
+\end_layout
+
+\end_inset
+
+ with call-by-object
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://effbot.org/zone/call-by-object.htm
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ function argument passing and assignment semantics
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+objects are referenced, rather than copied, when passed around and assignments
+ in nested scope are invisible to parent scope
+\end_layout
+
+\end_inset
+
+ and immutable basic types such as numbers and strings.
+ Python provides automatic memory management, which is done through reference
+ counting in its reference implementation (other implementations are free
+ to implement it differently).
+\end_layout
+
+\begin_layout Subsubsection
+Implementations
+\end_layout
+
+\begin_layout Standard
+The name Python may refer to the language, its standard library which is
+ part of it, or even the principal implementation, CPython.
+ While many implementations exist, for example Jython,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.jython.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ IronPython
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://ironpython.net/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ (that are based on Java and .NET runtime environments, respectively) and
+ promising just-in-time compiling PyPy,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://pypy.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ CPython is shipped with the standard Python installation as is by far the
+ most used.
+ It is written in C and provides a relatively stable C API that exposes
+ its internals.
+ This API is exploited by Cython described below.
+\end_layout
+
+\begin_layout Subsubsection
+Versions
+\end_layout
+
+\begin_layout Standard
+Python (the language) comes in two major versions, 2 and 3.
+ Python 2 is considered legacy, its specification is frozen and the CPython
+ implementation only receives bug fixes.
+ Python 3, which introduces a couple of backward-incompatible changes to
+ the language and standard library, is the current and promoted version.
+ Still, many useful Python projects have not yet finished their Python 3
+ port, so Python 2 is, at the time of writing, the version with widest palette
+ of 3rd party components available.
+ Methods for almost automatic conversion between the 2 versions of source
+ code exist: 2to3, 3to2 tools and even Cython can be used as such.
+ We propose developing in the latest revision of the Python 2 language for
+ greatest compatibility while simultaneously avoiding deprecated functionality
+ (which improves accuracy of the automated conversion tools).
+\end_layout
+
+\begin_layout Subsubsection
+Software Ecosystem
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+NumPy
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.numpy.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ is the de facto standard Python library for numerical computing.
+ It provides a powerful n-dimensional array data-type, the 
+\family typewriter
+ndarray
+\family default
+, and a wide range of algebraic operations on top of it.
+ 
+\family typewriter
+ndarray
+\family default
+ forms the compatibility bridge between nearly all Python libraries related
+ to numerical computing.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+SciPy library
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.scipy.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ provides more specialized scientific computing methods not found in NumPy
+ and is in fact just one part of the SciPy ecosystem, which contains 
+\emph on
+Matplotlib
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://matplotlib.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ for data visualization and other projects for symbolic computing, interactive
+ development and so.
+ All these projects are published under permissive open-source licenses
+ and thus freely usable and modifiable.
+\end_layout
+
+\begin_layout Subsubsection
+Drawbacks
+\end_layout
+
+\begin_layout Standard
+Using Python (without additional measures) comes however with some drawbacks.
+ First and foremost, it incurs significant interpreter and dynamic typing
+ overhead.
+ About 60-fold speed improvements were observed when this overhead was removed
+ using Cython on a simple numerical integration example.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Laitl11"
+
+\end_inset
+
+ Such massive overhead is not compatible with our requirement of computing
+ efficiency and must be avoided in the desired software.
+\end_layout
+
+\begin_layout Standard
+Another problematic area is thread-based parallelization.
+ While Python supports many approaches to writing multi-threaded code, CPU-bound
+ computations written for multiple threads (but a single process) in pure
+ Python seldom make us of all available CPU cores because of the so-called
+ GIL, the Global Interpreter Lock.
+ Each CPython interpreter thread by default holds this lock and releases
+ it only explicitly for some I/O operations.
+ This results in just one thread (per each CPython interpreter process)
+ running at given time, i.e.
+ completely circumventing parallelization.
+ Methods combating this limitation exist, for example the 
+\family typewriter
+multiprocessing
+\family default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://docs.python.org/library/multiprocessing.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ module or Cython-based GIL releasing.
+\end_layout
+
 \begin_layout Subsection
 Cython
+\end_layout
+
+\begin_layout Standard
+Cython
+\begin_inset CommandInset citation
+LatexCommand cite
+key "BehBraCitDalSelSmi:11"
+
+\end_inset
+
+ was employed to counter performance problems of pure Python-based solutions
+ when developing PyBayes and it proved extremely useful for this purpose.
+ We present it briefly in this section, concentrating on recent developments
+ not yet available when PyBayes was conceived.
+\end_layout
+
+\begin_layout Standard
+Cython is both an extension of the Python language (a strict superset of
+ it) and its implementation.
+ Its mode of operation is to translate Python source code (
+\family typewriter
+.py
+\family default
+ Python or 
+\family typewriter
+.pyx
+\family default
+ Cython files) into C code that uses CPython API extensively.
+ The translated files are then compiled into binary Python modules (shared
+ libraries from the operating system point of view: 
+\family typewriter
+.so
+\family default
+ files on Linux and 
+\family typewriter
+.dll
+\family default
+ files on Windows) that are treated transparently and indistinguishably
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+with some limitations like inability to programmatically retrieve executed
+ source code
+\end_layout
+
+\end_inset
+
+ by CPython.
+ At the time of writing, Cython achieves virtually 100% compatibility with
+ Python language, meaning that nearly every Python module can be compiled
+ by Cython and then successfully used as a binary module in place of the
+ original one.
+ Cython is however not a replacement of CPython or any other Python implementati
+on: the resulting binary modules depend on CPython environment and its shared
+ library.
+ In fact, the dependency on this specific Python implementation is one of
+ the significant Cython limitations.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+efforts to make Cython compatible with other implementations exist, though,
+ e.g.
+ PyPy support is approached using a 
+\family typewriter
+cpyext
+\family default
+ layer: 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://docs.cython.org/src/userguide/pypy.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Static Typing
+\end_layout
+
+\begin_layout Standard
+Compilation to machine code nullifies the interpreter overhead of traditional
+ Python implementations, which was as high as 290% in the numerical integration
+ example.
+ This should be viewed as an extreme case with reports mentioning 30% performanc
+e improvement (with no modification to the code) being more common for general
+ code.
+ The main strength nonetheless lies in the ability to statically type 
+\emph on
+some
+\emph default
+ variables, which avoids dynamic-typing overhead mandated by the Python
+ language semantics; typing all variables involved in the accumulation loop
+ of numerical integration example resulted in additional 
+\begin_inset Formula $21\times$
+\end_inset
+
+ execution time reduction.
+ This version had virtually the same performance as the one hand-written
+ in C; this Cython's ability to come near to C code in terms of performance
+ was shown also with a more complex algorithm.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "WilLanOdeAsm:09"
+
+\end_inset
+
+ To express typing information for given variables Cython extends the Python
+ language with additional constructs:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+cdef
+\begin_inset space ~
+\end_inset
+
+int
+\begin_inset space ~
+\end_inset
+
+i
+\family default
+ declares a variable of type 
+\family typewriter
+int
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+cdef
+\begin_inset space ~
+\end_inset
+
+bint
+\begin_inset space ~
+\end_inset
+
+func(double
+\begin_inset space ~
+\end_inset
+
+x):
+\family default
+ defines a function with C calling semantics taking 
+\family typewriter
+double
+\family default
+ floating-point value and returning a boolean value encoded as integer (
+\family typewriter
+bint
+\family default
+)
+\end_layout
+
+\begin_layout Standard
+If 
+\family typewriter
+cpdef
+\family default
+ was used instead of 
+\family typewriter
+cdef
+\family default
+ in the function definition above, Cython would generate a Python wrapper
+ around func() so that it can be called from Python code (with usual overhead
+ coming from Python function call semantics).
+ Object-oriented paradigm is supported, class definitions can be annotated
+ using again the 
+\family typewriter
+cdef
+\family default
+ modifier to form so-called 
+\emph on
+extension types
+\emph default
+, Cython-extended classes whose attributes and methods can be typed.
+ Inheritance is supported, extension types can even by extended by Python
+ code (not the other way around); Cython implements virtual function support
+ in C to keep Python semantics.
+ Extension types, which behave like built-in types such as 
+\family typewriter
+str
+\family default
+ to Python code, can in turn appear in further Cython typing constructs.
+\end_layout
+
+\begin_layout Subsubsection
+Pure Python Mode
+\end_layout
+
+\begin_layout Standard
+Adding typing annotations to code makes it incompatible with Python and
+ associated development tools such as documentation extractors and static
+ code analysis utilities.
+ This is often undesirable.
+ When using Cython, this can be avoided by placing the annotations outside
+ of 
+\family typewriter
+.py
+\family default
+ module files.
+ It supports so-called 
+\emph on
+pure Python
+\emph default
+ mode, where these would-be incompatible annotations are put into augmentation
+ 
+\family typewriter
+.pxd
+\family default
+ files.
+ For example a 
+\family typewriter
+module.py
+\family default
+ file can be kept Python-compatible while still providing necessary typing
+ information in a 
+\family typewriter
+module.pxd
+\family default
+ file.
+ Another purpose of putting declarations into 
+\family typewriter
+.pxd
+\family default
+ files is to share them between multiple modules, in a direct analogy to
+ 
+\family typewriter
+.h
+\family default
+ header files in C.
+ PyBayes uses pure Python mode to resolve the ambivalent requirements of
+ supporting rapid prototyping 
+\emph on
+and
+\emph default
+ high performance.
+\end_layout
+
+\begin_layout Subsubsection
+Interfacing C/C++ Code
+\end_layout
+
+\begin_layout Standard
+Another property, and in fact the original rationale behind Cython, is its
+ ability to interface external C and (since version 0.13) C++ code.
+ Given its design (compilation into C/C++), Cython only needs to know signatures
+ of accessed functions and data type layouts.
+ Special syntax is provided to achieve this (Cython is not able to parse
+ C header files, but a range of external projects provide such functionality
+ and generate appropriate Cython declarations).
+ Supported C++ features include polymorphism, templates, bundled interface
+ to C++ standard library and automatic conversion of C++ exceptions to Python
+ equivalents.
+\end_layout
+
+\begin_layout Subsubsection
+Parallelism and GIL
+\end_layout
+
+\begin_layout Standard
+In order to ease development or parallel algorithms that make use of multiple
+ processor cores simultaneously, Cython brings support for parallelizing
+ algorithms using OpenMP-like interface.
+ Internally Cython implements this support by actually emitting OpenMP pragmas
+ into generated C code.
+ It additionally performs control flow analysis of the the variables involved
+ in parallelized blocks to infer their thread-locality and whether they
+ are used as reduction quantities.
+ Hence it suffices to replace a 
+\family typewriter
+range
+\family default
+ loop by a 
+\family typewriter
+prange
+\family default
+ (which stands for parallel range) one in simple cases to achieve parallelism.
+\end_layout
+
+\begin_layout Standard
+Parallelization feature would be of little use if Cython didn't solve the
+ Global Interpreter Lock issue described above.
+ The GIL is used by CPython to ensure consistency of otherwise non-thread-safe
+ data structures, most prominently reference counters attached to each living
+ Python object.
+ Each variable assignment or function call adhering to Python semantics
+ causes several updates of reference counts of involved objects.
+ Cython can, if types are known and suitable, skip the Python semantics
+ and perform desired operation (like a function call) in pure C without
+ touching CPython data structures, thus removing the need to hold the GIL.
+ Moreover it provides means to express that given code block can execute
+ with the GIL released
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+ability to transiently hold the GIL inside a 
+\begin_inset Quotes eld
+\end_inset
+
+nogil
+\begin_inset Quotes erd
+\end_inset
+
+ block is also provided
+\end_layout
+
+\end_inset
+
+ (which turns on compile-time checking whether this is possible) and means
+ to label entire functions as not requiring the GIL to be held.
+ It is then required that 
+\family typewriter
+prange
+\family default
+ appears only at places where the GIL is released (in fact, it can be instructed
+ to release the GIL itself using a parameter), which in turn ensures that
+ the nested block can execute in a truly parallel manner.
+\end_layout
+
+\begin_layout Subsubsection
+Typed Memoryviews
+\end_layout
+
+\begin_layout Standard
+Cython 0.16 introduced support for so-called 
+\emph on
+typed memoryviews
+\emph default
+, a special Cython-specific data type representing a view on a multidimensional
+ numeric array.
+ Unlike NumPy's 
+\family typewriter
+ndarray
+\family default
+, memoryviews encode their base data type (e.g.
+ 
+\family typewriter
+double
+\family default
+, 
+\family typewriter
+int
+\family default
+) and number of dimensions statically instead of dynamically, which along
+ with implementation directly in Cython leads to significantly reduced overhead.
+ Memoryviews provide very fast member access (indexing), transposing and
+ slicing (creating a sub-view on part of the array, potentially of different
+ dimension) while still keeping great flexibility, the format is for example
+ able to express a view on a matrix of third components of a tensor, without
+ copying data:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cdef double[:, :] third_components = tensor[:, :, 2]
+\end_layout
+
+\end_inset
+
+another inherent advantage is that above operations can be done without
+ holding the GIL, e.g.
+ inside parallel blocks.
+\end_layout
+
+\begin_layout Standard
+Memoryviews can be created out of any Python type that supports PEP
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Python Enhancement Proposal
+\end_layout
+
+\end_inset
+
+ 3118
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.python.org/dev/peps/pep-3118
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+-style buffer interface --- without copying any data.
+ This includes NumPy 
+\family typewriter
+ndarrays
+\family default
+, CPython 
+\family typewriter
+arrays
+\family default
+, newly introduced Cython arrays (provided just for the purpose of backing
+ memoryviews).
+ Automatic copy-free coercion to NumPy 
+\family typewriter
+ndarray
+\family default
+ is also implemented, which means that one can freely mix NumPy and memoryview
+ methods.
+ However, even without copying the data, each conversion incurs overhead
+ caused by boilerplate Python code and requires holding the GIL.
+\end_layout
+
+\begin_layout Standard
+It was shown by Jake Vanderplas in 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://jakevdp.github.io/blog/2012/08/08/memoryview-benchmarks/
+\end_layout
+
+\end_inset
+
+ that optimized usage of Cython memoryviews led to speed virtually same
+ as one of the fastest solution using raw pointers on a nearest neighbor
+ search example.
+ This version was significantly faster than a different one that used legacy
+ direct Cython support for NumPy 
+\family typewriter
+ndarray
+\family default
+ type.
+ This support still exists, but it cannot do slicing as efficiently as memoryvie
+ws, requires holding the GIL for all but element access and the syntax cannot
+ be used for class attribute definitions.
+ It should be noted that development of PyBayes predates introduction of
+ memoryviews; the legacy 
+\family typewriter
+ndarray
+\family default
+ syntax was used in its Cython builds before it was ported as part of the
+ work on this text.
+\end_layout
+
+\begin_layout Standard
+TODO: algebraic operations, Tokyo and Ceygen.
+ -> next section.
+\end_layout
+
+\begin_layout Subsection
+Eigen
+\end_layout
+
+\begin_layout Subsection
+PyBayes
+\end_layout
+
+\begin_layout Standard
+PyBayes is, as the name suggests, a Python library for recursive Bayesian
+ estimation written by the author of this text as part of the Bachelor thesis
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Laitl11"
+
+\end_inset
+
+ and actively maintained since.
+ PyBayes is developed publicly using git
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://git-scm.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ version control system on GitHub
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ project hosting service at the address 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/strohel/PyBayes
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
