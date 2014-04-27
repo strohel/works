@@ -72,6 +72,7 @@
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
+\listings_params "basicstyle={\ttfamily}"
 \tracking_changes false
 \output_changes false
 \html_math_output 0
@@ -3785,8 +3786,8 @@ The desired software is not built on a green field, we base it on existing
  This section presents these projects so that proper design of their interaction
  can be developed later on.
  We ascend from the lower-level parts, the Python language and software
- ecosystem surrounding it, the Cython compiler and a newly incorporated
- project Eigen, a C++ template library for linear algebra, to the employed
+ ecosystem surrounding it, the Cython compiler, the newly incorporated project
+ --- Eigen (a C++ template library for linear algebra), to the employed
  library for Bayesian filtering, PyBayes.
 \end_layout
 
@@ -4098,6 +4099,15 @@ key "Laitl11"
 
  Such massive overhead is not compatible with our requirement of computing
  efficiency and must be avoided in the desired software.
+ This conclusion aligns with a general agreement in the literature that
+ Python alone is not suitable for numerically intensive computations.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Sel:09,CaiLanMoe:05"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4167,7 +4177,7 @@ Cython is both an extension of the Python language (a strict superset of
 \family typewriter
 .pyx
 \family default
- Cython files) into C code that uses CPython API extensively.
+ Cython files) into C or C++ code that uses CPython API extensively.
  The translated files are then compiled into binary Python modules (shared
  libraries from the operating system point of view: 
 \family typewriter
@@ -4476,11 +4486,36 @@ prange
 \end_layout
 
 \begin_layout Subsubsection
+Templates
+\end_layout
+
+\begin_layout Standard
+Since its 0.16 version Cython allows programmers to avoid some sorts of code
+ duplication by providing simple templating support.
+ The feature called 
+\emph on
+fused types
+\emph default
+ is somehow restricted compared template support as known e.g.
+ from the C++ language: all possible specializations of a fused type need
+ to be known at compile time.
+ The advantage is that this approach doesn't change build system semantics:
+ functions using fused types are still generated in the same phase.
+ Cython generates a typed code block for each possible combination (for
+ public code; in case of publicly inaccessible parts, only actually used
+ variants are generated), which can lead to combinatorial explosion unless
+ used carefully.
+ When interfacing C++ code, fused types can be combined with C++ templating
+ system, so that for example wrappers around generic C++ container types
+ can be written relatively easily.
+\end_layout
+
+\begin_layout Subsubsection
 Typed Memoryviews
 \end_layout
 
 \begin_layout Standard
-Cython 0.16 introduced support for so-called 
+Cython 0.16 also introduced support for so-called 
 \emph on
 typed memoryviews
 \emph default
@@ -4586,9 +4621,9 @@ https://jakevdp.github.io/blog/2012/08/08/memoryview-benchmarks/
 
 \end_inset
 
- that optimized usage of Cython memoryviews led to speed virtually same
- as one of the fastest solution using raw pointers on a nearest neighbor
- search example.
+ that optimized usage of Cython memoryviews led to to a an algorithm with
+ virtually the same performance as the fastest solution using raw pointers
+ on a nearest neighbor search example.
  This version was significantly faster than a different one that used legacy
  direct Cython support for NumPy 
 \family typewriter
@@ -4597,23 +4632,432 @@ ndarray
  type.
  This support still exists, but it cannot do slicing as efficiently as memoryvie
 ws, requires holding the GIL for all but element access and the syntax cannot
- be used for class attribute definitions.
- It should be noted that development of PyBayes predates introduction of
- memoryviews; the legacy 
-\family typewriter
-ndarray
-\family default
- syntax was used in its Cython builds before it was ported as part of the
- work on this text.
+ be used for class attributes, among other limitations.
 \end_layout
 
 \begin_layout Standard
-TODO: algebraic operations, Tokyo and Ceygen.
- -> next section.
+Memoryview feature of Cython is not yet perfect, though.
+ The biggest obstacle is, in our opinion, the lack of support of algebraic
+ operations of top of memoryviews.
+ A mere attempt to add two matrices 
+\family typewriter
+a
+\family default
+ and 
+\family typewriter
+b
+\family default
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cdef double[:, :] a, b
+\end_layout
+
+\begin_layout Plain Layout
+
+result = a + b
+\end_layout
+
+\end_inset
+
+results in a compile-time error as of Cython 0.20.1 with it complaining about
+ invalid operands for the + operator.
+ It is of course possible to exploit bidirectional coercion to NumPy types
+ and use NumPy methods,
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import numpy as np
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+cdef double[:, :] a, b
+\end_layout
+
+\begin_layout Plain Layout
+
+np.add(a, b)
+\end_layout
+
+\begin_layout Plain Layout
+
+np.asarray(a) + np.asarry(b)
+\end_layout
+
+\end_inset
+
+but implied overhead and the need for the GIL negates virtually all advantages
+ of using memoryviews in the first place.
+ A project called 
+\emph on
+array expressions
+\emph default
+ had been worked on by memoryview support author, Mark Florisson, as part
+ of his Master's thesis.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Flo:12"
+
+\end_inset
+
+ Array expressions would add functionality to perform algebraic operations
+ with memoryviews directly into Cython, through use of embedded 
+\emph on
+minivect
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/markflorisson88/minivect
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ expression compiler.
+ Unfortunately, a request to merge this support into Cython code-base was
+ recalled by its author after discussions whether and how to include the
+ minivect project.
+\end_layout
+
+\begin_layout Standard
+Back in the days when memoryviews didn't exist and custom support for NumPy
+ 
+\family typewriter
+ndarray
+\family default
+ was state-of-the-art for computations in Cython, one could use Shane Legg's
+ 
+\emph on
+Tokyo
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.vetta.org/2009/09/tokyo-a-cython-blas-wrapper-for-fast-matrix-math/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ project as a Cython wrapper for a range of functions of system BLAS
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Basic Linear Algebra Subprograms, a de facto standard API for computer linear
+ algebra dating back to 1979
+\end_layout
+
+\end_inset
+
+ implementation and a couple of system LAPACK
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Linear Algebra PACKage, extension of BLAS with higher-level methods like
+ equation solving or decompositions
+\end_layout
+
+\end_inset
+
+ functions.
+ While not even close to flexibility and elegance that would have been offered
+ by array expressions (Tokyo inherited many legacy properties from BLAS
+ and LAPACK, most prominently a fixed-function API which is painful to use),
+ Tokyo did its job and offered remarkable overhead reduction.
+ Still, BLAS and LAPACK compatibility problems that have been experienced
+ when deploying Tokyo-based software along with its API motivated us to
+ investigate different possibilities than porting Tokyo to memoryviews.
+ A viable project, Eigen, was found and is presented in the next section.
 \end_layout
 
 \begin_layout Subsection
 Eigen
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Eigen
+\emph default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://eigen.tuxfamily.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ is a mature C++ template library for linear algebra written entirely in
+ header files.
+ Eigen makes extensive use of some of the lesser known features offered
+ by the C++ language to achieve maximum performance, flexibility and elegance
+ of use.
+ Eigen employs templates to implement lazy evaluation,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+deferring of the actual computations to the point where they are first really
+ needed
+\end_layout
+
+\end_inset
+
+ so that expressions like
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+MatrixXd A, B, C, D;
+\end_layout
+
+\begin_layout Plain Layout
+
+(...)
+\end_layout
+
+\begin_layout Plain Layout
+
+A = 2*B - 3*(D - B));
+\end_layout
+
+\end_inset
+
+expand only to one for loop (something that is impossible with a fixed-function
+ API like the one of BLAS) and do not use any temporary variables because
+ the computation happens as late as in the assignment operator (
+\family typewriter
+operator=()
+\family default
+), where memory of the matrix 
+\family typewriter
+A
+\family default
+ is already available.
+ Eigen also performs explicit vectorization so that features of modern processor
+s
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+like the SSE or AVX extensions
+\end_layout
+
+\end_inset
+
+ are properly utilized for maximum performance.
+\end_layout
+
+\begin_layout Standard
+Supported features include all common algebraic operations, linear problem
+ solving, a variety of decompositions (Cholesky, LU, QR, SVD) and methods
+ for solving eigenvalue problems.
+ Large part of this functionality is also provided for sparse matrices,
+ for which a custom efficient storage format is noted.
+ Sparse matrices however present no advantage for our software solution
+ and are thus not further studied.
+\end_layout
+
+\begin_layout Standard
+The basic 
+\family typewriter
+Eigen::Matrix
+\family default
+ type has six template parameters (many of them implicit if unspecified)
+ and allows programmer to specify individual dimensions either statically
+ (at compile time) or dynamically (at runtime).
+ Dimensionality (tensor order) is always specified statically, as in Cython
+ memoryviews.
+ To share code without the overhead of virtual C++ methods, Eigen exploits
+ so-called 
+\emph on
+Curiously Recurring Template Pattern
+\emph default
+, where a base class takes the type of the derived class as its template
+ parameter:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+template<class Derived>
+\end_layout
+
+\begin_layout Plain Layout
+
+class Base {
+\end_layout
+
+\begin_layout Plain Layout
+
+    (...)
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+class Derived : public Base<Derived> {
+\end_layout
+
+\begin_layout Plain Layout
+
+	(...)
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\end_inset
+
+Thanks to this strangely-looking construct the 
+\family typewriter
+Base
+\family default
+ class can statically access methods and attributes of the 
+\family typewriter
+Derived
+\family default
+ class, which allows the C++ compiler to perform unprecedented range of
+ optimizations.
+ With this mechanism, element-wise complex conjugate operation on a real
+ matrix becomes a true no-op 
+\emph on
+implicitly
+\emph default
+, without any help from application or library developer.
+\end_layout
+
+\begin_layout Standard
+Thanks to this approach, Eigen's single-threaded performance surpasses all
+ freely available BLAS/LAPACK implementations and matches state-of-the-art
+ proprietary ones
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://eigen.tuxfamily.org/index.php?title=Benchmark
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ like Intel MKL
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Intel Math Kernel Library, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://software.intel.com/en-us/intel-mkl
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ or ACML.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+AMD Core Math Library, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://developer.amd.com/tools-and-sdks/cpu-development/amd-core-math-library-acml
+/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Since Eigen 3.1.0 an optional support is provided for transparently using
+ Intel MKL for functions and problem sizes that are known to be computed
+ more efficiently using it.
 \end_layout
 
 \begin_layout Subsection
@@ -4684,6 +5128,16 @@ https://github.com/strohel/PyBayes
 .
 \end_layout
 
+\begin_layout Standard
+TODO: It should be noted that development of PyBayes predates introduction
+ of memoryviews; the legacy 
+\family typewriter
+ndarray
+\family default
+ syntax was used in its Cython builds before it was ported as part of the
+ work on this text.
+\end_layout
+
 \begin_layout Section
 Analysis
 \end_layout
@@ -4713,15 +5167,7 @@ Documentation
 \end_layout
 
 \begin_layout Chapter
-Performance Tuning
-\end_layout
-
-\begin_layout Standard
-Mainly about Ceygen and how it improves software efficiency
-\end_layout
-
-\begin_layout Chapter
-Results: Benchmark on Real-World Scenario
+Results
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Results"
