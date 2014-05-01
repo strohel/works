@@ -2231,13 +2231,24 @@ name "fig:Temelin"
 
 \end_inset
 
+
+\begin_inset Argument
+status open
+
+\begin_layout Plain Layout
 Temelín power plant and adjacent monitoring network
 \end_layout
 
 \end_inset
 
-Assumed source of release is marked by red circle, blue circles represent
+Temelín power plant and adjacent monitoring network.
+ Assumed source of release is marked by red circle, blue circles represent
  dose receptors.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -3598,16 +3609,12 @@ reference "chap:SequentialMC"
  decisions.
  The chapter continues by overview of existing projects that were deemed
  useful as building blocks of the desired software stack; the Python software
- environment enhanced by Cython Python-to-C compiler is described.
- What follows is actual software analysis, where object-oriented structure
- of individual components along with their interaction with external and
- internal parts is presented and justified.
- A project called 
-\noun on
-asim
-\noun default
- was implemented according to the analysis, so this chapter also describes
- the actual implementation.
+ environment enhanced by Cython Python-to-C compiler, Eigen C++ template
+ library for linear algebra and PyBayes Python/Cython library for Bayesian
+ filtering are presented.
+ It is concluded by our suggestion of high-level design of the desired software
+ stack, interaction of individual components and enhancements to existing
+ projects.
 \end_layout
 
 \begin_layout Section
@@ -3625,13 +3632,9 @@ Research
 \begin_inset space ~
 \end_inset
 
-platform The 
-\noun on
-asim
-\noun default
- project, when paired with suggested components, should form a solid environment
- for rapid prototyping and validating new variants of assimilation methods
- and/or dispersion models.
+platform The resulting project, when paired with suggested components, should
+ form a solid environment for rapid prototyping and validating new variants
+ of assimilation methods and/or dispersion models.
  This has implications on the used development language and development
  iteration time, which needs to be rather low.
 \end_layout
@@ -3660,14 +3663,12 @@ system
 \begin_inset space ~
 \end_inset
 
-worker It is desired for 
-\noun on
-asim
-\noun default
- to be usable as a worker in a distributed web-based assimilation simulation
- system, which is currently being developed.
+worker It is desired that the target project is be usable as a worker in
+ a distributed web-based assimilation simulation system, which is currently
+ being developed.
  The user interface allowing to specify simulation parameters runs in a
- web server, which in turn distributes the work to computing nodes.
+ web server and distributes the work to computing nodes, which feed back
+ the results.
 \end_layout
 
 \begin_layout Standard
@@ -3684,7 +3685,7 @@ Language The need for ability to rapidly prototype new variants of assimilation
  and environmental modeling methods calls for use of a high-productivity
  programming language.
  Such language should be easy to learn or well-known so that is is attractive
- also for researchers without firm programing background.
+ also for researchers without interest in programing on its own.
 \end_layout
 
 \begin_layout Description
@@ -3702,7 +3703,7 @@ reference "chap:DispersionModel"
 
 \end_inset
 
- (with some insignificant details being omitted the the theoretical chapters
+ (with some insignificant details being omitted in the theoretical chapters
  for clarity), the software should expect that improvements to the methodology
  will arise and should allow them to be incorporated.
  It should allow to use implemented assimilation methods with a different
@@ -5095,7 +5096,11 @@ Eigen::Map
 Eigen::Matrix
 \family default
  is accepted if storage layout of the underlying numeric array is known.
- Eigen::Map has the following signature:
+ 
+\family typewriter
+Eigen::Map
+\family default
+ has the following signature:
 \begin_inset listings
 inline false
 status open
@@ -6697,7 +6702,11 @@ bootstrap
 EmpPdf
 \family default
  was used unconditionally, because the implementation was tied to it.
- ParticleFilter constructor took number of particles 
+ 
+\family typewriter
+ParticleFilter
+\family default
+ constructor took number of particles 
 \begin_inset Formula $N$
 \end_inset
 
@@ -6728,8 +6737,535 @@ CPdf
 ) as its arguments.
 \end_layout
 
+\begin_layout Subsubsection
+Linear Algebra Wrappers
+\end_layout
+
+\begin_layout Standard
+We finish the section about PyBayes with brief mention of its 
+\family typewriter
+wrappers
+\family default
+ module.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+in fact a package in Python nomenclature, 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://docs.python.org/distutils/introduction.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ While it is not intended to be used externally and can be considered an
+ implementation detail, it is a workhorse of dual nature (Python-interpreted
+ and Cython-combined) of PyBayes.
+\end_layout
+
+\begin_layout Standard
+Instead of using NumPy functions and data types directly, other PyBayes
+ components use shim layers found in the 
+\family typewriter
+wrappers
+\family default
+ package: 
+\family typewriter
+_numpy
+\family default
+, which mimics (to certain extent) the 
+\family typewriter
+numpy
+\family default
+ module of NumPy project, and 
+\family typewriter
+_linalg
+\family default
+, which mimics the 
+\family typewriter
+numpy.linalg
+\family default
+ module of NumPy (that contains more specialized linear algebra functions).
+ Unlike other PyBayes components, modules in the 
+\family typewriter
+wrappers
+\family default
+ package have separate implementation for each of the 2 PyBayes build types,
+ e.g.
+ 
+\family typewriter
+_numpy.pxd
+\family default
+ + 
+\family typewriter
+_numpy.pyx
+\family default
+ for Cython build and 
+\family typewriter
+_numpy.py
+\family default
+ for Python build.
+ The PyBayes build-system ensures that correct implementation is picked
+ up.
+\end_layout
+
+\begin_layout Standard
+The Python versions of wrapper modules had straightforward implementation,
+ they just imported appropriate NumPy objects and defined aliases that were
+ needed to make static typing in Cython possible.
+ What follows was an actual implementation (with non-crucial lines omitted)
+ of the 
+\family typewriter
+_numpy
+\family default
+ wrapper:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+from numpy import *
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+dotvv = dot  # vector-vector dot product
+\end_layout
+
+\end_inset
+
+Here, 
+\family typewriter
+dot()
+\family default
+ was aliased to 
+\family typewriter
+dotvv()
+\family default
+ as the code differentiated between vector-vector dot product, which returns
+ a scalar, and other dot products that result in an 
+\family typewriter
+ndarray
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Cython versions contained more logic.
+ First, they defined the base vector and matrix type, 
+\family typewriter
+ndarray
+\family default
+, through a special Cython import that ensured that direct 
+\family typewriter
+ndarray
+\family default
+ support in Cython kicked in.
+ Fast implementations of frequently-called algebraic functions were provided
+ through the Tokyo wrapper for system BLAS/LAPACK libraries.
+ These were 
+\family typewriter
+dot()
+\family default
+ and 
+\family typewriter
+dotvv()
+\family default
+ in the 
+\family typewriter
+_numpy
+\family default
+ wrapper and 
+\family typewriter
+inv()
+\family default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+matrix inversion
+\end_layout
+
+\end_inset
+
+ in the 
+\family typewriter
+_linalg
+\family default
+ wrapper.
+ It should be noted that these implementations were less than elegant in
+ some cases.
+ For example the 
+\family typewriter
+dot()
+\family default
+ implementation had multiple code paths for various matrix/vector and C-contiguo
+us/Fortran-contiguous combinations and simply failed for non-contiguous
+ vectors and matrices.
+ Other NumPy functionality that PyBayes used was simply imported from NumPy,
+ which incurred the inevitable Python overhead.
+\end_layout
+
 \begin_layout Section
 Analysis Results
+\end_layout
+
+\begin_layout Standard
+The aim of this section is to draw conclusions from feasibility analysis
+ of the projects presented above and to suggest high-level structure of
+ the desired software solution.
+ This structure is visualized in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:asim-pybayes-ceygen-overview"
+
+\end_inset
+
+ on page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "fig:asim-pybayes-ceygen-overview"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Asim
+\end_layout
+
+\begin_layout Standard
+We propose that a separate project that focuses on radioactive pollutant
+ atmospheric dispersion assimilation is created.
+ This project, which became known as Asim, would consist of two main parts:
+ dispersion model part and assimilation part.
+ The 
+\emph on
+dispersion model
+\emph default
+ part should contain:
+\end_layout
+
+\begin_layout Itemize
+Dispersion model prototype, an interface that could be implemented by any
+ model that simulates radioactive pollutant release into the atmosphere.
+ Any such model should be able to simulate development of spacial pollutant
+ concentration in time given meteorologic situation and release conditions.
+ Additionally it should be able to compute absorbed doses at given points
+ of interest and time intervals.
+ Initial implementation would be puff-based dispersion model as presented
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:DispersionModel"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Meteorologic model prototype that would provide all necessary information
+ to the dispersion model.
+ Such abstraction would allow for different sources of meteorologic data
+ to be plugged in when performing simulation of assimilation.
+\end_layout
+
+\begin_layout Itemize
+Release model prototype which would supply data such as release location,
+ rate and type of the radioactive pollutant (which determines parameters
+ such as decay half-life and released energy).
+\end_layout
+
+\begin_layout Itemize
+A simple runner that would perform simulation with predefined meteorologic
+ and release data and visualize the release.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+assimilation
+\emph default
+ part should combine the dispersion model with the particle filter from
+ PyBayes to create the assimilation algorithm.
+ The transition and observation models need to be formulated in terms of
+ PyBayes-compatible probability density functions.
+ It is assumed that PyBayes' particle filter can be enhanced to support
+ proposal density, so that again needs to be expressed in a suitable manner.
+ It is expected that subclasses of some PyBayes classes will have to be
+ implemented; if these are general enough to be useful for other PyBayes
+ users, we suggest to add such classes directly to PyBayes, otherwise to
+ Asim.
+\end_layout
+
+\begin_layout Standard
+As planned usage of PyBayes implies, Asim is to be implemented in Cython-enhance
+d Python implementation environment, which proved very well suitable for
+ intended use in case of PyBayes.
+ While the stress does not need to be put so much on ease of first use,
+ we still propose that 
+\emph on
+pure Python
+\emph default
+ approach is used where feasible: the implementation should be done in valid
+ Python 
+\family typewriter
+.py
+\family default
+ files and Cython-specific enhancements should go into separate 
+\family typewriter
+.pxd
+\family default
+ files.
+ The motivation for this is 
+\emph on
+a)
+\emph default
+ compatibility with existing Python development tools (IDEs,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Integrated Development Environments
+\end_layout
+
+\end_inset
+
+ documentation extractors such as Sphinx, testing and test coverage tools...)
+ and 
+\emph on
+b)
+\emph default
+ possibility that projects like PyPy and/or Numba
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://numba.pydata.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ will render use of Cython unnecessary in the future.
+\end_layout
+
+\begin_layout Standard
+As the Asim project is rather specific in its purpose, we do not see any
+ advantage in developing it in public.
+ Of course, any improvements into its upstream projects that are already
+ openly developed that arise during Asim development should be propagated
+ to these projects for public benefit.
+\end_layout
+
+\begin_layout Subsection
+PyBayes Improvements
+\end_layout
+
+\begin_layout Standard
+While PyBayes was found generally suitable as a recursive Bayesian estimation
+ back-end for dispersion model assimilation, it needs to be enhanced in
+ a couple of areas for perfect fit.
+ It was identified that truncated normal, gamma and inverse gamma distributions
+ have to be added along with conditional variants.
+ The conditional variants should model the case where the condition specifies
+ their mean value and their standard error is proportional to the mean value.
+\end_layout
+
+\begin_layout Standard
+Another area that requires improvement is the 
+\family typewriter
+ParticleFilter
+\family default
+ class.
+ It needs to be extended to allow using custom proposal distribution (which
+ is crucial in cases like ours where the observation density is significantly
+ narrower than the transition density).
+ Another modification arises from a special form of our state variable:
+ while only 3 dimensions are actually assimilated, the full state variable
+ consists of much more (deterministic) variables whose count can grow in
+ time.
+ We suggest that such complexity is hidden in a custom 
+\family typewriter
+EmpPdf
+\family default
+ subclass (which would too specific to be useful outside Asim); 
+\family typewriter
+ParticleFilter
+\family default
+ should be therefore modified to allow specification of 
+\family typewriter
+EmpPdf
+\family default
+ subclass to work with.
+ It is also proposed that the transitioning step (when 
+\begin_inset Formula $x_{t}^{(i)}$
+\end_inset
+
+ is sampled using 
+\begin_inset Formula $x_{t-1}^{(i)}$
+\end_inset
+
+ and 
+\begin_inset Formula $q(x_{t}|y_{t},x_{t-1})$
+\end_inset
+
+) is delegated to 
+\family typewriter
+EmpPdf
+\family default
+ (as it is already done with the resampling and weight normalizing step)
+ so that the special cases like ours can be handled.
+\end_layout
+
+\begin_layout Subsection
+Ceygen
+\end_layout
+
+\begin_layout Standard
+Due to recent developments in Cython compiler and language, most prominently
+ its support for typed memoryviews, fused types (lightweight templating)
+ and advancements in the C++ support, we opinion that implementing vector/matrix
+ algebra using NumPy 
+\family typewriter
+ndarray
+\family default
+s and resorting to Tokyo/BLAS/LAPACK solution for speeding it up should
+ be considered obsolete.
+\end_layout
+
+\begin_layout Standard
+Memoryviews come with fewer limitations (such as ability to appear as class
+ attributes, in global scope), are more parallelization-friendly due to
+ reduced need of holding the GIL and have been shown to bring better performance
+ in general.
+ With the array expressions project unfortunately not materializing, only
+ roadblock left was unavailability of linear algebra operations on top of
+ them.
+ After finding that the Eigen C++ library can be interfaced through Cython
+ with minimal overhead and a proof-of-concept test implementation, we became
+ convinced that implementing a linear algebra library for typed memoryviews
+ using Eigen would be well possible with reasonable effort.
+\end_layout
+
+\begin_layout Standard
+The project was named Ceygen (a rather poor wordplay on Cython + Eigen)
+ and turned out a success.
+ Its design and implementation is presented in the next chapter, so are
+ the Asim project and improvements to PyBayes.
+ It was deemed appropriate and advantageous to develop Ceygen
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+which could be useful to anyone who performs linear algebra with Cython
+ memoryviews
+\end_layout
+
+\end_inset
+
+ publicly and release it under free open-source license.
+ Rationale being 
+\emph on
+a)
+\emph default
+ to give back to Cython community 
+\emph on
+b)
+\emph default
+ to attract testers and possible contributors so that maintenance and developmen
+t is distributed.
+\end_layout
+
+\begin_layout Standard
+It was decided that Cython build of PyBayes will be ported to use memoryviews
+ + Eigen, dropping the dependency on Tokyo and BLAS/LAPACK along the way.
+ Beyond the 
+\family typewriter
+wrappers
+\family default
+ module, which was rewritten, only small changes (such as changing method
+ signatures and some function calls) had to be done to functional parts
+ of PyBayes.
+ Asim project then inherently has to use the same vector/matrix type.
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename dia/asim-pybayes-ceygen-overview.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:asim-pybayes-ceygen-overview"
+
+\end_inset
+
+
+\begin_inset Argument
+status open
+
+\begin_layout Plain Layout
+High-level overview of Asim, PyBayes and Ceygen projects
+\end_layout
+
+\end_inset
+
+High-level overview of Asim, PyBayes and Ceygen projects.
+ Dashed lines mark dependencies, e.g.
+ Asim depends on PyBayes and Ceygen.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
