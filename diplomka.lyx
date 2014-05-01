@@ -849,6 +849,13 @@ also known as the Sequential Importance resampling (SIR) or Sequential Monte
 
 \begin_layout Section
 Recursive Bayesian Estimation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Recursive-Bayesian-Estimation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1153,6 +1160,13 @@ key "Kalman:60"
 
 \begin_layout Section
 Particle Filter
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Particle-Filter"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5468,9 +5482,9 @@ We continue by brief presentation of actual functionality that the PyBayes
  library offers for solving problems of recursive Bayesian estimation: the
  way how random variables are represented and why, the framework of probability
  density functions and finally the available Bayesian filtering methods.
- Next sections do not form a complete reference to PyBayes, they merely
- pick up classes and methods that were deemed important when considering
- its involvement and enhancement.
+ Next sections do not form a complete reference to PyBayes and omit some
+ classes, they merely pick up classes and methods that were deemed important
+ when considering its involvement and enhancement.
 \end_layout
 
 \begin_layout Subsubsection
@@ -5856,7 +5870,7 @@ cond=None)
 \begin_inset space ~
 \end_inset
 
-vector
+double
 \family default
  return logarithm of the (conditional) likelihood function in point x.
  Logarithm is used instead of untransformed value in order to achieve more
@@ -6034,10 +6048,10 @@ normalise_weights()
 \end_inset
 
  is weight of 
-\begin_inset Formula $i$
+\begin_inset Formula $i^{\mathrm{th}}$
 \end_inset
 
--th particle.
+ particle.
 \end_layout
 
 \begin_layout Description
@@ -6083,11 +6097,651 @@ old
 \end_inset
 
  being particle count).
+ This method does not change the distribution itself in any way it is merely
+ a helper for subclasses.
 \end_layout
 
 \end_deeper
+\begin_layout Description
+
+\family typewriter
+EmpPdf(AbstractEmpPdf)
+\family default
+ implements the standard weighted empirical probability density function
+ as needed by the particle filter,
+\begin_inset Formula 
+\begin{align*}
+f(\mathbf{x}) & =\sum_{i=1}^{n}\omega_{i}\delta(\mathbf{x}-\mathbf{x}^{(i)}),\\
+\sum\omega_{i} & =1,
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{x}^{(i)}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $i^{\mathrm{th}}$
+\end_inset
+
+ particle.
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+resample()
+\family default
+ performs actual resampling as described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:SequentialMC"
+
+\end_inset
+
+: particles are re-indexed with the help of 
+\family typewriter
+get_resample_indices()
+\family default
+ and copied as needed, weights are reset to uniform (
+\begin_inset Formula $\forall i\in N\quad\omega_{i}:=\frac{1}{N}$
+\end_inset
+
+).
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\family typewriter
+ProdPdf(Pdf)
+\family default
+ represents a product of factor probability density functions, which need
+ to be independent:
+\begin_inset Formula 
+\[
+p(a,b,c)=p(a)p(b)p(c).
+\]
+
+\end_inset
+
+This way one can represent for example a 2-dimensional random variable which
+ is uniform along first axis and Gaussian along second axi
+s
+\lang english
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import pybayes as pb
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+prod = pb.ProdPdf([pb.UniPdf(...), pb.GaussPdf(...)]).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+MLinGaussCPdf(CPdf)
+\family default
+ is a conditional normal distribution whose mean value 
+\begin_inset Formula $\mu$
+\end_inset
+
+ depends on the condition through affine transformation:
+\begin_inset Formula 
+\[
+f(x|c)\propto\exp\left(-\left(x-\mu\right)'R^{-1}\left(x-\mu\right)\right),
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mu=Ac+b$
+\end_inset
+
+ and 
+\begin_inset Formula $c$
+\end_inset
+
+ is the value of conditioning variable.
+ 
+\family typewriter
+MLinGaussCPdf
+\family default
+ takes optional parameter 
+\family typewriter
+base_class
+\family default
+ (
+\family typewriter
+AbstractGaussPdf
+\family default
+ subclass) which can be used to specify alternate base probability density
+ function to work on.
+ This way one can create e.g.
+ log-normal conditional density by passing 
+\family typewriter
+LogNormPdf
+\family default
+ as 
+\family typewriter
+base_class
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+LinGaussCPdf(CPdf)
+\family default
+ models similar, but univariate, conditional normal distribution whose mean
+ value and variance depend on 2-dimensional conditioning variable so that
+\begin_inset Formula 
+\[
+f(x|c_{1}c_{2})\propto\exp\left(-\frac{\left(x-\mu\right)^{2}}{2\sigma^{2}}\right),
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mu=ac_{1}+b$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma^{2}=cc_{2}+d$
+\end_inset
+
+.
+ 
+\family typewriter
+LinGaussCPdf
+\family default
+ accepts 
+\family typewriter
+base_class
+\family default
+ optional argument (which again defaults to 
+\family typewriter
+GaussPdf
+\family default
+) in a manner similar to 
+\family typewriter
+MLinGaussCPdf
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+GaussCPdf(CPdf)
+\family default
+ is the most general one-dimensional normal probability density function
+ available in PyBayes.
+ It exploits Python's 
+\begin_inset Quotes eld
+\end_inset
+
+function is a first-class citizen
+\begin_inset Quotes erd
+\end_inset
+
+ principle and takes 2 functions 
+\begin_inset Formula $f$
+\end_inset
+
+ and 
+\begin_inset Formula $g$
+\end_inset
+
+ to perform general transformation of the condition so that
+\begin_inset Formula 
+\begin{align*}
+\mu & =f(\mathbf{c}),\\
+R & =g(\mathbf{c}),
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{c}$
+\end_inset
+
+ is the conditioning variable.
+ 
+\family typewriter
+GaussCPdf
+\family default
+ also takes 
+\family typewriter
+base_class
+\family default
+ optional argument as described above.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+ProdCPdf(CPdf) 
+\family default
+represents general conditional product (application of the chain rule for
+ probability density functions) of 2 or more (conditional) factor distributions.
+ An example to describe
+\begin_inset Formula 
+\[
+p(x_{1}x_{2}|y_{1}y_{2})=p(x_{1}|x_{2}y_{1})p(x_{2}|y_{2}y_{1})
+\]
+
+\end_inset
+
+can look like this in the code:
+\family typewriter
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# prepare random variable components:
+\end_layout
+
+\begin_layout Plain Layout
+
+x_1, x_2 = RVComp(1), RVComp(1, "name is optional")
+\end_layout
+
+\begin_layout Plain Layout
+
+y_1, y_2 = RVComp(1), RVComp(1, "but recommended")
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+p_1 = SomePdf(..., rv=[x_1], cond_rv=[x_2, y_1])
+\end_layout
+
+\begin_layout Plain Layout
+
+p_2 = SomePdf(..., rv=[x_2], cond_rv=[y_2, y_1])
+\end_layout
+
+\begin_layout Plain Layout
+
+p = ProdCPdf((p_2, p_1), rv=[x_1, x_2],
+\end_layout
+
+\begin_layout Plain Layout
+
+             cond_rv=[y_1, y_2]).
+\end_layout
+
+\end_inset
+
+ProdCPdf
+\family default
+ then constructs the data-flow automatically (with the help of utility methods
+ of the 
+\family typewriter
+RV
+\family default
+ class) and raises an exception if this is impossible to do.
+\end_layout
+
+\begin_layout Subsubsection
+Bayesian Filters
+\end_layout
+
+\begin_layout Standard
+With frameworks modeling probability density functions and associated random
+ variables in place, the road is paved to construct Bayesian filters.
+ As it is common in PyBayes, there is abstract filter prototype and individual
+ implementations.
+ All filters are found in the 
+\family typewriter
+filters
+\family default
+ module of PyBayes.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+Filter
+\family default
+ represents a Bayesian filter, i.e.
+ any solution of the recursive Bayesian estimation problem as defined in
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Recursive-Bayesian-Estimation"
+
+\end_inset
+
+ or its approximation.
+ Filters usually take a description (of some form) of the transition and
+ observation probability density functions as constructor parameters.
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+bayes(yt,
+\begin_inset space ~
+\end_inset
+
+cond=None)
+\family default
+ performs the Bayesian update, i.e.
+ the transition from 
+\begin_inset Formula $t-1$
+\end_inset
+
+ to 
+\begin_inset Formula $t$
+\end_inset
+
+, taking observation at time 
+\begin_inset Formula $t$
+\end_inset
+
+, which is passed through the 
+\family typewriter
+yt
+\family default
+ (
+\family typewriter
+vector
+\family default
+) argument, into account.
+ For flexibility, optional argument 
+\family typewriter
+cond
+\family default
+ (
+\family typewriter
+vector
+\family default
+) can be also supplied.
+ Its meaning (as well as whether it is required or not) and depends on individua
+l subclasses.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+posterior()
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+Pdf
+\family default
+ returns posterior probability density function: 
+\begin_inset Formula $p(x_{t}|y_{1:t})$
+\end_inset
+
+ however with 
+\begin_inset Formula $y_{1:t}$
+\end_inset
+
+ already substituted by values passed to preceding 
+\family typewriter
+bayes()
+\family default
+ calls so that it takes unconditional form 
+\begin_inset Formula $p(x_{t})$
+\end_inset
+
+.
+ One might expect that posterior distribution would be returned right by
+ the 
+\family typewriter
+bayes()
+\family default
+ method, but this is not done because constructing posterior may spend some
+ additional resources and some callers may not need to know it after each
+ 
+\family typewriter
+bayes()
+\family default
+ call.
+ It also makes calling code more explicit, which considered as more 
+\begin_inset Quotes eld
+\end_inset
+
+Pythonic
+\begin_inset Quotes erd
+\end_inset
+
+ way of designing software.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.python.org/dev/peps/pep-0020/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Subclasses are allowed to return a reference (for performance reasons)
+ to their internal attribute, it is therefore forbidden to modify the returned
+ object.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+evidence_log(yt)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+double
+\family default
+ returns logarithm of the 
+\emph on
+marginal likelihood
+\emph default
+ (sometimes also called 
+\emph on
+evidence
+\emph default
+)
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Smi:10"
+
+\end_inset
+
+ of the observation 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+, which is passed as 
+\family typewriter
+yt
+\family default
+ (
+\family typewriter
+vector
+\family default
+), given previous observations 
+\begin_inset Formula $y_{1:t-1}$
+\end_inset
+
+, which are taken from preceding 
+\family typewriter
+bayes()
+\family default
+ calls (excluding the most recent one), i.e.
+\begin_inset Formula 
+\[
+p(y_{t}|y_{1:t-1})=\int p(y_{t}|x_{t})p(x_{t}|y_{1:t-1})\:\mathrm{d}x_{t}.
+\]
+
+\end_inset
+
+This quantity can be used as a measure of confidence in the filter.
+ Logarithm is returned instead of plain value for symmetry with 
+\family typewriter
+CPdf.eval_log()
+\family default
+ method.
+ As closed formula for this quantity may not be known, subclasses are not
+ required to implement this method.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\family typewriter
+KalmanFilter(Filter)
+\family default
+ implements the Kalman filter
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kalman:60"
+
+\end_inset
+
+ (formulated in language of recursive Bayesian estimation).
+ To make PyBayes suitable also for decision-making applications, control
+ vector can be optionally specified through the 
+\family typewriter
+cond
+\family default
+ argument of the 
+\family typewriter
+bayes()
+\family default
+ method (along with related matrix parameters in the constructor).
+ 
+\family typewriter
+GaussPdf
+\family default
+ is (naturally) used as a posterior distribution and evidence_log() is implement
+ed.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+ParticleFilter(Filter)
+\family default
+ implements the particle filter as presented in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Particle-Filter"
+
+\end_inset
+
+.
+ Before it was enhanced as part of this thesis, 
+\family typewriter
+ParticleFilter
+\family default
+ did not allow specifying the 
+\emph on
+proposal
+\emph default
+ distribution, i.e.
+ it implemented only the 
+\emph on
+bootstrap
+\emph default
+ variant of the particle filter which cannot take most recent observation
+ into account when sampling new particles.
+ It also did not support specifying custom empirical probability density
+ function --- 
+\family typewriter
+EmpPdf
+\family default
+ was used unconditionally, because the implementation was tied to it.
+ ParticleFilter constructor took number of particles 
+\begin_inset Formula $N$
+\end_inset
+
+ (
+\family typewriter
+int
+\family default
+), initial probability density function 
+\begin_inset Formula $p(x_{0})$
+\end_inset
+
+ (
+\family typewriter
+Pdf
+\family default
+) to sample starting particles from, transition density 
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+ and observation density 
+\begin_inset Formula $p(y_{t}|x_{t})$
+\end_inset
+
+ (both 
+\family typewriter
+CPdf
+\family default
+) as its arguments.
+\end_layout
+
 \begin_layout Section
-Analysis
+Analysis Results
+\end_layout
+
+\begin_layout Chapter
+Design and Implementation
+\end_layout
+
+\begin_layout Section
+Ceygen
+\end_layout
+
+\begin_layout Section
+Asim
 \end_layout
 
 \begin_layout Subsection
@@ -6106,12 +6760,8 @@ Assimilation
 Interaction With PyBayes
 \end_layout
 
-\begin_layout Section
-Implementation (?)
-\end_layout
-
 \begin_layout Subsection
-Documentation
+Documentation (?)
 \end_layout
 
 \begin_layout Chapter
