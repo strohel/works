@@ -9025,6 +9025,534 @@ x
 PyBayes Enhancements
 \end_layout
 
+\begin_layout Standard
+Improvements made to the PyBayes Bayesian filtering library can be split
+ into three separate parts: porting its Cython build to use Cython memoryviews
+ and Ceygen for linear algebra, implementing newly needed probability density
+ functions with their conditional variants and extending its particle filter
+ implementation.
+ We present these modifications one by one.
+\end_layout
+
+\begin_layout Subsection
+Porting to Cython memoryviews
+\end_layout
+
+\begin_layout Standard
+As soon as Ceygen project proved to be useful, it was decided that Python-compil
+ed version of PyBayes should be ported away from using NumPy 
+\family typewriter
+ndarray
+\family default
+s and problematic Tokyo wrapper to new Cython memoryviews with Ceygen backing.
+ The reasons included:
+\end_layout
+
+\begin_layout Enumerate
+relief from dependency on (C interfaces to) system BLAS and LAPACK libraries.
+ The dependency was found to be peculiar roadblock for portability especially
+ when optimized PyBayes was to be run on Apple Mac platforms.
+ Given that standardized BLAS and LAPACK implementations are only Fortran-based,
+ C interfaces to them vary.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+there are for example at least 2 different C LAPACK interfaces: the one
+ produced by f2c and LAPACKe one, with incompatible method signatures
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+ability to off-load linear algebra implementation to more appropriate projects.
+ Due to low-level nature of the 2 numerical libraries and in extension of
+ the Tokyo wrapper, PyBayes contained logic that was not deemed appropriate
+ for a topical library.
+\end_layout
+
+\begin_layout Enumerate
+Cython memoryviews have been shown to be more elegant, less limited and
+ more performant than exploiting Cython's ad-hoc support for NumPy 
+\family typewriter
+ndarray
+\family default
+s.
+ Sticking to legacy interfaces was found to be a blocker in PyBayes' integration
+ with emerging projects.
+\end_layout
+
+\begin_layout Standard
+The porting itself happened in two steps.
+ First, Tokyo was replaced with Ceygen, but usage of NumPy 
+\family typewriter
+ndarray
+\family default
+s was kept.
+ In second step, signatures of methods, types of class attributes and appropriat
+e local variables have been changed to memoryviews.
+ Operators were replaced by functions calls; in-code comments were added
+ so that adverse effects on code readability are minimized.
+\end_layout
+
+\begin_layout Standard
+This was accompanied by rewrite of the wrapper modules so that Python-only
+ build of PyBayes is not affected.
+ The wrappers became more straightforward, what follows is side-by-side
+ comparison of Cython (
+\family typewriter
+_linalg.pxd
+\family default
+) and Python (
+\family typewriter
+_linalg.py
+\family default
+) version of the 
+\family typewriter
+_linalg
+\family default
+ wrapper that mocks 
+\family typewriter
+numpy.linalg
+\family default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+from ceygen.lu cimport *    |  from numpy.linalg import *
+\end_layout
+
+\begin_layout Plain Layout
+
+from ceygen.llt cimport *   |
+\end_layout
+
+\end_inset
+
+I.e.
+ this wrapper became, due to Ceygen mimicking NumPy, a simple switcher between
+ the 2 implementations.
+ Note that in case of Cython build, the imports are in 
+\family typewriter
+.pxd
+\family default
+ 
+\begin_inset Quotes eld
+\end_inset
+
+header
+\begin_inset Quotes erd
+\end_inset
+
+ file so that they are resolved at compile-time.
+ Associated 
+\family typewriter
+_linalg.pyx
+\family default
+ file is empty.
+\end_layout
+
+\begin_layout Standard
+The _numpy wrapper was changed similarly.
+ Convenience methods 
+\family typewriter
+vector()
+\family default
+, 
+\family typewriter
+index_vector()
+\family default
+, 
+\family typewriter
+index_range()
+\family default
+ and 
+\family typewriter
+matrix()
+\family default
+ to abstract creation of new objects have been added with NumPy-, respectively
+ Ceygen-backed implementations.
+ Similar layer was created for advanced indexing within arrays.
+ This was needed because Python and Cython versions now use different types.
+ Other PyBayes modules now use more specialized function variants such as
+ 
+\family typewriter
+add_vv()
+\family default
+ and 
+\family typewriter
+dot_mm()
+\family default
+ --- the Python variant of the 
+\family typewriter
+_numpy
+\family default
+ wrapper aliases them as shown in the following except:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+add_vv = add
+\end_layout
+
+\begin_layout Plain Layout
+
+add_mm = add
+\end_layout
+
+\begin_layout Plain Layout
+
+dot_vv = dot
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given comprehensive test and stress-testing suite of PyBayes, the transition
+ could have been made without fear of breaking functionality.
+ Only problem worth mentioning that was faced during the transition was
+ Cython's inability to work with zero-length memoryview matrices of vectors.
+ Logic of some algorithms was therefore changed slightly to avoid these
+ corner-cases.
+\end_layout
+
+\begin_layout Standard
+From user point of view, nothing has changed in the Python version of PyBayes.
+ Only user-facing change of the Cython-compiled build are different (but
+ compatible) return types of methods and increased performance.
+\end_layout
+
+\begin_layout Subsection
+New Probability Density Functions
+\end_layout
+
+\begin_layout Standard
+Adding new probability density functions was more straightforward as was
+ sufficient to implement the defined interfaces.
+ Following distributions have been added:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+TruncatedNormPdf(Pdf)
+\family default
+ implements uniform truncated normal probability density function, i.e.
+ distribution of 
+\begin_inset Formula $Y$
+\end_inset
+
+, where 
+\begin_inset Formula $Y=X|a\leq x\leq b$
+\end_inset
+
+ and 
+\begin_inset Formula $X\sim\mathcal{N}(\mu,\sigma^{2})$
+\end_inset
+
+.
+ The 
+\family typewriter
+sample()
+\family default
+ method is implemented using rejection sampling.
+ More efficient implementation is being considered.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+GammaPdf(Pdf)
+\family default
+ models gamma distribution 
+\begin_inset Formula $\mathcal{G}(k,\theta)$
+\end_inset
+
+ with shape parameter 
+\begin_inset Formula $k$
+\end_inset
+
+ and scale parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+f(x)=\frac{1}{\Gamma(k)\theta^{k}}x^{k-1}e^{\frac{-x}{\theta}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+InverseGammaPdf(Pdf)
+\family default
+\series bold
+ 
+\series default
+implements inverse gamma distribution 
+\begin_inset Formula $i\mathcal{G}(\alpha,\beta)$
+\end_inset
+
+ with shape parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and scale parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+f(x)=\frac{\beta^{\alpha}}{\Gamma(\alpha)}x^{-\alpha-1}e^{\frac{-\beta}{x}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+GammaCPdf(CPdf)
+\family default
+ provides conditional 
+\family typewriter
+GammaPdf
+\family default
+ variant as needed by wind speed transition density.
+ Given fixed relative error coefficient 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ and conditioning variable 
+\begin_inset Formula $\mu$
+\end_inset
+
+, it is tuned to form gamma distribution with mean value 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and standard error 
+\begin_inset Formula $\gamma\mu$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+InverseGammaCPdf(CPdf)
+\family default
+ is inverse analogy of the 
+\family typewriter
+GammaCPdf
+\family default
+ distribution above.
+ It is needed for absorbed dose and wind speed observation densities.
+ Given fixed 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ and conditioning 
+\begin_inset Formula $\mu$
+\end_inset
+
+, 
+\family typewriter
+InverseGammaCPdf
+\family default
+ produces inverse gamma probability density function of mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and variance 
+\begin_inset Formula $\left(\gamma\mu\right)^{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Extending PyBayes Particle Filter
+\end_layout
+
+\begin_layout Standard
+Last step to make PyBayes fully usable for dispersion model assimilation
+ was to make its particle filter more flexible and capable.
+\end_layout
+
+\begin_layout Standard
+First, support for the proposal density has been added into 
+\family typewriter
+ParticleFilter
+\family default
+ class.
+ The proposal density takes the form 
+\begin_inset Formula $q(x_{t}|x_{t-1},y_{t})$
+\end_inset
+
+ which coincides with posterior probability density function of a Bayesian
+ filter (which is in PyBayes represented using unconditional probability
+ density function with 
+\begin_inset Formula $x_{t-1}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ already substituted) and it is evaluated twice in particle filter algorithm
+ (once during sampling, for the second time during weight update).
+ Because of this, it was decided that proposal would be represented by a
+ nested Bayesian filter (the alternative had been a conditional distribution).
+ This has a favorable side-effect that filters can be chained this way.
+ Filter's 
+\family typewriter
+bayes()
+\family default
+ method is called for each particle and its posterior density is then used
+ for sampling and weight evaluation.
+\end_layout
+
+\begin_layout Standard
+More technical change was to make 
+\family typewriter
+ParticleFilter
+\family default
+ accept custom implementation of the underlying 
+\family typewriter
+EmpPdf
+\family default
+ distribution.
+ Such change was needed to accommodate specially-crafted 
+\family typewriter
+PuffModelEmpPdf
+\family default
+ which is described below in the Asim section.
+ This request has been implemented without increasing number of 
+\family typewriter
+ParticleFilter
+\family default
+ constructor parameters: if the passed 
+\family typewriter
+init_pdf
+\family default
+ is already an instance of (a subclass of) 
+\family typewriter
+EmpPdf
+\family default
+, it is used directly for the whole lifetime of the 
+\family typewriter
+ParticleFilter
+\family default
+ instance.
+ Previous implementation used it just to sample initial particles.
+\end_layout
+
+\begin_layout Standard
+Third and last change relates to the second one.
+ Since 
+\family typewriter
+ParticleFilter
+\family default
+ no longer knowns all internal details of its newly polymorphic 
+\family typewriter
+EmpPdf
+\family default
+ instance, it delegates more work to it, namely the task to sample 
+\begin_inset Formula $i$
+\end_inset
+
+-th particle given a proposal density.
+ This was facilitated by introducing the 
+\family typewriter
+transition_using()
+\family default
+ method to 
+\family typewriter
+EmpPdf
+\family default
+ as depicted in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:asim-pf-emppdf"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename dia/pybayes-pf-emppdf.dia
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:asim-pf-emppdf"
+
+\end_inset
+
+ParticleFiler.bayes()
+\family default
+ pseudo-code and interaction with 
+\family typewriter
+EmpPdf
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Asim
 \end_layout
