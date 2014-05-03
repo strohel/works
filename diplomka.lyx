@@ -796,11 +796,12 @@ Chapter 3
 Chapter 4
 \emph default
  presents the design and implementation of these components in greater detail.
- It starts by description of the developed Asim project which combines Bayesian
- filtering with dispersion models, continues by presentation of enhancements
- done to PyBayes to support Asim and finishes with the Ceygen project which
- was conceived to provide highly efficient linear algebra operations for
- Asim and PyBayes.
+ It starts by description of the Ceygen library which was conceived to provide
+ highly efficient linear algebra operations for the latter projects; continues
+ by presentation of enhancements done to PyBayes to support the umbrella
+ project Asim, which was developed to combine Bayesian filtering from PyBayes
+ with dispersion models to form the desired dispersion model assimilation
+ solution.
 \end_layout
 
 \begin_layout Standard
@@ -808,12 +809,13 @@ Chapter 4
 \emph on
 Chapter 5
 \emph default
- verifies functionality of the software stack by performing a twin simulation
- and assimilation experiment.
- TODO.
- Second part of this chapter is devoted to benchmarks of the Ceygen library
- to confirm that it indeed brings significant overhead compared to previous
- solutions.
+ verifies functionality of the software stack.
+ It presents results from benchmarks of the Ceygen library to confirm that
+ it indeed brings significant overhead reduction compared to previous solutions.
+ Second part of this chapter is devoted to a twin experiment, where a simulation
+ of pollutant release under realistic meteorologic conditions is performed,
+ noise is added to simulated measurements, assimilation is run with the
+ noisy observations and its results are compared against the original simulation.
 \end_layout
 
 \begin_layout Chapter
@@ -3589,6 +3591,13 @@ reference "eq:p_Q_y_proposal_approx"
 
 \begin_layout Chapter
 Software Analysis
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Software-Analysis"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7274,11 +7283,1073 @@ Design and Implementation
 In this chapter, we present the design of developed software components,
  their implementation and rationale behind it.
  The design builds on suggestions made in the previous chapter with occasional
- enhancements aimed mainly to make the software more future-proof.
- The chapter starts with the top-level project Asim, continues with description
- of enhancements made to PyBayes and finalizes with presentation of the
- Ceygen linear algebra library that has been developed to improve performance.
- The implemented software is the main result of this thesis.
+ enhancements aimed mainly to make the software more future-proof or efficient.
+ It is shown how the software stack is built from the bottom up; the chapter
+ starts with the Ceygen linear algebra library that has been developed to
+ improve performance, continues with description of enhancements made to
+ PyBayes and finalizes with presentation of the top-level project Asim.
+ We consider the implemented software the main result of this thesis.
+\end_layout
+
+\begin_layout Standard
+In the whole chapter a Python-like syntax for class and method description
+ is used along with function annotations as defined by PEP 3107:
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://www.python.org/dev/peps/pep-3107
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\family typewriter
+ClassA(ClassB)
+\family default
+ denotes that 
+\family typewriter
+ClassA
+\family default
+ is a subclass of 
+\family typewriter
+ClassB
+\family default
+ and 
+\family typewriter
+func(p : int) → bool
+\family default
+ denotes a function/method 
+\family typewriter
+func
+\family default
+ with parameter 
+\family typewriter
+p
+\family default
+ of type 
+\family typewriter
+int
+\family default
+ that returns a boolean value.
+ Functions with no return value mentioned do not return semantically valuable
+ information; they are usually designed to return 
+\family typewriter
+True
+\family default
+ to allow for efficient exception passing when compiled by Cython.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+when functions with no return value are called, Cython has to use Python
+ API function to check to possible raised exceptions every time, which induces
+ overhead: 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://docs.cython.org/src/userguide/language_basics.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Ceygen
+\end_layout
+
+\begin_layout Standard
+Ceygen was developed to fill the missing gap in usability of Cython typed
+ memoryviews for numerical software: linear algebra on top of them.
+ Per software analysis from 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Software-Analysis"
+
+\end_inset
+
+, the Eigen library (combined with recent improvements to C++ support in
+ Cython) was identified as a perfect back-end to perform the actual computations.
+ Eigen is is a compile-time only dependency of Ceygen.
+\end_layout
+
+\begin_layout Standard
+Ceygen is being publicly developed and actively maintained by the author
+ of this text using the git version control system at the GitHub source
+ code repository at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/strohel/Ceygen
+\end_layout
+
+\end_inset
+
+.
+ It is released under the free and open-source GNU GPL v2+ license and packages
+ of released versions are available through the PyPI Python package repository
+ at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://pypi.python.org/pypi/Ceygen
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It should be noted that Ceygen is not useful for interpreted Python code,
+ for which using NumPy is, in our opinion, totally appropriate given already
+ present interpreter and dynamic-typing overhead.
+ It is rather designed to be used from Cython-compiled code (which is enhanced
+ with type declarations) that requires high performance and/or ability to
+ parallelize.
+ In fact, Ceygen functions are only visible from Cython-compiled code to
+ prevent such ill-optimization.
+\end_layout
+
+\begin_layout Subsection
+Achieved Design Goals
+\end_layout
+
+\begin_layout Standard
+Design goals, which have been fulfilled, prescribe that Ceygen...
+\end_layout
+
+\begin_layout Description
+is
+\begin_inset space ~
+\end_inset
+
+fast: Ceygen would be of no use if it wasn't highly performant; it does
+ not implement functionality that is 
+\emph on
+not available
+\emph default
+, it implements functionality that is 
+\emph on
+not available without considerable overhead
+\emph default
+, especially for small to moderate-sized matrices and vectors.
+ For this reason, every Ceygen function has a code-path where no Python
+ function is called, no memory is allocated on heap and no data (beyond
+ auxiliary variables of fixed size) is copied.
+\end_layout
+
+\begin_layout Description
+is
+\begin_inset space ~
+\end_inset
+
+documented: To be usable for its users without the need to study the source-code
+, software must be properly documented.
+ Every public Ceygen method is therefore described in detail in its reference
+ manual, which is generated using Sphinx from out-of-source documentation
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+generation from in-source declarations is not currently possible due to
+ Cython-enhanced syntax beyond the Python language
+\end_layout
+
+\end_inset
+
+ and is available on-line at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://strohel.github.io/Ceygen-doc/
+\end_layout
+
+\end_inset
+
+ or on the enclosed DVD-ROM.
+\end_layout
+
+\begin_layout Description
+works
+\begin_inset space ~
+\end_inset
+
+with
+\begin_inset space ~
+\end_inset
+
+a
+\begin_inset space ~
+\end_inset
+
+range
+\begin_inset space ~
+\end_inset
+
+of
+\begin_inset space ~
+\end_inset
+
+scalar
+\begin_inset space ~
+\end_inset
+
+types: Thanks to 
+\emph on
+fused types
+\emph default
+ support in Cython and templated nature of Eigen, Ceygen can be designed
+ in a way that various data types are supported using single implementation.
+ Types offered out-of-the box are 
+\family typewriter
+char
+\family default
+, 
+\family typewriter
+short
+\family default
+, 
+\family typewriter
+int
+\family default
+, 
+\family typewriter
+long
+\family default
+, 
+\family typewriter
+float
+\family default
+ and 
+\family typewriter
+double
+\family default
+; complex type support is planned.
+\end_layout
+
+\begin_layout Description
+is
+\begin_inset space ~
+\end_inset
+
+tested: Every public function has a unit test that assures its correctness
+ and also proper behavior when invalid input is passed.
+ At the time of writing, the test-suite consists of 98 individual tests
+ (of which 11 are benchmarking ones).
+ Thanks to Travis CI, a publicly available continuous integration server,
+ the test-suite is run every time under multiple Python versions when source
+ code is changed.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://travis-ci.org/strohel/Ceygen
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+supports
+\begin_inset space ~
+\end_inset
+
+multi-threading: Every Ceygen function does not acquire the GIL unless it
+ needs to create a Python object (which is always avoidable); all functions
+ are declared 
+\family typewriter
+nogil
+\family default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+a special Cython-specific decorator that marks the function as callable
+ with the GIL released
+\end_layout
+
+\end_inset
+
+ so that they can be called in 
+\family typewriter
+prange
+\family default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+parallelized for loop, a multi-threading construct provided by Cython
+\end_layout
+
+\end_inset
+
+ blocks without losing parallelism.
+\end_layout
+
+\begin_layout Description
+reports
+\begin_inset space ~
+\end_inset
+
+errors
+\begin_inset space ~
+\end_inset
+
+consistently: Care is taken to propagate all errors properly (down from
+ Eigen) to fulfill semantics expected by Python programmers.
+ Ceygen functions don't crash on invalid input, but rather raise reasonable
+ errors.
+ Steps taken to achieve this are described below.
+\end_layout
+
+\begin_layout Description
+is
+\begin_inset space ~
+\end_inset
+
+compatible
+\begin_inset space ~
+\end_inset
+
+with
+\begin_inset space ~
+\end_inset
+
+NumPy, but does not depend on it at compile or run-time (although its test
+ suite uses it).
+ Cython makes memoryviews and NumPy 
+\family typewriter
+ndarray
+\family default
+s fully interchangeable (without copying data, but with some overhead),
+ so Ceygen can be plugged into an existing project without need to modify
+ all code paths --- just those performance-critical.
+\end_layout
+
+\begin_layout Standard
+In order not to make false expectations, we find it fair to mention that
+ Ceygen...
+\end_layout
+
+\begin_layout Description
+is
+\begin_inset space ~
+\end_inset
+
+not
+\begin_inset space ~
+\end_inset
+
+an
+\begin_inset space ~
+\end_inset
+
+interface
+\begin_inset space ~
+\end_inset
+
+to
+\begin_inset space ~
+\end_inset
+
+Eigen: while Eigen is used internally, Ceygen does not wrap Eigen types
+ for others to use.
+\end_layout
+
+\begin_layout Description
+does
+\begin_inset space ~
+\end_inset
+
+not
+\begin_inset space ~
+\end_inset
+
+bring
+\begin_inset space ~
+\end_inset
+
+Eigen
+\begin_inset space ~
+\end_inset
+
+elegance
+\begin_inset space ~
+\end_inset
+
+to
+\begin_inset space ~
+\end_inset
+
+Python: Because of the way how Ceygen is implemented, it does not support
+ lazy evaluation or pseudo-code-like expressions that make Eigen beautiful
+ when used in C++ code.
+\end_layout
+
+\begin_layout Description
+does
+\begin_inset space ~
+\end_inset
+
+not
+\begin_inset space ~
+\end_inset
+
+help
+\begin_inset space ~
+\end_inset
+
+code
+\begin_inset space ~
+\end_inset
+
+readability: Because Ceygen does not integrate with memoryviews at Cython
+ level,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+which would be doable, but out of scope of this text
+\end_layout
+
+\end_inset
+
+ expressions where operators would be normally used have to be written as
+ function calls.
+ Users therefore have to find a trade-off between readability and performance.
+\end_layout
+
+\begin_layout Standard
+To illustrate usage of Ceygen, we show a sneak peek from its README file:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>>> cimport ceygen.core as c
+\end_layout
+
+\begin_layout Plain Layout
+
+>>> cdef double[:, :] big = np.array(
+\end_layout
+
+\begin_layout Plain Layout
+
+>>>                   [[1.,  2.,   2.,  0.,   0.,  0.],
+\end_layout
+
+\begin_layout Plain Layout
+
+>>>                    [3.,  4.,   0., -2.,   0.,  0.]])
+\end_layout
+
+\begin_layout Plain Layout
+
+>>> c.dot_mm(big[:, 0:2], big[:, 2:4], big[:, 4:6])
+\end_layout
+
+\begin_layout Plain Layout
+
+[[ 2.
+ -4.]
+\end_layout
+
+\begin_layout Plain Layout
+
+ [ 6.
+ -8.]]
+\end_layout
+
+\begin_layout Plain Layout
+
+>>> big
+\end_layout
+
+\begin_layout Plain Layout
+
+[[ 1.
+  2.
+   2.
+  0.
+   2.
+ -4.]
+\end_layout
+
+\begin_layout Plain Layout
+
+ [ 3.
+  4.
+   0.
+ -2.
+   6.
+ -8.]]
+\end_layout
+
+\end_inset
+
+The 
+\family typewriter
+dot_mm()
+\family default
+ call above does not copy any data, allocates no memory on heap, does not
+ need need the GIL and uses vectorization (SSE, AltiVec) if the processor
+ architecture it is compiled for supports it.
+\end_layout
+
+\begin_layout Subsection
+Interfacing Eigen
+\end_layout
+
+\begin_layout Standard
+As mentioned above, Ceygen uses 
+\family typewriter
+Eigen::Map
+\family default
+ class to make Cython memoryviews accessible from Eigen.
+ More specifically, Eigen::Map is subclassed (C++ -wise) in Ceygen file
+ 
+\family typewriter
+eigen_cpp.h
+\family default
+.
+ Template arguments are omitted for brevity and mentioned in description
+ if significant:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+BaseMap(Eigen::Map)
+\family default
+ exists to overcome Cython C++ limitation that all instantiated classes
+ must have a default constructor.
+ Its default constructor sets Eigen:Map values to null as nothing else is
+ available at that time.
+ It has 2 template parameters, 
+\family typewriter
+BaseType
+\family default
+ to specify underlying Eigen type (matrix, vector and its scalar type, 
+\family typewriter
+Scalar
+\family default
+) and 
+\family typewriter
+StrideType
+\family default
+ to specify striding (Fortran- or C-contiguity) at compile-time.
+ The initialization is done by a later called method:
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+init(data
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+Scalar*,
+\begin_inset space ~
+\end_inset
+
+shape
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+const
+\begin_inset space ~
+\end_inset
+
+int*,
+\begin_inset space ~
+\end_inset
+
+strides
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+const
+\begin_inset space ~
+\end_inset
+
+int*)
+\family default
+ sets vital 
+\family typewriter
+Eigen::Map
+\family default
+ variables extracted from Cython memoryview base pointer 
+\family typewriter
+data
+\family default
+, 
+\family typewriter
+shape
+\family default
+ (number of rows and/or columns) and 
+\family typewriter
+strides
+\family default
+ (memory layout along axes; contiguity).
+ It uses a trick with placement new operator (as 
+\family typewriter
+Eigen::Map
+\family default
+ otherwise does not allow late initialization).
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Other convenience subclasses are provided with no implementation that just
+ transform their template parameters.
+ All following classes take 
+\family typewriter
+dtype
+\family default
+ template argument to specify base scalar type (denoted as 
+\family typewriter
+Scalar
+\family default
+ in 
+\family typewriter
+BaseMap
+\family default
+) and 
+\family typewriter
+ContiguityType
+\family default
+ template argument, which is our way to specify compile-time striding (whether
+ individual axes are contiguous or specified as run-time) and storage order
+ (column-major or row-major):
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+VectorMap(BaseMap)
+\family default
+ fixes 
+\family typewriter
+BaseType
+\family default
+ to 
+\begin_inset Formula $n\times1$
+\end_inset
+
+ 
+\family typewriter
+Eigen::Matrix
+\family default
+ (column vector) for matrix-based operations.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+RowVectorMap(BaseMap)
+\family default
+ fixes 
+\family typewriter
+BaseType
+\family default
+ to 
+\begin_inset Formula $1\times n$
+\end_inset
+
+ 
+\family typewriter
+Eigen::Matrix
+\family default
+ (row vector).
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+Array1DMap(BaseMap)
+\family default
+ fixes 
+\family typewriter
+BaseType
+\family default
+ to 
+\begin_inset Formula $n\times1$
+\end_inset
+
+ 
+\family typewriter
+Eigen::Array
+\family default
+ (column vector) for element-wise operations.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+MatrixMap(BaseMap)
+\family default
+ fixes 
+\family typewriter
+BaseType
+\family default
+ to 
+\begin_inset Formula $m\times n$
+\end_inset
+
+ 
+\family typewriter
+Eigen::Matrix
+\family default
+ for matrix-based operations such as dot product.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+Array2DMap(BaseMap)
+\family default
+ fixes 
+\family typewriter
+BaseType
+\family default
+ to 
+\begin_inset Formula $m\times n$
+\end_inset
+
+ 
+\family typewriter
+Eigen::Array
+\family default
+ for element-wise operations with matrices.
+\end_layout
+
+\begin_layout Standard
+With C++ classes being prepared, last step is to make them known to Cython.
+ As it cannot parse C or C++ header files itself, signatures and interfaces
+ have to be communicated to it using its own syntax.
+ The 
+\family typewriter
+eigen_cython.pxd
+\family default
+ file in the source code does exactly that, it declares 
+\family typewriter
+BaseMap
+\family default
+ and its defined methods and operators (including the ones that are inherited
+ from Eigen)
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Cython does not require to declare all methods, just the ones used
+\end_layout
+
+\end_inset
+
+ and mentions that VectorMap, RowVectorMap, ..., Array2DMap are its subclasses.
+ This suffices to make the whole machinery accessible from Cython-compiled
+ Python code.
+\end_layout
+
+\begin_layout Subsection
+Contiguity-based Dispatching
+\end_layout
+
+\begin_layout Standard
+Because Cython memoryviews can be both contiguous (in row or column sense)
+ or noncontiguous, but only contiguous ones can be computed with effectively,
+ it was decided that Ceygen should support both without incurring performance
+ penalty in the favorable case.
+\end_layout
+
+\begin_layout Standard
+Because of that, every computational Ceygen function is divided into 2 parts:
+ a wrapper and worker, which takes contiguity type of its arguments as a
+ template parameter.
+ Wrapper just prepares the arguments and calls the worker through a so-called
+ 
+\emph on
+dispatcher
+\emph default
+, which determines what variant of worker is to be called depending on runtime
+ inspection of passed vector and matrix layouts.
+ Scary-looking implementation of dispatchers in 
+\family typewriter
+dispatch.h
+\family default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+which is again presented to Cython through 
+\family typewriter
+dispatch.pxd
+\end_layout
+
+\end_inset
+
+ has in fact little effect on performance, because their code is embedded
+ directly into wrappers by the compiler, furthermore function pointer assignment
+s are used instead of deep branching involving function calls.
+ Thanks to this approach, dispatcher code adds only tens of instructions
+ into wrapper function object code when compiled using optimizing C++ compiler.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+this was verified in the generated assembly code
+\end_layout
+
+\end_inset
+
+ We also expect that CPU branch predictors to be reasonably effective in
+ this case.
+\end_layout
+
+\begin_layout Standard
+All this is best shown on an example implementation of matrix dot product
+ in Ceygen:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cdef void dot_vv_worker(
+\end_layout
+
+\begin_layout Plain Layout
+
+        dtype *x_data, Py_ssize_t *x_shape,
+\end_layout
+
+\begin_layout Plain Layout
+
+        Py_ssize_t *x_strides, XVectorContiguity x_dummy,
+\end_layout
+
+\begin_layout Plain Layout
+
+        dtype *y_data, Py_ssize_t *y_shape,
+\end_layout
+
+\begin_layout Plain Layout
+
+        Py_ssize_t *y_strides, YVectorContiguity y_dummy,
+\end_layout
+
+\begin_layout Plain Layout
+
+        dtype *o) nogil:
+\end_layout
+
+\begin_layout Plain Layout
+
+    cdef VectorMap[dtype, XVectorContiguity] x
+\end_layout
+
+\begin_layout Plain Layout
+
+    cdef VectorMap[dtype, YVectorContiguity] y
+\end_layout
+
+\begin_layout Plain Layout
+
+    x.init(x_data, x_shape, x_strides)
+\end_layout
+
+\begin_layout Plain Layout
+
+    y.init(y_data, y_shape, y_strides)
+\end_layout
+
+\begin_layout Plain Layout
+
+    o[0] = x.dot(y)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@cython.boundscheck(False)
+\end_layout
+
+\begin_layout Plain Layout
+
+@cython.wraparound(False)
+\end_layout
+
+\begin_layout Plain Layout
+
+cdef dtype dot_vv(dtype[:] x, dtype[:] y) nogil except *:
+\end_layout
+
+\begin_layout Plain Layout
+
+    # vector x vector -> scalar operation dispatcher:
+\end_layout
+
+\begin_layout Plain Layout
+
+    cdef VVSDispatcher[dtype] dispatcher
+\end_layout
+
+\begin_layout Plain Layout
+
+    cdef dtype out
+\end_layout
+
+\begin_layout Plain Layout
+
+    dispatcher.run(&x[0], x.shape, x.strides,
+\end_layout
+
+\begin_layout Plain Layout
+
+                   &y[0], y.shape, y.strides, &out,
+\end_layout
+
+\begin_layout Plain Layout
+
+                   dot_vv_worker, dot_vv_worker,
+\end_layout
+
+\begin_layout Plain Layout
+
+                   dot_vv_worker, dot_vv_worker)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return out
+\end_layout
+
+\end_inset
+
+We remind that all dispatcher code is actually compiled into 
+\family typewriter
+dot_vv()
+\family default
+ and that 4 identically-looking passings of 
+\family typewriter
+dot_vv_worker
+\family default
+ in fact instantiate different contiguity variant each time.
+\end_layout
+
+\begin_layout Subsubsection
+Exception Passing
+\end_layout
+
+\begin_layout Standard
+Another purpose of dispatchers is to facilitate exception propagation from
+ Eigen (C++) to Python caller.
+ First, a macro 
+\family typewriter
+eigen_assert(statement)
+\family default
+ is defined before including Eigen in 
+\family typewriter
+eigen_cpp.h
+\family default
+ to code that throws a standard C++ library exception instead of aborting
+ the program being run (which is the default Eigen behavior and which would
+ be unexpected by Python programmers).
+\end_layout
+
+\begin_layout Standard
+Second, 
+\family typewriter
+run()
+\family default
+ methods of all dispatchers are decorated using special 
+\family typewriter
+except +
+\family default
+ flag which signals Cython to enclose the call into 
+\family typewriter
+try { } catch
+\family default
+ block and convert compatible C++ exceptions to Python ones.
+ For performance reasons it is important to do this just once per each function
+ call, so dispatchers are perfect place to do this even though the C++ exception
+ is raised much lower in the stack (the fact that BaseMap methods may raise
+ C++ exceptions themselves is purposefully concealed from Cython so that
+ generated worker code is leaner).
+\end_layout
+
+\begin_layout Subsection
+Ceygen Modules
+\end_layout
+
+\begin_layout Standard
+Finally, with all important technical details being thoroughly discussed,
+ we can present useful functionality implemented by Ceygen.
+ Se further divide the the functionality to subsections which correspond
+ to Ceygen modules.
+\end_layout
+
+\begin_layout Section
+PyBayes Enhancements
 \end_layout
 
 \begin_layout Section
@@ -7428,157 +8499,51 @@ depending on difference between original and alternative models, we expect
 \end_layout
 
 \begin_layout Standard
-We again use Python-like syntax for class and method description (with function
- annotations as defined by PEP 3107
-\begin_inset Foot
-status open
-
-\begin_layout Plain Layout
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-https://www.python.org/dev/peps/pep-3107
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-): 
+All classes described in this chapter lie in the 
 \family typewriter
-ClassA(ClassB)
+dispmodel.iface
 \family default
- denotes that 
-\family typewriter
-ClassA
-\family default
- is a subclass of 
-\family typewriter
-ClassB
-\family default
- and 
-\family typewriter
-func(p : int) → bool
-\family default
- denotes a function/method 
-\family typewriter
-func
-\family default
- with parameter 
-\family typewriter
-p
-\family default
- of type 
-\family typewriter
-int
-\family default
- that returns a boolean value.
- Functions with no return value mentioned do not return semantically valuable
- information; they are usually designed to return 
-\family typewriter
-True
-\family default
- to allow for efficient exception passing when compiled by Cython.
-\begin_inset Foot
-status open
-
-\begin_layout Plain Layout
-when functions with no return value are called, Cython has to call Python
- API function to check to possible raised exceptions, which induces overhead:
- 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://docs.cython.org/src/userguide/language_basics.html
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+ module of Asim.
 \end_layout
 
 \begin_layout Description
 
 \family typewriter
-DispersionModel
+Location
 \family default
- is the prototype for atmospheric pollutant dispersion models.
- Apart from simulating the pollutant propagation, it also needs to be able
- to compute pollutant concentration at given spatial coordinates and absorbed
- pollutant dose at any point of interest during the last time step.
- It does not contain any logic for meteorologic or release simulation, such
- data are rather passed through separate models.
- 
-\family typewriter
-DispersionModel
-\family default
- is required not to make any assumptions about these models apart from their
- conformance to the specified interface.
- 
-\family typewriter
-DispersionModel
-\family default
- is designed to keep track of time; implementations are expected to accept
- a parameter denoting time step 
-\begin_inset Formula $\Delta t$
-\end_inset
-
- and advance internal time counter during each propagation step.
- Because continuous infinite assimilation is among use-cases, it is not
- recommended that dispersion models keep track of history; they are not
- required to provide any data or computations from all but the most recent
- time step.
+ is a simple container for spatial coordinates, a non-abstract class.
 \end_layout
 
 \begin_deeper
 \begin_layout Description
 
 \family typewriter
-propagate(meteo_model,
+x,
 \begin_inset space ~
 \end_inset
 
-source_model)
+y,
+\begin_inset space ~
+\end_inset
+
+z
 \family default
- advances to next time step by simulating atmospheric effects on the pollutant
- in the air.
- It sources meteorologic information exclusively from the 
-\family typewriter
-meteo_model
-\family default
- argument, which is an instance of the 
-\family typewriter
-MeteoModel
-\family default
- interface described below.
- It also simulates ongoing pollutant release (which may be zero) from the
- facility based on data provided by the 
-\family typewriter
-source_model
-\family default
- parameter (instance of 
-\family typewriter
-SourceModel
-\family default
-, which is again described below).
+ attributes contain x (increases in the East direction), y (increases in
+ the North direction) and z (height) coordinates in meters.
 \end_layout
 
 \begin_layout Description
 
 \family typewriter
-concentration_at(loc)
+distance_to(loc
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+Location)
 \begin_inset space ~
 \end_inset
 
@@ -7586,50 +8551,31 @@ concentration_at(loc)
 \begin_inset space ~
 \end_inset
 
-vector
+double
 \family default
- should return the concentration in 
-\begin_inset Formula $\mathrm{Bq}\cdot\mathrm{m}^{-3}$
-\end_inset
-
- of each pollutant component at given spatial coordinates 
+ computes distance between this location and another one, 
 \family typewriter
 loc
 \family default
- (all arguments named 
-\family typewriter
-loc
-\family default
- are of type 
-\family typewriter
-Location
-\family default
- in Asim) and current time step.
-\end_layout
-
-\begin_layout Description
-
-\family typewriter
-dose_at(loc)
-\begin_inset space ~
-\end_inset
-
-→
-\begin_inset space ~
-\end_inset
-
-vector
-\family default
- is designed to return time-integrated absorbed dose in Sv at given location
- 
-\family typewriter
-loc
-\family default
- per the most recent time step.
- Individual vector components correspond to pollutant components.
+.
 \end_layout
 
 \end_deeper
+\begin_layout Description
+
+\family typewriter
+Nuclide
+\family default
+ class describes physical properties of one radionuclide such as half-life,
+ energy radiated during decay or coefficients describing tendency to deposit.
+ It is a simple container for attributes with no methods.
+ Instantiated 
+\family typewriter
+Nuclide
+\family default
+ objects should be treated as immutable.
+\end_layout
+
 \begin_layout Description
 
 \family typewriter
@@ -7741,7 +8687,19 @@ double
 \begin_inset Formula $\mathrm{m}\cdot\mathrm{s}^{-1}$
 \end_inset
 
- at given location and time step.
+ at given location 
+\family typewriter
+loc
+\family default
+ (all arguments named 
+\family typewriter
+loc
+\family default
+ are of type 
+\family typewriter
+Location
+\family default
+ in Asim) and time step.
 \end_layout
 
 \begin_layout Description
@@ -7786,7 +8744,8 @@ time)
 double
 \family default
  returns height in meters of the atmospheric layer where air that rises
- from the ground clashes with colder air in the upper parts.
+ from the ground clashes with colder air in the upper parts (at given time-spati
+al coordinates, ignoring the height).
  Such quantity is needed by certain dispersion models including our puff-based
  one.
 \end_layout
@@ -7866,33 +8825,73 @@ double
 \begin_layout Description
 
 \family typewriter
-Location
+DispersionModel
 \family default
- is a simple container for spatial coordinates.
+ is the prototype for atmospheric pollutant dispersion models.
+ Apart from simulating the pollutant propagation, it also needs to be able
+ to compute pollutant concentration at given spatial coordinates and absorbed
+ pollutant dose at any point of interest during the last time step.
+ It does not contain any logic for meteorologic or release simulation, such
+ data are rather passed through separate models.
+ 
+\family typewriter
+DispersionModel
+\family default
+ is required not to make any assumptions about these models apart from their
+ conformance to the specified interface.
+ 
+\family typewriter
+DispersionModel
+\family default
+ is designed to keep track of time; implementations are expected to accept
+ a parameter denoting time step 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ and advance internal time counter during each propagation step.
+ Because continuous infinite assimilation is among use-cases, it is not
+ recommended that dispersion models keep track of history; they are not
+ required to provide any data or computations from all but the most recent
+ time step.
 \end_layout
 
 \begin_deeper
 \begin_layout Description
 
 \family typewriter
-x,
+propagate(meteo_model,
 \begin_inset space ~
 \end_inset
 
-y,
-\begin_inset space ~
-\end_inset
-
-z
+source_model)
 \family default
- attributes contain x (increases in the East direction), y (increases in
- the North direction) and z (height) coordinates in meters.
+ advances to next time step by simulating atmospheric effects on the pollutant
+ in the air.
+ It sources meteorologic information exclusively from the 
+\family typewriter
+meteo_model
+\family default
+ argument, which is an instance of the 
+\family typewriter
+MeteoModel
+\family default
+ interface.
+ It also simulates ongoing pollutant release (which may be zero) from the
+ facility based on data provided by the 
+\family typewriter
+source_model
+\family default
+ parameter (instance of 
+\family typewriter
+SourceModel
+\family default
+).
 \end_layout
 
 \begin_layout Description
 
 \family typewriter
-distance_to(loc)
+concentration_at(loc)
 \begin_inset space ~
 \end_inset
 
@@ -7900,21 +8899,42 @@ distance_to(loc)
 \begin_inset space ~
 \end_inset
 
-double
+vector
 \family default
- computes distance between this location and another one.
+ should return the concentration in 
+\begin_inset Formula $\mathrm{Bq}\cdot\mathrm{m}^{-3}$
+\end_inset
+
+ of each pollutant component at given spatial coordinates 
+\family typewriter
+loc
+\family default
+ and current time step.
 \end_layout
 
-\end_deeper
 \begin_layout Description
 
 \family typewriter
-Nuclide
+dose_at(loc)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+vector
 \family default
- class describes physical properties of one radionuclide such as half-life,
- energy radiated during decay or coefficients describing tendency to deposit.
+ is designed to return time-integrated absorbed dose in Sv at given location
+ 
+\family typewriter
+loc
+\family default
+ per the most recent time step.
+ Individual vector components correspond to pollutant components.
 \end_layout
 
+\end_deeper
 \begin_layout Standard
 As an extension to theory in 
 \begin_inset CommandInset ref
@@ -7934,7 +8954,7 @@ reference "chap:DispersionModel"
 For performance reasons, implementations may return a reference to internal
  workspace attribute in vector-returning methods.
  This means that callers cannot make modifications to vectors they get.
- Given intended uses, this was considered more elegant than the alternative
+ Given intended uses, this was considered this more elegant than the alternative
  to let callers (optionally) pass the 
 \begin_inset Quotes eld
 \end_inset
@@ -8016,19 +9036,15 @@ Assimilation
 \end_layout
 
 \begin_layout Subsection
+Supportive Modules
+\end_layout
+
+\begin_layout Subsection
 Integration in Distributed Worker Setup
 \end_layout
 
-\begin_layout Section
-PyBayes Enhancements
-\end_layout
-
-\begin_layout Section
-Ceygen
-\end_layout
-
 \begin_layout Chapter
-Results
+Verification
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Results"
