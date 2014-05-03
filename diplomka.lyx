@@ -7833,9 +7833,10 @@ The
 \family typewriter
 dot_mm()
 \family default
- call above does not copy any data, allocates no memory on heap, does not
- need need the GIL and uses vectorization (SSE, AltiVec) if the processor
- architecture it is compiled for supports it.
+ call above does not copy any data, allocates no memory on heap and does
+ not need need the GIL.
+ If the passed array was bigger, it would use vectorization (SSE, AltiVec)
+ if the processor architecture it is compiled for supported it.
 \end_layout
 
 \begin_layout Subsection
@@ -7863,8 +7864,8 @@ eigen_cpp.h
 \family typewriter
 BaseMap(Eigen::Map)
 \family default
- exists to overcome Cython C++ limitation that all instantiated classes
- must have a default constructor.
+ exists to overcome Cython C++ support limitation that all instantiated
+ classes must have a default constructor.
  Its default constructor sets Eigen:Map values to null as nothing else is
  available at that time.
  It has 2 template parameters, 
@@ -8101,7 +8102,19 @@ Cython does not require to declare all methods, just the ones used
 
 \end_inset
 
- and mentions that VectorMap, RowVectorMap, ..., Array2DMap are its subclasses.
+ and mentions that 
+\family typewriter
+VectorMap
+\family default
+, 
+\family typewriter
+RowVectorMap
+\family default
+, ..., 
+\family typewriter
+Array2DMap
+\family default
+ are its subclasses.
  This suffices to make the whole machinery accessible from Cython-compiled
  Python code.
 \end_layout
@@ -8346,6 +8359,666 @@ Finally, with all important technical details being thoroughly discussed,
  we can present useful functionality implemented by Ceygen.
  Se further divide the the functionality to subsections which correspond
  to Ceygen modules.
+ This section does not form a reference manual of Ceygen (which is available
+ on-line or on the enclosed DVD-ROM), it only mentions implemented functionality
+, omitting unimportant functions.
+\end_layout
+
+\begin_layout Standard
+All computational Ceygen functions share a common signature pattern: their
+ suffix determines on what combination of vectors/matrices they operate,
+ e.g.
+ 
+\family typewriter
+dot_mv()
+\family default
+ is matrix-vector dot product while 
+\family typewriter
+dot_mm()
+\family default
+ is a matrix-matrix one.
+ This is done because Cython memoryviews encode their dimensionality statically.
+ We believe this does not restrict users significantly as we have only rarely
+ seen numerical code that accepts tensors of varying dimensionality.
+ Disregarding the suffixes, function names mimic those of NumPy to allow
+ for easy back and forth code transitions.
+\end_layout
+
+\begin_layout Standard
+Another pattern is optional 
+\family typewriter
+out
+\family default
+ parameter (available in all but scalar-returning or in-place operations).
+ Familiar to NumPy users, this parameter allows Ceygen to eliminate significant
+ overhead of creating a new vector/matrix for return value.
+ If specified, Ceygen uses it to fill the operation results and returns
+ it back for symmetry.
+ Some element-wise methods support repeating one of the input parameters
+ in 
+\family typewriter
+out
+\family default
+, effectively forming in-place operations.
+\end_layout
+
+\begin_layout Subsubsection
+Core Data-type: 
+\family typewriter
+dtype
+\family default
+ Module
+\end_layout
+
+\begin_layout Standard
+The base scalar templated type, dtype, is defined in this module.
+ There is also 
+\family typewriter
+nonint_dtype
+\family default
+, which omits integer types and is used in functions where integer scalars
+ are not feasible: decompositions, matrix inversion etc.
+ Both are implemented as Cython 
+\emph on
+fused types
+\emph default
+, meaning that all latter functions using them are generated for various
+ scalars: 
+\family typewriter
+float
+\family default
+, 
+\family typewriter
+double
+\family default
+, 
+\family typewriter
+int
+\family default
+ and so on.
+ In theory, adding support for a new type (for example complex ones) to
+ Ceygen involves just extending 
+\family typewriter
+dtype
+\family default
+ and providing implementation for helper methods to create new instances:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+vector(size
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+int,
+\begin_inset space ~
+\end_inset
+
+like
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+dtype*)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+dtype[:]
+\family default
+ creates a new vector; 
+\family typewriter
+like
+\family default
+ is a dummy parameter used to specify desired base type.
+ Individual components are uninitialized.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+matrix(rows
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+int,
+\begin_inset space ~
+\end_inset
+
+cols
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+int,
+\begin_inset space ~
+\end_inset
+
+like
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+dtype*)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+dtype[:,
+\begin_inset space ~
+\end_inset
+
+:]
+\family default
+ similarly creates a new matrix.
+\end_layout
+
+\begin_layout Subsubsection
+Linear Algebra: 
+\family typewriter
+core
+\family default
+ Module
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+ceygen.core
+\family default
+ module implements matrix dot product for various matrix/vector combinations.
+ As Cython memoryviews don't differentiate between row and column vectors
+ (contrary to Eigen), Ceygen assumes that vectors are transposed in a way
+ so that operation result is of smaller dimensions.
+ 
+\begin_inset Formula $n\times1$
+\end_inset
+
+ or 
+\begin_inset Formula $1\times n$
+\end_inset
+
+ matrices can always be specified to force desired behavior.
+ Functions in this module are (omitting their obvious arguments): 
+\family typewriter
+dot_vv() → dtype
+\family default
+, 
+\family typewriter
+dot_mv() → dtype[:]
+\family default
+, 
+\family typewriter
+dot_vm() → dtype[:]
+\family default
+, 
+\family typewriter
+dot_mm() → dtype[:, :]
+\family default
+.
+\end_layout
+
+\begin_layout Subsubsection
+Element-wise Operations: 
+\family typewriter
+elemwise
+\family default
+ Module
+\end_layout
+
+\begin_layout Standard
+As not even element-wise operations are provided by Cython for memoryviews
+ (apart from assignment which even supports broadcasting), they are supplied
+ by Ceygen.
+ Unlike more complex operations, element-wise operations allow its users
+ to repeat one of the input arrays in the out parameter to create in-place
+ versions of the methods.
+\end_layout
+
+\begin_layout Standard
+Vector-scalar operations implemented: 
+\family typewriter
+add_vs() → dtype[:]
+\family default
+, 
+\family typewriter
+multiply_vs() → dtype[:]
+\family default
+, 
+\family typewriter
+power_vs() → dtype[:]
+\family default
+.
+ Note that there are no 
+\family typewriter
+subtract_vs()
+\family default
+ or 
+\family typewriter
+divide_vs()
+\family default
+: users are instead simply advised to add opposite and multiply by inverse
+ number, respectively.
+\end_layout
+
+\begin_layout Standard
+Strictly analogous are matrix-scalar functions 
+\family typewriter
+add_ms()
+\family default
+, 
+\family typewriter
+multiply_ms()
+\family default
+, 
+\family typewriter
+power_ms()
+\family default
+ that all return 
+\family typewriter
+dtype[:, :]
+\family default
+ (matrix).
+\end_layout
+
+\begin_layout Standard
+Vector-vector element-wise methods follow similar pattern: 
+\family typewriter
+add_vv()
+\family default
+, 
+\family typewriter
+subtract_vv()
+\family default
+, 
+\family typewriter
+multiply_vv()
+\family default
+, 
+\family typewriter
+divide_vv()
+\family default
+ all return a vector.
+\end_layout
+
+\begin_layout Standard
+For completeness matrix-matrix functions are listed: 
+\family typewriter
+add_mm()
+\family default
+, 
+\family typewriter
+subtract_mm()
+\family default
+, 
+\family typewriter
+multiply_mm()
+\family default
+, 
+\family typewriter
+divide_mm()
+\family default
+.
+\end_layout
+
+\begin_layout Subsubsection
+Decompositions: 
+\family typewriter
+lu
+\family default
+ and 
+\family typewriter
+llt
+\family default
+ Modules
+\end_layout
+
+\begin_layout Standard
+Functions based on lower-upper and Cholesky 
+\begin_inset Formula $\left(L\cdot L^{T}\right)$
+\end_inset
+
+ decompositions are more interesting.
+ 
+\family typewriter
+ceygen.lu
+\family default
+ module provides:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+inv(x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+nonint_dtype[:
+\begin_inset space ~
+\end_inset
+
+:],
+\begin_inset space ~
+\end_inset
+
+out=None)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+nonint_dtype[:
+\begin_inset space ~
+\end_inset
+
+:]
+\family default
+ computes inverse of the matrix x using LU factorization with partial pivoting.
+ Produces undefined results on non-invertible matrices.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+iinv(x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+nonint_dtype[:
+\begin_inset space ~
+\end_inset
+
+:])
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+nonint_dtype[:
+\begin_inset space ~
+\end_inset
+
+:]
+\family default
+ is a similar method that inverts the matrix in-place.
+ This is faster than using 
+\family typewriter
+A = ceygen.lu.inv(A)
+\family default
+ because the temporary workspace is allocated in C++ domain rather than
+ Python domain.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+det(x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+dtype[:
+\begin_inset space ~
+\end_inset
+
+:])
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+dtype
+\family default
+ computes matrix determinant using LU decomposition.
+\end_layout
+
+\begin_layout Standard
+The Cholesky factorization-powered 
+\family typewriter
+ceygen.llt
+\family default
+ module implements this method:
+\end_layout
+
+\begin_layout Description
+cholesky(
+\family typewriter
+x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+nonint_dtype[:
+\begin_inset space ~
+\end_inset
+
+:],
+\begin_inset space ~
+\end_inset
+
+out=None)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+nonint_dtype[:
+\begin_inset space ~
+\end_inset
+
+:]
+\family default
+ computes decomposition of the matrix 
+\family typewriter
+x
+\family default
+ (which must be square, Hermitian and positive-definite) so that 
+\begin_inset Formula $x=\mathtt{out}\cdot\mathtt{out}^{H}$
+\end_inset
+
+ (
+\begin_inset Formula $\mathtt{out}^{H}$
+\end_inset
+
+ being conjugate transpose of 
+\family typewriter
+out
+\family default
+).
+\end_layout
+
+\begin_layout Subsubsection
+Reductions: 
+\family typewriter
+reductions
+\family default
+ Module
+\end_layout
+
+\begin_layout Standard
+The last-presented 
+\family typewriter
+ceygen.reductions
+\family default
+ module contains, at the time of writing, just various variants of summing:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+sum_v(x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+dtype[:])
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+dtype
+\family default
+ returns sum of the vector 
+\family typewriter
+x
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+sum_m(x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+dtype[:,
+\begin_inset space ~
+\end_inset
+
+:])
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+dtype
+\family default
+ similarly returns sum of the matrix 
+\family typewriter
+x
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+rowwise_sum(x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+dtype[:,
+\begin_inset space ~
+\end_inset
+
+:],
+\begin_inset space ~
+\end_inset
+
+out=None)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+dtype[:]
+\family default
+ reduces all rows of the matrix 
+\family typewriter
+x
+\family default
+ to scalars by summing.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+colwise_sum(x
+\begin_inset space ~
+\end_inset
+
+:
+\begin_inset space ~
+\end_inset
+
+dtype[:,
+\begin_inset space ~
+\end_inset
+
+:],
+\begin_inset space ~
+\end_inset
+
+out=None)
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+dtype[:]
+\family default
+ analogously reduces all columns of the matrix 
+\family typewriter
+x
+\family default
+ to scalars by summing.
 \end_layout
 
 \begin_layout Section
