@@ -843,7 +843,7 @@ status open
 
 \begin_layout Plain Layout
 also known as the Sequential Importance resampling (SIR) or Sequential Monte
- Carlo method
+ Carlo method.
 \end_layout
 
 \end_inset
@@ -870,7 +870,7 @@ Recursive Bayesian estimation
 status open
 
 \begin_layout Plain Layout
-also known as Bayesian filtering
+also known as Bayesian filtering.
 \end_layout
 
 \end_inset
@@ -1218,7 +1218,7 @@ constraint
 \begin_inset Formula $\sum_{i=1}^{N}\omega_{t}^{(i)}=1\quad\forall t$
 \end_inset
 
- must hold
+ must hold.
 \end_layout
 
 \end_inset
@@ -1242,7 +1242,7 @@ constraint
 status open
 
 \begin_layout Plain Layout
-independently identically distributed
+independently identically distributed.
 \end_layout
 
 \end_inset
@@ -1853,7 +1853,7 @@ a measure similar to
 \emph on
 number of effective particles
 \emph default
- used in this text
+ used in this text.
 \end_layout
 
 \end_inset
@@ -1886,7 +1886,7 @@ where
 \begin_inset Formula $N$
 \end_inset
 
- is the total number of particles
+ is the total number of particles.
 \end_layout
 
 \end_inset
@@ -1934,7 +1934,7 @@ or even to
 \begin_inset Formula $O(N)$
 \end_inset
 
- when some favorable conditions are met
+ when some favorable conditions are met.
 \end_layout
 
 \end_inset
@@ -2036,7 +2036,7 @@ status open
 
 \begin_layout Plain Layout
 we use a nuclear power plan Temelín as an example of such facility in this
- text
+ text.
 \end_layout
 
 \end_inset
@@ -2098,7 +2098,7 @@ status open
 
 \begin_layout Plain Layout
 a meteorologic measure of atmospheric turbulence, an important factor affecting
- dispersion
+ dispersion.
 \end_layout
 
 \end_inset
@@ -2371,7 +2371,7 @@ reference "eq:fluency_rate"
 
 \end_inset
 
- in our test runs
+ in our test runs.
 \end_layout
 
 \end_inset
@@ -2421,7 +2421,7 @@ km spatial and 1
 \begin_inset space ~
 \end_inset
 
-hour temporal grid step
+hour temporal grid step.
 \end_layout
 
 \end_inset
@@ -2581,7 +2581,7 @@ although not effortlessly as this would invalidate our derivation of conjugate
 \begin_inset Formula $b_{t}$
 \end_inset
 
-
+.
 \end_layout
 
 \end_inset
@@ -2792,7 +2792,7 @@ given half-life
 \begin_inset Formula $\lambda=\frac{t_{\nicefrac{1}{2}}}{\ln2}$
 \end_inset
 
-
+.
 \end_layout
 
 \end_inset
@@ -3437,7 +3437,7 @@ this is possible because
 \begin_inset Formula $\forall i\; d_{t,i}$
 \end_inset
 
- depends on linear combination of puff activities
+ depends on linear combination of puff activities.
 \end_layout
 
 \end_inset
@@ -3732,7 +3732,7 @@ status open
 
 \begin_layout Plain Layout
 Application Programming Interface, a set of rules defining how a software
- library is used
+ library is used.
 \end_layout
 
 \end_inset
@@ -3874,7 +3874,7 @@ status open
 
 \begin_layout Plain Layout
 types are bound to values, not variables; one variable can assume multiple
- non-covariant types during its lifetime
+ non-covariant types during its lifetime.
 \end_layout
 
 \end_inset
@@ -3905,7 +3905,7 @@ status open
 
 \begin_layout Plain Layout
 objects are referenced, rather than copied, when passed around and assignments
- in nested scope are invisible to parent scope
+ in nested scope are invisible to parent scope.
 \end_layout
 
 \end_inset
@@ -4222,7 +4222,7 @@ status open
 
 \begin_layout Plain Layout
 with some limitations like inability to programmatically retrieve executed
- source code
+ source code.
 \end_layout
 
 \end_inset
@@ -4498,7 +4498,7 @@ nogil
 \begin_inset Quotes erd
 \end_inset
 
- block is also provided
+ block is also provided.
 \end_layout
 
 \end_inset
@@ -4592,7 +4592,7 @@ Memoryviews can be created out of any Python type that supports PEP
 status open
 
 \begin_layout Plain Layout
-Python Enhancement Proposal
+Python Enhancement Proposal.
 \end_layout
 
 \end_inset
@@ -4809,7 +4809,7 @@ status open
 
 \begin_layout Plain Layout
 Basic Linear Algebra Subprograms, a de facto standard API for computer linear
- algebra dating back to 1979
+ algebra dating back to 1979.
 \end_layout
 
 \end_inset
@@ -4820,7 +4820,7 @@ status open
 
 \begin_layout Plain Layout
 Linear Algebra PACKage, extension of BLAS with higher-level methods like
- equation solving or decompositions
+ equation solving or decompositions.
 \end_layout
 
 \end_inset
@@ -4876,7 +4876,7 @@ status open
 
 \begin_layout Plain Layout
 deferring of the actual computations to the point where they are first really
- needed
+ needed.
 \end_layout
 
 \end_inset
@@ -4920,7 +4920,7 @@ s
 status open
 
 \begin_layout Plain Layout
-like the SSE or AVX extensions
+like the SSE or AVX extensions.
 \end_layout
 
 \end_inset
@@ -5213,7 +5213,7 @@ status open
 \begin_layout Plain Layout
 in fact, Eigen allows to express whether the storage order is row-major
  or column major, specifying the other storage variant has the same effect
- as swapping inner and outer stride
+ as swapping inner and outer stride.
 \end_layout
 
 \end_inset
@@ -5338,7 +5338,7 @@ https://travis-ci.org/strohel/PyBayes
 status open
 
 \begin_layout Plain Layout
-Continuous Integration
+Continuous Integration.
 \end_layout
 
 \end_inset
@@ -5474,7 +5474,7 @@ float
 \family typewriter
 double
 \family default
- type
+ type.
 \end_layout
 
 \end_inset
@@ -5532,7 +5532,7 @@ pybayes.pdfs
 status open
 
 \begin_layout Plain Layout
-pdfs stands for probability density functions
+pdfs stands for probability density functions.
 \end_layout
 
 \end_inset
@@ -6909,7 +6909,7 @@ inv()
 status open
 
 \begin_layout Plain Layout
-matrix inversion
+matrix inversion.
 \end_layout
 
 \end_inset
@@ -7054,7 +7054,7 @@ a)
 status open
 
 \begin_layout Plain Layout
-Integrated Development Environments
+Integrated Development Environments.
 \end_layout
 
 \end_inset
@@ -7196,7 +7196,7 @@ status open
 
 \begin_layout Plain Layout
 which could be useful to anyone who performs linear algebra with Cython
- memoryviews
+ memoryviews.
 \end_layout
 
 \end_inset
@@ -7476,7 +7476,7 @@ status open
 
 \begin_layout Plain Layout
 generation from in-source declarations is not currently possible due to
- Cython-enhanced syntax beyond the Python language
+ Cython-enhanced syntax beyond the Python language.
 \end_layout
 
 \end_inset
@@ -7604,7 +7604,7 @@ status open
 
 \begin_layout Plain Layout
 a special Cython-specific decorator that marks the function as callable
- with the GIL released
+ with the GIL released.
 \end_layout
 
 \end_inset
@@ -7618,7 +7618,7 @@ prange
 status open
 
 \begin_layout Plain Layout
-parallelized for loop, a multi-threading construct provided by Cython
+parallelized for loop, a multi-threading construct provided by Cython.
 \end_layout
 
 \end_inset
@@ -7749,7 +7749,7 @@ readability: Because Ceygen does not integrate with memoryviews at Cython
 status open
 
 \begin_layout Plain Layout
-which would be doable, but out of scope of this text
+which would be doable, but out of scope of this text.
 \end_layout
 
 \end_inset
@@ -8097,7 +8097,7 @@ BaseMap
 status open
 
 \begin_layout Plain Layout
-Cython does not require to declare all methods, just the ones used
+Cython does not require to declare all methods, just the ones used.
 \end_layout
 
 \end_inset
@@ -8153,6 +8153,8 @@ status open
 which is again presented to Cython through 
 \family typewriter
 dispatch.pxd
+\family default
+.
 \end_layout
 
 \end_inset
@@ -8166,7 +8168,7 @@ s are used instead of deep branching involving function calls.
 status open
 
 \begin_layout Plain Layout
-this was verified in the generated assembly code
+this was verified in the generated assembly code.
 \end_layout
 
 \end_inset
@@ -9059,7 +9061,7 @@ status open
 
 \begin_layout Plain Layout
 there are for example at least 2 different C LAPACK interfaces: the one
- produced by f2c and LAPACKe one, with incompatible method signatures
+ produced by f2c and LAPACKe one, with incompatible method signatures.
 \end_layout
 
 \end_inset
@@ -9691,7 +9693,7 @@ status open
 \begin_layout Plain Layout
 depending on difference between original and alternative models, we expect
  that modifications may still be needed, for example the presented released
- dose proposal density is rather tied to puff-based dispersion model
+ dose proposal density is rather tied to puff-based dispersion model.
 \end_layout
 
 \end_inset
@@ -10155,8 +10157,8 @@ reference "chap:DispersionModel"
 For performance reasons, implementations may return a reference to internal
  workspace attribute in vector-returning methods.
  This means that callers cannot make modifications to vectors they get.
- Given intended uses, this was considered this more elegant than the alternative
- to let callers (optionally) pass the 
+ Given intended uses, this was considered to be more elegant than the alternativ
+e to let callers (optionally) pass the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -10171,7 +10173,7 @@ status open
 \begin_layout Plain Layout
 we consider employing at least one of these approaches crucial for high
  computational efficiency as allocating memory and creating new objects
- upon each call constitutes significant overhead
+ upon each call constitutes significant overhead.
 \end_layout
 
 \end_inset
