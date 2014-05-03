@@ -9559,9 +9559,9 @@ Asim
 
 \begin_layout Standard
 Asim is the functionally highest-level project presented here.
- It is written in Cython-enhanced Python language (pure Python mode variant
- of it) and makes use of PyBayes for Bayesian filtering, Ceygen to perform
- linear algebra and employs Cython typed memoryviews as its base vector/matrix
+ It is written in Cython-enhanced Python language (pure Python mode approach)
+ and makes use of PyBayes for Bayesian filtering, Ceygen to perform linear
+ algebra and employs Cython typed memoryviews as its base vector/matrix
  type (the basic scalar type being 
 \family typewriter
 double
@@ -9641,7 +9641,7 @@ http://sphinx-doc.org/
 
 \end_inset
 
- from directives embedded in code.
+ from directives embedded in code (available on the enclosed DVD-ROM).
  Asim uses coding style conventions expected by vast majority of Python
  developers as defined in PEP 8.
 \begin_inset Foot
@@ -10219,7 +10219,45 @@ UML diagram of dispersion model prototype, supportive models and implementation
 
 \end_inset
 
-UML diagram of dispersion model prototype, supportive models and implementation
+UML diagram of dispersion model prototype, supportive models and implementation.
+ 
+\family typewriter
+DispersionModel
+\family default
+ uses (depends on) 
+\family typewriter
+MeteoModel
+\family default
+ and 
+\family typewriter
+SourceModel
+\family default
+, which is in turn composed of 
+\family typewriter
+Nuclide
+\family default
+ instances.
+ Both 
+\family typewriter
+Puff
+\family default
+ and 
+\family typewriter
+PuffModel
+\family default
+ are implementations of 
+\family typewriter
+DispersionModel
+\family default
+, 
+\family typewriter
+DispersionModel
+\family default
+ being composed of 
+\family typewriter
+Puff
+\family default
+s.
 \end_layout
 
 \end_inset
