@@ -2483,8 +2483,8 @@ key "HieKarDij:11"
 
 \end_inset
 
- to combine local measurements with numerical forecast was employed, the
- corrected wind speed and direction 
+ to combine local measurements with numerical forecast was employed.
+ The corrected wind speed and direction quantities 
 \begin_inset Formula $\dot{v}_{t}(\mathbf{s})$
 \end_inset
 
@@ -2492,7 +2492,7 @@ key "HieKarDij:11"
 \begin_inset Formula $\dot{\phi}_{t}(\mathbf{s})$
 \end_inset
 
- respectively are given by
+, respectively, are given by
 \begin_inset Formula 
 \begin{eqnarray}
 \dot{v}_{t}(\mathbf{s}) & = & a_{t}\tilde{v}_{t}\left(\mathbf{s}\right),\label{eq:AsimV}\\
@@ -2808,17 +2808,17 @@ given half-life
 Given the deterministic property of large part of the full state, we can
  shrink the state space for the purposes of assimilation into 
 \begin_inset Formula 
-\begin{eqnarray*}
-\mathbf{x}_{t} & = & (a_{t},b_{t},Q_{t})
-\end{eqnarray*}
+\begin{eqnarray}
+\mathbf{x}_{t} & = & (a_{t},b_{t},Q_{t})\label{eq:x_t}
+\end{eqnarray}
 
 \end_inset
 
 along with the transition density
 \begin_inset Formula 
-\begin{eqnarray*}
-p(\mathbf{x}_{t}|\mathbf{x}_{t-1}) & = & p(Q_{t})p(a_{t}|a_{t-1})p(b_{t}|b_{t-1}),
-\end{eqnarray*}
+\begin{eqnarray}
+p(\mathbf{x}_{t}|\mathbf{x}_{t-1}) & = & p(Q_{t})p(a_{t}|a_{t-1})p(b_{t}|b_{t-1}),\label{eq:p_xt_xtp}
+\end{eqnarray}
 
 \end_inset
 
@@ -3095,6 +3095,13 @@ ty
 
 \begin_layout Section
 Problem-specific Proposal Density
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Problem-specific-Proposal"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3365,17 +3372,17 @@ In our case (again with
 
 ): 
 \begin_inset Formula 
-\begin{align*}
-a & =a_{t}\tilde{v}_{t}\\
-y & =v_{t}\\
-p(y|a) & =p(v_{t}|a_{t}\tilde{v}_{t})\\
- & =i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)\\
-p(a) & =p(a_{t}\tilde{v}_{t}|a_{t-1})\\
- & =\mathcal{G}(a_{t}\tilde{v}_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}\tilde{v}_{t})\\
-p(a|y) & =p(a_{t}\tilde{v}_{t}|a_{t-1},v_{t})\\
- & =\mathcal{G}\left(a_{t}\tilde{v}_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}+\gamma_{a}^{-2}a_{t-1}^{-1}\tilde{v}_{t}^{-1}\right)^{-1}\right)\\
-p(a_{t}|a_{t-1},v_{t}) & =\mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right).
-\end{align*}
+\begin{align}
+a & =a_{t}\tilde{v}_{t}\nonumber \\
+y & =v_{t}\nonumber \\
+p(y|a) & =p(v_{t}|a_{t}\tilde{v}_{t})\nonumber \\
+ & =i\mathcal{G}\left(v_{t};\gamma_{v}^{-2}+2,(\gamma_{v}^{-2}+1)a_{t}\tilde{v}_{t}\right)\nonumber \\
+p(a) & =p(a_{t}\tilde{v}_{t}|a_{t-1})\nonumber \\
+ & =\mathcal{G}(a_{t}\tilde{v}_{t};\gamma_{a}^{-2},\gamma_{a}^{2}a_{t-1}\tilde{v}_{t})\nonumber \\
+p(a|y) & =p(a_{t}\tilde{v}_{t}|a_{t-1},v_{t})\nonumber \\
+ & =\mathcal{G}\left(a_{t}\tilde{v}_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}+\gamma_{a}^{-2}a_{t-1}^{-1}\tilde{v}_{t}^{-1}\right)^{-1}\right)\nonumber \\
+p(a_{t}|a_{t-1},v_{t}) & =\mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}+2,\left(\left(\gamma_{v}^{-2}+1\right)v_{t}^{-1}\tilde{v}_{t}+\gamma_{a}^{-2}a_{t-1}^{-1}\right)^{-1}\right).\label{eq:GammaConjugateRealParams}
+\end{align}
 
 \end_inset
 
@@ -3383,7 +3390,14 @@ p(a_{t}|a_{t-1},v_{t}) & =\mathcal{G}\left(a_{t};\gamma_{v}^{-2}+\gamma_{a}^{-2}
 \end_layout
 
 \begin_layout Subsection
-Released Dose Proposal Density
+Released Activity Proposal Density
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Released-Activity-Proposal"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7288,7 +7302,7 @@ In this chapter, we present the design of developed software components,
  starts with the Ceygen linear algebra library that has been developed to
  improve performance, continues with description of enhancements made to
  PyBayes and finalizes with presentation of the top-level project Asim.
- We consider the implemented software the main result of this thesis.
+ We consider the implemented software one the main results of this thesis.
 \end_layout
 
 \begin_layout Standard
@@ -10711,9 +10725,59 @@ MeteoModel
 PuffModel
 \family default
  instances.
+ The design gets slightly more complicated due to the fact that released
+ dose assimilation is infeasible without appropriate proposal density and
+ that the state variable has to be split into non-deterministic and conditionall
+y deterministic part of variable dimension.
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename dia/asim-assimilation.dia
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:asim-assimilation"
+
+\end_inset
+
+
+\begin_inset Argument
+status open
+
+\begin_layout Plain Layout
+Objects participating in assimilation
+\end_layout
+
+\end_inset
+
+Objects participating in assimilation.
+ Relationships between instances (rather than classes) are shown.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
 Presented classes are implemented in the 
 \family typewriter
 assimilation.twin
@@ -10729,16 +10793,852 @@ pb
 pb.GaussPdf
 \family default
  is PyBayes' implementation of the normal distribution.
+ Overall assimilation design is depicted in the 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:asim-assimilation"
+
+\end_inset
+
+, where diamond-ending lines represent composition and dashed arrows usage.
+\end_layout
+
+\begin_layout Subsubsection
+Puff-enhanced Empirical Posterior Distribution
+\end_layout
+
+\begin_layout Standard
+To cope with special form of the state vector 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:x_t"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:x_t_full"
+
+\end_inset
+
+, a problem-specific subclass of 
+\family typewriter
+pb.EmpPdf
+\family default
+ has been created.
+ It is described below along with supportive classes.
 \end_layout
 
 \begin_layout Description
 
 \family typewriter
-AssimilationSourceModel(StaticCompoLocSourceModel)
+PuffModelEmpPdf(pb.EmpPdf)
+\family default
+ is a work-horse container for the assimilation; it enhances 
+\family typewriter
+pb.EmpPdf
+\family default
+ to add a 
+\family typewriter
+PuffModel
+\family default
+ instance to each particle.
+ The weights 
+\begin_inset Formula $\omega_{t}^{(i)}$
+\end_inset
+
+ and assimilated quantities 
+\begin_inset Formula $\left(a_{t}^{(i)},b_{t}^{(i)},Q_{t}^{(i)}\right)$
+\end_inset
+
+ are kept in 
+\family typewriter
+pb.EmpPdf
+\family default
+, but 
+\family typewriter
+PuffModel
+\family default
+ instances are stored in its own 
+\family typewriter
+models
+\family default
+ attribute.
+ The task of 
+\family typewriter
+PuffModelEmpPdf
+\family default
+ is to keep them in sync and ensure that it can be used as a posterior density
+ of 
+\family typewriter
+pb.ParticleFilter
+\family default
+.
+ To do so, it re-implements two methods:
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+resample()
+\family default
+ ensures that 
+\family typewriter
+models
+\family default
+ (in addition to 
+\family typewriter
+pb.EmpPdf
+\family default
+ attributes) are resampled correctly during the final step of particle filter
+ iteration.
+ It tries to minimize copying, which is expensive.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+transition_using()
+\family default
+ is called by particle filter for each particle to sample 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ given 
+\begin_inset Formula $x_{t-1},y_{t}$
+\end_inset
+
+ and passed proposal density.
+ This is where propagation of the dispersion model happens.
+ Absorbed doses at receptors (assuming unitary puff acitivites) are precomputed
+ here for the proposal and observation distributions so that they do not
+ have to be computed twice.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+an optimization that convolutes the design, but cuts needed resources virtually
+ in half as the dose evaluation is the single most demanding operation resource-
+wise.
+\end_layout
+
+\end_inset
+
+ Multiple smaller propagations of the dispersion model per each particle
+ filter iteration (
+\family typewriter
+transition_using()
+\family default
+ call) happen to achieve adequate precision of the dose calculation.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+which can be, in time domain, viewed as a simple addition-based integration.
+\end_layout
+
+\end_inset
+
+ Computing real absorbed doses is then a matter of simple vector multiplication
+ of 
+\begin_inset Quotes eld
+\end_inset
+
+unitary
+\begin_inset Quotes erd
+\end_inset
+
+ doses and puff activities.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\family typewriter
+AssimilationSourceModel(StaticCompoLocSourceModel) 
+\family default
+(not shown in the diagram) simply hooks assimilation into dispersion models
+ by returning assimilated released dose.
+ As en exception, 
+\family typewriter
+AssimilationSourceModel
+\family default
+ in fact just provides release rate that results in unitary released puff
+ activity as it is triggered by the activity proposal distribution before
+ the sampled activity is known (which is assigned to the released puff once
+ it is known).
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+AssimilationMeteoModel(PasquillsMeteoModel) 
+\family default
+(not shown in the diagram) provides wind field to dispersion models given
+ assimilated 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+, 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ and externally supplied numerical forecast according to transformations
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimV"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimPhi"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Transition and Observation Probability Density Functions
+\end_layout
+
+\begin_layout Standard
+PyBayes particle filter expects transition and observation distributions
+ in form of conditional probability density functions.
+ Problem-specific ones are hence implemented in Asim, using building blocks
+ provided by PyBayes.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+TransitionCPdf(pb.CPdf)
+\family default
+ represents transition density 
+\begin_inset Formula $p(x_{t}|x_{t-1})$
+\end_inset
+
+.
+ 
+\family typewriter
+TransitionCPdf
+\family default
+ implements 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_xt_xtp"
+
+\end_inset
+
+ by employing 
+\family typewriter
+pb.GammaPdf
+\family default
+ for wind speed correction coefficient 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ and 
+\family typewriter
+pb.MLinGaussCPdf
+\family default
+ for wind direction correction coefficient 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+.
+ It also formally contains 
+\begin_inset Formula $Q_{t}$
+\end_inset
+
+, but its sampling is skipped (as it is infeasible) and during evaluation
+ equal probability is assigned to all realizations.
+ This is possible because it is the proposal distribution that performs
+ this job.
+ If there were not this special casing (and circular wrapping for 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+) 
+\family typewriter
+TransitionCPdf
+\family default
+ could have been implemented as 
+\family typewriter
+pb.ProdCPdf
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+ObservationCPdf(pb.CPdf)
+\family default
+ models observation density 
+\begin_inset Formula $p(y_{t}|x_{t})$
+\end_inset
+
+ per 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimObservationCPdf"
+
+\end_inset
+
+.
+ Anemometer wind direction read-out is evaluated using 
+\family typewriter
+pb.MLinGaussCPdf
+\family default
+, while wind speed and absorbed dose read-outs (from 
+\begin_inset Formula $M$
+\end_inset
+
+ receptors) are modeled using the 
+\family typewriter
+pb.InverseGammaCPdf
+\family default
+ densities.
+ As an optimization, only one instance of inverse gamma distribution is
+ created for dose evaluation and shared.
+\end_layout
+
+\begin_layout Subsubsection
+Proposal Filter and Densities
+\end_layout
+
+\begin_layout Standard
+The assimilation is made possible (assuming real-world resources) only by
+ employing a suitable form of proposal density.
+ Following classes implement it.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+ConjugateProposalFilter(pb.Filter)
+\family default
+ provides problem-specific proposal density as shown in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Problem-specific-Proposal"
+
+\end_inset
+
+ in form of a Bayesian filter as required by 
+\family typewriter
+pb.ParticleFilter
+\family default
+.
+ We note that its name is slightly misleading as only 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+ proposals take form of conjugate probability density functions; 
+\begin_inset Formula $Q_{t}$
+\end_inset
+
+ proposal is an approximation with arbitrarily chosen distribution.
+ Its 
+\family typewriter
+bayes()
+\family default
+ method is called by particle filter when it is about to sample a new particle.
+ This method returns a posterior distribution in form of 
+\family typewriter
+pb.ProdCPdf
+\family default
+ representing 
+\family typewriter
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AsimApproxSDOptim"
+
+\end_inset
+
+
+\family default
+ that is composed of:
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+pb.GammaPdf
+\family default
+ whose parameters are given by 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:GammaConjugateRealParams"
+
+\end_inset
+
+ for sampling wind speed correction coefficient 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+pb.GaussPdf 
+\family default
+for sampling wind direction correction coefficient 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+, tuned according to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:NormalConjugate"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+ActivityProposalCPdf(pb.CPdf)
+\family default
+ performs released activity proposal approximation as described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Released-Activity-Proposal"
+
+\end_inset
+
+.
+ It is conditionally dependent on 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $b_{t}$
+\end_inset
+
+.
+ In its 
+\family typewriter
+sample()
+\family default
+ method, it performs dispersion model propagation with unitary released
+ activity and simulates dose measurements on receptors (computation results
+ are saved for reuse in 
+\family typewriter
+PuffModelEmpPdf
+\family default
+).
+ Computed doses are substituted into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_y_Q_explicit"
+
+\end_inset
+
+, which is then approximated using Laplace's method
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+which involves finding maxima of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_y_Q_explicit"
+
+\end_inset
+
+ and computing second derivative in it.
+\end_layout
+
+\end_inset
+
+ as 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:p_Q_y_proposal_approx"
+
+\end_inset
+
+.
+ The final approximation is then represented using 
+\family typewriter
+pb.TruncatedNormalPdf
+\family default
+.
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+Runner
+\end_layout
+
+\begin_layout Standard
+The whole assimilation machinery is orchestrated by the 
+\family typewriter
+run()
+\family default
+ method, which contains support for running multiple variants of the assimilatio
+n on the same data for easy comparison.
+ It also saves assimilation results for reuse and allows them to be visualized.
 \end_layout
 
 \begin_layout Subsection
-Integration in Distributed Worker Setup
+Supportive Modules
+\end_layout
+
+\begin_layout Standard
+Apart from work-horse classes, Asim contains also some auxiliary objects
+ and functions in its 
+\family typewriter
+support
+\family default
+ package.
+ Module 
+\family typewriter
+support.newton
+\family default
+ implements Netwon's method for finding a root of a function with known
+ derivative.
+ It accepts instances of the 
+\family typewriter
+Function
+\family default
+ class prototype that exists to let Cython fully optimize the algorithm.
+ Data visualization can be performed using convenience functions in the
+ 
+\family typewriter
+support.plotters
+\family default
+ module, which is implemented in ordinary Python as it is not performance-critic
+al.
+\end_layout
+
+\begin_layout Section
+Integration in Distributed Worker System
+\end_layout
+
+\begin_layout Standard
+One of the intended use-case of Asim is to provide so-called 
+\emph on
+workers
+\emph default
+ for web-based distributed dispersion modeling system.
+ Instance of such system, which uses a different dispersion model, HARP,
+ is available at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://dss.utia.cas.cz/
+\end_layout
+
+\end_inset
+
+.
+ Such workers listen for tasks given by the server.
+ A task assignment is described in a JSON format which contains necessary
+ parameters for the worker and once the worker is done, it sends back the
+ results again in the JSON format.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://tools.ietf.org/html/rfc7159
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Two workers have been implemented (outside Asim project), one for simulation
+ and one for assimilation.
+\end_layout
+
+\begin_layout Subsection
+puff_simulation Worker
+\end_layout
+
+\begin_layout Standard
+The puff_simulation worker, which can be found on the enclosed DVD-ROM under
+ a directory of the same name, performs atmospheric pollutant release simulation
+ using the 
+\family typewriter
+asim.simulation
+\family default
+ Asim package.
+ It contains a stripped-down version of the runner found in the mentioned
+ package that constructs the required classes with parameters given in the
+ task JSON.
+ Format of this experiment configuration file is best shown on an example
+ (shortened for brevity):
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+    "simulation_length": 14400,
+\end_layout
+
+\begin_layout Plain Layout
+
+    "time_step": 120,
+\end_layout
+
+\begin_layout Plain Layout
+
+    "source_model": {
+\end_layout
+
+\begin_layout Plain Layout
+
+        "puff_sampling_step": 600,
+\end_layout
+
+\begin_layout Plain Layout
+
+        "activities": [
+\end_layout
+
+\begin_layout Plain Layout
+
+            [0.4E+16],
+\end_layout
+
+\begin_layout Plain Layout
+
+            (..)
+\end_layout
+
+\begin_layout Plain Layout
+
+            [1.9E+16]
+\end_layout
+
+\begin_layout Plain Layout
+
+        ]
+\end_layout
+
+\begin_layout Plain Layout
+
+    },
+\end_layout
+
+\begin_layout Plain Layout
+
+    "meteo_model": {
+\end_layout
+
+\begin_layout Plain Layout
+
+        "stability_category": 3,
+\end_layout
+
+\begin_layout Plain Layout
+
+        "grid_step_time": 3600,
+\end_layout
+
+\begin_layout Plain Layout
+
+        "grid_step_xy": 3000,
+\end_layout
+
+\begin_layout Plain Layout
+
+        "meteo_array": <4D array with wind speed, wind
+\end_layout
+
+\begin_layout Plain Layout
+
+                        direction on a time-spatial grid>
+\end_layout
+
+\begin_layout Plain Layout
+
+    },
+\end_layout
+
+\begin_layout Plain Layout
+
+    "receptors": [
+\end_layout
+
+\begin_layout Plain Layout
+
+        {"name": "ETE 01", x: 115.36, y: 445.01, z: 0},
+\end_layout
+
+\begin_layout Plain Layout
+
+        (...)
+\end_layout
+
+\begin_layout Plain Layout
+
+        {"name": "Sedlec", x: -30.50, y: -77.46, z: 0}
+\end_layout
+
+\begin_layout Plain Layout
+
+    ]
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As can be seen, the parameters are organized in a structure similar to object-or
+iented design of Asim classes.
+ The simulation runner therefore only interprets top-level parameters and
+ passes other ones as constructor arguments to individual components.
+\end_layout
+
+\begin_layout Standard
+puff_simulation worker repeats some of its input parameters in its output
+ JSON file and adds:
+\end_layout
+
+\begin_layout Itemize
+total doses computed on a grid (which is itself also specified),
+\end_layout
+
+\begin_layout Itemize
+per-
+\family typewriter
+puff_sampling_step
+\family default
+ doses computed for each receptor specified in 
+\family typewriter
+receptors
+\family default
+,
+\end_layout
+
+\begin_layout Itemize
+recorded trajectories for each released puff,
+\end_layout
+
+\begin_layout Itemize
+wind speeds and directions that could have been measured at origin (facility)
+ using anemometer given the meteorologic forecast.
+\end_layout
+
+\begin_layout Standard
+Precise output format is not included here for brevity, but full versions
+ of both files can be found on the enclosed DVD-ROM under the 
+\family typewriter
+puff_simulation/
+\family default
+ folder.
+\end_layout
+
+\begin_layout Subsection
+puff_assimilation Worker
+\end_layout
+
+\begin_layout Standard
+The simulation-performing worker is strictly analogous.
+ It contains simplified version of Asim's 
+\family typewriter
+assimilation.twin.run()
+\family default
+ runner that supports executing just one assimilation at a time.
+ Input JSON format of the 
+\family typewriter
+puff_assimilation
+\family default
+ worker is exactly the same as output format of the 
+\family typewriter
+puff_simulation
+\family default
+ worker so that a twin experiment can be executed trivially.
+ Its input can be however enhanced with more properties that affect assimilation
+ (such as number of particles 
+\begin_inset Formula $N$
+\end_inset
+
+ etc.) --- specified parameters override built-in defaults.
+\end_layout
+
+\begin_layout Standard
+Once assimilation is done, output dataset is produced.
+ It currently lists just estimated released activities (
+\begin_inset Formula $Q_{t}$
+\end_inset
+
+ values) along with its standard deviations, a measure of particle filter
+ effectivity, 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ and time spent in each iteration.
+ It is expected that output data will be extended to allow visualization
+ of the results and better comparison (as much more variables are actually
+ computed).
+ Source code of this worker along with its example input and output formats
+ is available on the enclosed DVD-ROM in the 
+\family typewriter
+puff_simulation/
+\family default
+ directory.
+\end_layout
+
+\begin_layout Standard
+Both simulation and assimilation workers assume that Asim, PyBayes and Ceygen
+ are installed as Python site-packages.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+There are however many standardized ways specify additional Python package
+ search locations.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
