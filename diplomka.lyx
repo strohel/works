@@ -11653,6 +11653,833 @@ name "chap:Results"
 \end_layout
 
 \begin_layout Standard
+In this final chapter, we verify that the implemented software stack works
+ correctly and performs according to expected performance and accuracy levels
+ on a series of benchmarks and an experiment.
+ After defining the hardware and software environment used to perform the
+ tests, results of the Ceygen's benchmark suite are presented and compared
+ against analogous NumPy functions.
+ The second part of this chapter is devoted to verification of the assimilation
+ algorithms as implemented in Asim in a so-called twin experiment.
+\end_layout
+
+\begin_layout Section
+Testing Environment
+\end_layout
+
+\begin_layout Standard
+Following equipment and software was used to perform the benchmarking and
+ testing below:
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="4">
+<features tabularvalignment="middle">
+<column alignment="right" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<column alignment="right" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Processor
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Intel Core i5-2520M @ 2.5 GHz (turbo boost up to 3.2 GHz) 
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Main Memory
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8 GB @ 1333 MHz
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Storage
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Intel SSD 310 80 GB, mSATA 3Gb/s
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Operating System
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gentoo Linux (Base System release 2.2)
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Linux kernel 3.10.26-gentoo
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Compiler
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gcc 4.7.3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Cython
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.19.2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BLAS, LAPACK
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ATLAS 3.10.1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ceygen
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TODO
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NumPy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.8.0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset space \qquad{}
+\end_inset
+
+
+\begin_inset space \qquad{}
+\end_inset
+
+
+\begin_inset space \qquad{}
+\end_inset
+
+
+\begin_inset space \qquad{}
+\end_inset
+
+
+\begin_inset space \qquad{}
+\end_inset
+
+PyBayes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TODO
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Python
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.7.5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Asim
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TODO
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Eigen
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3.0.6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Used ATLAS
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Automatically Tuned Linear Algebra Software: 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://math-atlas.sourceforge.net/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ BLAS/LAPACK implementation was carefully compiled on the target machine
+ so that its automatically-tuning feature is used to maximum extent.
+ NumPy was build with support for calling into BLAS/LAPACK enabled so that
+ maximum expected performance can be achieved.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Note:
+\emph default
+ A regression in very recent versions of Cython (at least 0.20.1) which causes
+ Cython compiler to crash when it is about to compile Ceygen.
+ This is being investigated and until resolved, users are advised to use
+ versions 0.19.1 or 0.19.2 with Ceygen.
+\end_layout
+
+\begin_layout Section
+Ceygen Benchmark
+\end_layout
+
+\begin_layout Standard
+We have picked 4 algebraic operations of different nature to benchmark performan
+ce of Ceygen against equivalent NumPy functions.
+ The benchmark itself is part of Ceygen and can be found in its 
+\family typewriter
+tests.bench
+\family default
+ module.
+\end_layout
+
+\begin_layout Standard
+Care is taken to use the function variants that incur least overhead: the
+ 
+\family typewriter
+out
+\family default
+ parameter is always specified for both NumPy and Ceygen function calls.
+ The benchmarking code is compiled by Cython (to eliminate interpreter overhead)
+ and involved objects are properly typed (in case of NumPy, most efficient
+ type for both arguments and function itself is just 
+\family typewriter
+object
+\family default
+).
+ To illustrate, only 2 Python API function calls (which cause most overhead)
+ are done inside the loop where
+\family typewriter
+ numpy.add()
+\family default
+ is called: 
+\family typewriter
+PyTuple_New()
+\family default
+ to construct its parameters and 
+\family typewriter
+PyObject_Call()
+\family default
+ to call it.
+ Number of iterations is chosen so that at least 0.2 s is spent inside the
+ loop.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename cyegen_bench/add_vv.eps
+	width 80text%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:bench-add-vv"
+
+\end_inset
+
+Ceygen vector-vector addition benchmark
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:bench-add-vv"
+
+\end_inset
+
+ we compare vector-vector addition for vectors of size 2 up to size 128.
+ As in all latter benchmarks we plot relative wall clock time consumed by
+ one call, i.e.
+ the slowest variant gets assigned time 1 an other variants are scaled relativel
+y to it.
+ Ceygen really shines in this 
+\begin_inset Formula $O(n)$
+\end_inset
+
+ operation and is roughly 
+\begin_inset Formula $3\times$
+\end_inset
+
+faster for all examined data sizes.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename cyegen_bench/dot_mv.eps
+	width 80text%
+	clip
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:bench-dot-mv"
+
+\end_inset
+
+Ceygen matrix-vector dot product benchmark
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Square matrix-vector dot product performance is plotted in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:bench-dot-mv"
+
+\end_inset
+
+.
+ We note that Ceygen performance is about double for problem sizes 2--32,
+ and approaches that of NumPy from size 64.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename cyegen_bench/dot_mm.eps
+	width 80text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:bench-dot-mm"
+
+\end_inset
+
+Ceygen matrix-matrix dot product benchmark
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:bench-dot-mm"
+
+\end_inset
+
+ shows that Ceygen consumes approximately half of the resources compared
+ to NumPy in square matrix-matrix dot product for sizes 2--48, and slowly
+ converges to NumPy as problem size increases.
+ Visible bumps can be, in our opinion, explained by CPU cache and alignment
+ effects.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename cyegen_bench/det.eps
+	width 80text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:bench-det"
+
+\end_inset
+
+Ceygen determinant calculation benchmark including parallel variants
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Last plot, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:bench-det"
+
+\end_inset
+
+, where matrix determinant is computed, is most interesting, because it
+ includes parallelized versions.
+ Ceygen 
+\family typewriter
+lu.det()
+\family default
+ method is run under Cython's 
+\family typewriter
+prange
+\family default
+ block that internally uses OpenMP
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://openmp.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+, while NumPy 
+\family typewriter
+det()
+\family default
+ is run in parallel using Python 
+\family typewriter
+multiprocessing
+\family default
+ module, which spawns multiple Python processes and facilitates communication
+ between them.
+ Both methods have been checked to use the same computing algorithm, the
+ LU decomposition with partial pivoting.
+ Serial versions are included too for comparison.
+\end_layout
+
+\begin_layout Standard
+Comparing appropriate versions of Ceygen and NumPy, it can be seen that
+ the Ceygen variants are over tenfold faster up to size 12 and gradually
+ come nearer to NumPy variants as problem size approaches 100, where they
+ are even occasionally outperformed.
+\end_layout
+
+\begin_layout Standard
+Worth noting is parallel efficiency of respective algorithms.
+ Python 
+\family typewriter
+multiprocessing
+\family default
+ seems to be rather successful at parallelizing NumPy determinant computations,
+ with irregular fluctuations (still, parallel NumPy variant is slower than
+ even serial Ceygen function up to 
+\begin_inset Formula $48\times48$
+\end_inset
+
+ matrices).
+ Parallelization in Cython has slightly different behavior.
+ It has negative impact in 2--8 problem sizes and slowly starts to be effective
+ only with 
+\begin_inset Formula $24\times24$
+\end_inset
+
+ and larger matrices.
+ We speculate that reference counting (which is implemented using atomic
+ integer operations in Cython memoryviews) might be the culprit.
+\end_layout
+
+\begin_layout Standard
+In general, we believe that we may conclude that Ceygen really brings significan
+t performance increase, at least for operations being considered, especially
+ for matrices and vectors whose one side is smaller than roughly 50 elements;
+ speed improvement usually exceeds factor of 2.
+ Performance beyond this size depends on function benchmarked, but in worst
+ case it gradually approaches that of equivalent NumPy method.
+\end_layout
+
+\begin_layout Section
+Twin Experiment
+\end_layout
+
+\begin_layout Standard
+Twin experiment experiment as performed here means that, atmospheric radioactive
+ pollutant release simulation is performed under realistic conditions, measureme
+nts are recorded, noise is added and then assimilation is run against the
+ noisy measurements.
+ Assimilation results are then compared with original simulation.
+\end_layout
+
+\begin_layout Standard
 \begin_inset ERT
 status open
 
