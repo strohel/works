@@ -12472,11 +12472,328 @@ Twin Experiment
 \end_layout
 
 \begin_layout Standard
-Twin experiment experiment as performed here means that, atmospheric radioactive
- pollutant release simulation is performed under realistic conditions, measureme
-nts are recorded, noise is added and then assimilation is run against the
- noisy measurements.
+During twin experiment, an atmospheric radioactive pollutant release simulation
+ is performed under realistic conditions, measurements are recorded, noise
+ is added and then assimilation is run against the noisy measurements.
  Assimilation results are then compared with original simulation.
+\end_layout
+
+\begin_layout Subsection
+Setup
+\end_layout
+
+\begin_layout Standard
+A 4-hour simulation of hypothetic pollutant release from the Temelín power
+ plant was used as validation scenario.
+ Realistic wind-field was generated with Northeast direction, which varies
+ slightly during the simulation, with wind speed that fluctuates around
+ 
+\begin_inset Formula $\unitfrac[2]{m}{s}$
+\end_inset
+
+.
+ Because real-world dose measurement devices on site perform data read-outs
+ each 10 minutes, the same period was chosen as an interval between 2 puff
+ releases and subsequently as iteration interval in assimilation.
+ The 
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+41
+\end_layout
+
+\end_inset
+
+Ar isotope with half-life of 109 minutes was released during the first hour
+ of the experiment, with following activities: 
+\begin_inset Formula $\left[0.1,3,4,2,3,1\right]\times\unit{Bq}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Once simulation was done, the captured measurements (anemometer read-outs
+ at the facility and dose receptor measurements) were obfuscated by noise
+ of the similar type and same intensity as defined by the observation model:
+ gamma noise of relative variance 
+\begin_inset Formula $\gamma_{v}$
+\end_inset
+
+ was added to wind speed measurements, wind direction was burdened by Gaussian
+ noise with 
+\begin_inset Formula $\sigma_{\theta}$
+\end_inset
+
+ standard error and individual dose measurements were obfuscated by gamma
+ distribution with relative error 
+\begin_inset Formula $\gamma_{y}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Parameters for both obfuscation and assimilation measurement model were
+ chosen as follows: 
+\begin_inset Formula $\gamma_{v}=0.1$
+\end_inset
+
+, 
+\begin_inset Formula $\sigma_{\theta}=5\text{°}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma_{y}=0.2$
+\end_inset
+
+ as recommended by 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Thompson:00"
+
+\end_inset
+
+.
+ Transition model parameters were chosen slightly wider to accommodate for
+ possible rapid changes: 
+\begin_inset Formula $\gamma_{a}=0.2$
+\end_inset
+
+ (for 
+\begin_inset Formula $a_{t}$
+\end_inset
+
+ coefficient relative error) and 
+\begin_inset Formula $\sigma_{b}=15\text{°}$
+\end_inset
+
+ (for wind direction correction coefficient).
+ Number of particles 
+\begin_inset Formula $N$
+\end_inset
+
+ was fixed to 1000.
+\end_layout
+
+\begin_layout Subsection
+Results
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename dipl-results/simulation.png
+	lyxscale 50
+	width 49text%
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Graphics
+	filename dipl-results/assimilation.png
+	lyxscale 50
+	width 49text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:sim-asim-side-by-side"
+
+\end_inset
+
+
+\begin_inset Argument
+status open
+
+\begin_layout Plain Layout
+Simulation and assimilation trajectories side-by-side
+\end_layout
+
+\end_inset
+
+Simulation (left) and assimilation (right) trajectories side-by-side.
+ Color curves represent trajectories of individual puffs; curve opacity
+ represents likelihood in case of assimilation.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename dipl-results/Neff-activities.eps
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Neff-activities"
+
+\end_inset
+
+
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ and simulated vs.
+ assimilated released activities
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Simulation and assimilation results are shown side-by-side in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:sim-asim-side-by-side"
+
+\end_inset
+
+; absorbed dose contour graph is only shown in simulation.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+but could have been computed from available assimilation data as it is determini
+stic given puff trajectories and activities.
+\end_layout
+
+\end_inset
+
+ As can be seen, assimilated trajectories match the simulated ones, which
+ means the assimilation succeeded at revealing the hidden state.
+ As puffs move away from the radioactive monitoring network of the facility
+ (whose receptors are marked by blue dots), a distinctive rise in trajectory
+ variance is observed (they become more dispersed).
+ We believe that this can be explained by the fact that at this point, the
+ observation vector is effectively reduced to anemometer measurements (as
+ puffs are out of range of any receptors) and the observation density thus
+ becomes significantly wider.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+as highly-nonlinear receptor dose measurements are significantly narrower.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Neff-activities"
+
+\end_inset
+
+ shows, on the right, assimilated nuclear activities released per individual
+ puffs along originally simulated ones.
+ They fall within expected accuracy so that we can conclude that the implemented
+ assimilation method works correctly.
+ On the left, plot of 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+, a measure of particle filtering efficiency, development with time is included.
+ 
+\begin_inset Formula $1\leq N_{\mathrm{eff}}\leq N$
+\end_inset
+
+ is an approximation of how many particles actually contribute to resulting
+ distribution (the rest of them is just overhead).
+ For comparison, results from the bootstrap variant of the particle filter
+ that assimilates just 
+\begin_inset Formula $\left(a_{t},b_{t}\right)$
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+and is given correct 
+\begin_inset Formula $Q_{t}$
+\end_inset
+
+.
+ The bootstrap variant also correctly revealed puff trajectories.
+\end_layout
+
+\end_inset
+
+ are plotted alongside the studied optimized variant.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ is very close to 1 during first 6 iterations for both implementations and
+ raised only after this point.
+ We opinion that this coincides with and could be explained by that fact
+ that during these initial 6 steps, new puffs are released; this means that
+ all 24 receptors arranged in ring around the facility measure non-negligible
+ quantities and therefore contribute to narrowing of the observation density,
+ which becomes sharp-peaked and assigns radically different likelihoods
+ to particles that are in fact very close to each other in the state space.
+\end_layout
+
+\begin_layout Standard
+After sixth iteration, number of effective particles of the optimized variant
+ fluctuates around 500, which could be, in our opinion, considered a good
+ result.
+ We speculate that occasional drops to values around 100 could be caused
+ by outliers in supplied observations, which is supported by the fact that
+ bootstrap variant shows coinciding drops.
+ 
 \end_layout
 
 \begin_layout Standard
