@@ -2767,11 +2767,11 @@ reference "eq:AsimPhi"
 
  activity, distance and dispersion coefficients are given by
 \begin_inset Formula 
-\begin{eqnarray*}
-Q_{k,t} & = & e^{-\lambda\Delta t}Q_{k,t-1},\\
-d_{k,t} & = & d_{k,t-1}+\left\Vert \mathbf{l}_{k,t}-\mathbf{l}_{k,t-1}\right\Vert ,\\
-\boldsymbol{\sigma}_{k,t} & = & \boldsymbol{\sigma}(t-k,d_{k,t},\mathbf{l}_{k,t}),
-\end{eqnarray*}
+\begin{eqnarray}
+Q_{k,t} & = & e^{-\lambda\Delta t}Q_{k,t-1},\nonumber \\
+d_{k,t} & = & d_{k,t-1}+\left\Vert \mathbf{l}_{k,t}-\mathbf{l}_{k,t-1}\right\Vert ,\label{eq:puff_Q_d_sigma}\\
+\boldsymbol{\sigma}_{k,t} & = & \boldsymbol{\sigma}(t-k,d_{k,t},\mathbf{l}_{k,t}),\nonumber 
+\end{eqnarray}
 
 \end_inset
 
@@ -9702,7 +9702,7 @@ depending on difference between original and alternative models, we expect
 \end_layout
 
 \begin_layout Standard
-All classes described in this chapter lie in the 
+All classes described in this section lie in the 
 \family typewriter
 dispmodel.iface
 \family default
@@ -10186,6 +10186,321 @@ Puff-based Dispersion Model
 \end_layout
 
 \begin_layout Standard
+When implementing a concrete realization of the dispersion model prototype,
+ the puff-based model described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:DispersionModel"
+
+\end_inset
+
+, it was noted that each puff could be viewed as a simple dispersion model
+ of its own, and given that measured quantities are additive,
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+with regards to puffs.
+\end_layout
+
+\end_inset
+
+ the whole plume-simulating model can be represented as a simple collection
+ of puffs.
+ This has been exploited in the software design in order to make the implementat
+ion clearer.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Note:
+\emph default
+ arguments of implemented prototype methods are not repeated for brevity.
+ Classes mentioned in this section can be found in the 
+\family typewriter
+dispmodel.puffmodel
+\family default
+ Asim module.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+Puff(DispersionModel)
+\family default
+ represents a single puff, a rather constrained realization of the dispersion
+ model.
+ It keeps track of its location, dispersion state, pollutant activity (accountin
+g for radioactive decay) and composition, and total flown distance.
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+__init__(time_step,
+\begin_inset space ~
+\end_inset
+
+inventory,
+\begin_inset space ~
+\end_inset
+
+Q,
+\begin_inset space ~
+\end_inset
+
+loc,
+\begin_inset space ~
+\end_inset
+
+time)
+\family default
+ constructs the Puff.
+ Beyond auxiliary variables 
+\family typewriter
+time_step
+\family default
+ and 
+\family typewriter
+time
+\family default
+, it takes natural parameters 
+\family typewriter
+inventory
+\family default
+ (composition of the released pollutant represented as a sequence of 
+\family typewriter
+Nuclides
+\family default
+), 
+\family typewriter
+Q
+\family default
+ (per-component activities in Bq) and appearance location 
+\family typewriter
+loc
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+propagate()
+\family default
+ advances the puff in time according to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_l"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_Q_d_sigma"
+
+\end_inset
+
+, with wind field and other atmospheric parameters supplied by the 
+\family typewriter
+meteo_model
+\family default
+.
+ 
+\family typewriter
+Puff
+\family default
+ ignores 
+\family typewriter
+release_model
+\family default
+, which makes it unsuitable when used on its own.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+concentration_at()
+\family default
+ computes pollutant concentration at given location in the atmosphere using
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_conc"
+
+\end_inset
+
+.
+ As an extension to the referenced formula, the implementation also accounts
+ for reflection from and deposition on the ground and reflection from the
+ atmospheric mixing layer.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+dose_at()
+\family default
+ computes dose absorbed at given location (which is assumed to be on the
+ ground) per the last 
+\family typewriter
+time_step
+\family default
+ according to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:puff_dose"
+
+\end_inset
+
+.
+ As the same computation of concentration is used internally, same notes
+ apply about reflecting additional physical phenomena such as ground and
+ mixing layer reflection and ground deposition.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+unit_dose_at(loc) 
+\family default
+is same as 
+\family typewriter
+dose_at()
+\family default
+, but ignores tracked activity 
+\family typewriter
+Q
+\family default
+ and assumes it is unitary instead.
+ This is an extension beyond 
+\family typewriter
+DispersionModel
+\family default
+ to help the released dose proposal distribution.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\family typewriter
+PuffModel(DispersionModel)
+\family default
+ consists of a series of puffs that together form a plume.
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\family typewriter
+__init__(time_step,
+\begin_inset space ~
+\end_inset
+
+puff_sampling_step,
+\begin_inset space ~
+\end_inset
+
+source_model)
+\family default
+ initializes the 
+\family typewriter
+PuffModel
+\family default
+.
+ 
+\family typewriter
+puff_sampling_step
+\family default
+, which must be a multiple of 
+\family typewriter
+time_step
+\family default
+ determines how frequently new puffs are created.
+ 
+\family typewriter
+source_model
+\family default
+ is used only to determine number of pollutant components, which is then
+ assumed to be constant.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+propagate()
+\family default
+ propagates child puffs and samples new ones (as determined by 
+\family typewriter
+puff_sampling_step
+\family default
+) using 
+\family typewriter
+source_model
+\family default
+.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+concentration_at()
+\family default
+ just sums child puff concentrations.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+dose_at()
+\family default
+ again only performs simple summing.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+unit_puff_dose_at(loc,
+\begin_inset space ~
+\end_inset
+
+out=None)
+\family default
+ is an extension for proposal density that computes per-puff unit doses
+ (does not sum them).
+ The 
+\family typewriter
+out
+\family default
+ parameter has the same meaning as in Ceygen.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+puff_activities(out=None)
+\family default
+ is another extension that returns per-puff and per-component activities
+ in a matrix.
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Relationship between dispersion model, its implementations and related classes
+ is depicted in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:asim-disp-model"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
@@ -10273,11 +10588,153 @@ s.
 \end_layout
 
 \begin_layout Subsection
-Assimilation
+Simulation
+\end_layout
+
+\begin_layout Standard
+In order to be able to perform dispersion model validation and the twin
+ experiment, supportive classes and a runner have been implemented in Asim's
+ 
+\family typewriter
+simulation.simple
+\family default
+ module:
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+StaticCompoLocSourceModel(SourceModel)
+\family default
+ is a semi-abstract code-sharing 
+\family typewriter
+SourceModel
+\family default
+ subclass that provides implementations of 
+\family typewriter
+inventory()
+\family default
+ and 
+\family typewriter
+location()
+\family default
+ that return predefined values.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+SimulatedSourceModel(StaticCompoLocSourceModel)
+\family default
+ simulates pollutant release based on per-
+\family typewriter
+puff_sampling_step
+\family default
+ activities that are passed to its constructor.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+PasquillsMeteoModel(MeteoModel)
+\family default
+ is another semi-abstract class that exists to share code and definitions
+ between meteorologic models based on Pasquill's stability category.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+StaticMeteoModel(PasquillsMeteoModel)
+\family default
+ lets its instantiator specify Pasquill's stability category and a 4-dimensional
+ precomputed grid of the wind field.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+run()
+\family default
+ function executes the simulation.
+ It reads meteorologic data from a file and passes it to 
+\family typewriter
+StaticMeteoModel
+\family default
+ and employs 
+\family typewriter
+SimulatedSourceModel
+\family default
+.
+ Finally it instantiates 
+\family typewriter
+PuffModel
+\family default
+ and runs it against created source and meteorologic models.
+ It also captures total absorbed doses on a 
+\begin_inset Formula $\unit[1]{km}\times\unit[1]{km}$
+\end_inset
+
+ grid and per-10-minute doses on specified receptor locations, which can
+ be later used as data for assimilation.
+ It provides facilities for plotting the results.
+\end_layout
+
+\begin_layout Standard
+It should be noted that up until this point, no code had an explicit dependency
+ on PyBayes or other components taking part in assimilation, and only a
+ couple of places were aware of assimilation.
+ Such functionality separation is intentional.
 \end_layout
 
 \begin_layout Subsection
-Supportive Modules
+Assimilation
+\end_layout
+
+\begin_layout Standard
+Finally, PyBayes can be plugged in to perform sequential Monte Carlo sampling
+ on top of dispersion models.
+ The idea is rather simple: create specialized 
+\family typewriter
+ReleaseModel
+\family default
+ and 
+\family typewriter
+MeteoModel
+\family default
+ subclasses that would transform and feed assimilated quantities 
+\begin_inset Formula $\left(Q_{t},a_{t},b_{t}\right)$
+\end_inset
+
+ into spawned 
+\family typewriter
+PuffModel
+\family default
+ instances.
+\end_layout
+
+\begin_layout Standard
+Presented classes are implemented in the 
+\family typewriter
+assimilation.twin
+\family default
+ module of Asim.
+ We alias PyBayes package to 
+\family typewriter
+pb
+\family default
+ in class descriptions, i.e.
+ 
+\family typewriter
+pb.GaussPdf
+\family default
+ is PyBayes' implementation of the normal distribution.
+\end_layout
+
+\begin_layout Description
+
+\family typewriter
+AssimilationSourceModel(StaticCompoLocSourceModel)
 \end_layout
 
 \begin_layout Subsection
