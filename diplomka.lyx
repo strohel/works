@@ -7297,7 +7297,7 @@ In this chapter, we present the design of developed software components,
  starts with the Ceygen linear algebra library that has been developed to
  improve performance, continues with description of enhancements made to
  PyBayes and finalizes with presentation of the top-level project Asim.
- We consider the implemented software one the main results of this thesis.
+ We consider the implemented software one of the main results of this thesis.
 \end_layout
 
 \begin_layout Standard
@@ -7398,7 +7398,7 @@ reference "chap:Software-Analysis"
 
 , the Eigen library (combined with recent improvements to C++ support in
  Cython) was identified as a perfect back-end to perform the actual computations.
- Eigen is is a compile-time only dependency of Ceygen.
+ Eigen is a compile-time only dependency of Ceygen.
 \end_layout
 
 \begin_layout Standard
@@ -7416,7 +7416,7 @@ https://github.com/strohel/Ceygen
 \end_inset
 
 .
- It is released under the free and open-source GNU GPL v2+ license and packages
+ It is released under a free and open-source GNU GPL v2+ license and packages
  of released versions are available through the PyPI Python package repository
  at 
 \begin_inset Flex URL
@@ -7436,9 +7436,9 @@ https://pypi.python.org/pypi/Ceygen
 It should be noted that Ceygen is not useful for interpreted Python code,
  for which using NumPy is, in our opinion, totally appropriate given already
  present interpreter and dynamic-typing overhead.
- It is rather designed to be used from Cython-compiled code (which is enhanced
- with type declarations) that requires high performance and/or ability to
- parallelize.
+ It is rather designed to be used from Cython-compiled code (which should
+ be enhanced with type declarations) that requires high performance and/or
+ ability to parallelize.
  In fact, Ceygen functions are only visible from Cython-compiled code to
  prevent such ill-optimization.
 \end_layout
@@ -12107,8 +12107,9 @@ http://math-atlas.sourceforge.net/
 \emph on
 Note:
 \emph default
- A regression in very recent versions of Cython (at least 0.20.1) which causes
- Cython compiler to crash when it is about to compile Ceygen.
+ A regression has been found in very recent versions of Cython (at least
+ 0.20.1) which causes Cython compiler to crash when it is about to compile
+ Ceygen.
  This is being investigated and until resolved, users are advised to use
  versions 0.19.1 or 0.19.2 with Ceygen.
 \end_layout
@@ -12141,8 +12142,10 @@ out
 object
 \family default
 ).
+ All involved arrays are C-contiguous.
  To illustrate, only 2 Python API function calls (which cause most overhead)
- are done inside the loop where
+ are done inside the loop where e.g.
+
 \family typewriter
  numpy.add()
 \family default
@@ -12208,7 +12211,7 @@ reference "fig:bench-add-vv"
  one call, i.e.
  the slowest variant gets assigned time 1 an other variants are scaled relativel
 y to it.
- Ceygen really shines in this 
+ Ceygen shines in this 
 \begin_inset Formula $O(n)$
 \end_inset
 
@@ -12443,7 +12446,7 @@ multiprocessing
  and larger matrices.
  We speculate that this is caused by the fact that all threads used the
  same instances of passed arrays in this synthetic test; this has lead to
- frequent cache flushes as different threads have written into the same
+ frequent cache flushes as different threads might have written into near
  memory locations.
  Also, reference counting (which is implemented using atomic integer operations
  in Cython memoryviews) might be the culprit.
@@ -12488,6 +12491,8 @@ A 4-hour simulation of hypothetic pollutant release from the Temelín power
  Because real-world dose measurement devices on site perform data read-outs
  each 10 minutes, the same period was chosen as an interval between 2 puff
  releases and subsequently as iteration interval in assimilation.
+ Model propagation interval was set to 2 minutes in both runs so that dose
+ measurements are approximated with sufficient precision.
  The 
 \begin_inset script superscript
 
@@ -12523,7 +12528,7 @@ Once simulation was done, the captured measurements (anemometer read-outs
 \begin_inset Formula $\gamma_{y}$
 \end_inset
 
-.
+ (in every case, added noise was unbiased).
 \end_layout
 
 \begin_layout Standard
@@ -12736,7 +12741,7 @@ reference "fig:Neff-activities"
 \begin_inset Formula $N_{\mathrm{eff}}$
 \end_inset
 
-, a measure of particle filtering efficiency, development with time is included.
+, a measure of particle filtering efficiency, development in time is included.
  
 \begin_inset Formula $1\leq N_{\mathrm{eff}}\leq N$
 \end_inset
@@ -12771,7 +12776,7 @@ and is given correct
 \end_inset
 
  is very close to 1 during first 6 iterations for both implementations and
- raised only after this point.
+ raises only after this point.
  We opinion that this coincides with and could be explained by that fact
  that during these initial 6 steps, new puffs are released; this means that
  all 24 receptors arranged in ring around the facility measure non-negligible
@@ -12785,12 +12790,12 @@ After sixth iteration, number of effective particles of the optimized variant
  fluctuates around 500, which could be, in our opinion, considered a good
  result.
  We speculate that occasional drops to values around 100 could be caused
- by outliers in supplied observations, which is supported by the fact that
- bootstrap variant shows coinciding drops.
+ by outliers in supplied observations, which is supported by the observation
+ that bootstrap variant shows coinciding drops.
  The fact that the bootstrap variant, which performs less demanding task
  of assimilating only the wind field, lags behind with number or effective
- particles slightly below 200 further emphasizes efficiency of the proposal
- density approach.
+ particles slightly below 200 further emphasizes efficiency of the employed
+ proposal density approach.
 \end_layout
 
 \begin_layout Standard
@@ -12835,36 +12840,38 @@ This text has been divided into several parts.
 \end_layout
 
 \begin_layout Standard
-Second chapter continued with presentation of the employed model to simulate
- atmospheric dispersion and devised ways to perform assimilation on top
- of this model: state and observation models have been defined and discussed.
+Second chapter has continued with presentation of the employed model to
+ simulate atmospheric dispersion and devised ways to perform assimilation
+ on top of this model: state and observation models have been defined and
+ discussed.
  Significant portion of the chapter has been dedicated to derivation of
  proposal density that has been later shown to substantially increase efficiency.
 \end_layout
 
 \begin_layout Standard
 Next part concentrated on software analysis.
- First, requirements on desired software stack were devised from a set of
- use-cases.
+ First, requirements posed on the desired software stack have been devised
+ from a set of use-cases.
  Rapid prototyping possibility, extensibility, high computing efficiency
- and proper documentation were identified as key demands.
- The chapter continued by review of possible building blocks and ended with
- suggestions.
+ and proper documentation have been identified as key demands.
+ The chapter has continued by review of possible building blocks and ended
+ with suggestions.
  Asim project for assimilation, PyBayes enhancements and a new library for
- linear algebra employing Eigen were proposed.
+ linear algebra employing Eigen have been proposed.
 \end_layout
 
 \begin_layout Standard
-Chapter 4 presents design of individual developed software components and
- describes their implementation.
- It tries to clarify relationships between individual classes and finally
- shows interaction of objects that span multiple components during a complex
- task of proposal distribution-enhanced assimilation of dispersion models.
+Chapter 4 has presented the design of individual developed software components
+ and has described their implementation.
+ It has tried to clarify relationships between individual classes and finally
+ has shown interaction of objects that span multiple components during a
+ complex task of proposal distribution-enhanced assimilation of dispersion
+ models.
 \end_layout
 
 \begin_layout Standard
-The final chapter shows results achieved with the implemented software.
- It is noted that 
+The final chapter has shown results achieved with the implemented software.
+ It has been noted that 
 \begin_inset Formula $2\times$
 \end_inset
 
@@ -12872,10 +12879,11 @@ The final chapter shows results achieved with the implemented software.
 \begin_inset Formula $10\times$
 \end_inset
 
- can be achieved by Ceygen for small to moderate problem sizes.
- Functionality of the Asim and other participating projects is finally verified
- on a twin experiment; successful assimilation is achieved with adequate
- particle filtering efficiency.
+ performance increase can be achieved by Ceygen for small to moderate problem
+ sizes.
+ Functionality of Asim and other participating projects has been finally
+ verified on a twin experiment; successful assimilation has been demonstrated
+ with adequate particle filtering efficiency.
 \end_layout
 
 \begin_layout Standard
@@ -12899,8 +12907,9 @@ The
 Asim
 \emph default
  project, which brings object-oriented design to dispersion model assimilation
- research, coupled with improvements to the PyBayes library, from which
- many may benefit at it is also an open-source project.
+ research, coupled with improvements to the PyBayes library including optimizati
+on resulting from Ceygen porting, from which many may benefit at it is also
+ an open-source project.
 \end_layout
 
 \begin_layout Standard
