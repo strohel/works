@@ -1,0 +1,15 @@
+*.kilepr
+*.log
+*.backup
+*.aux
+*.toc
+*.out
+*.brf
+*.bbl
+*.blg
+*.nav
+*.snm
+*.dvi
+*.lof
+
+thesis.pdf

@@ -1,0 +1,12 @@
+Dependencies
+============
+
+Modules in this directory need the "asim" UTIA package to be installed in Python's path.
+This is most easily done by running `python setup.py install` in asim's repository root
+directory.
+
+Manual execution
+================
+
+You can execute this worker manually by calling `python task.py` - in which case it will
+try to open example_input.json and output example_output.json.

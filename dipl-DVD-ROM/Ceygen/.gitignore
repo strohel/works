@@ -1,0 +1,8 @@
+/build
+*.cpp
+*.pyc
+*.html
+/setup.cfg
+/MANIFEST
+/dist/
+*.pickle

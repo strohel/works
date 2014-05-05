@@ -1675,7 +1675,7 @@ N_{\mathrm{eff}}(t)\approx\left(\sum_{i=1}^{N}\left(\omega_{t}^{(i)}\right)^{2}\
 \begin_inset Formula $N_{\mathrm{eff}}\ll N$
 \end_inset
 
-, available resources are used ineffectively, as accuracy of the estimate
+, available resources are used inefficiently, as accuracy of the estimate
  is only improved by the 
 \begin_inset Quotes eld
 \end_inset
@@ -1914,12 +1914,6 @@ for each particle
  of effective particles) at the cost of increased complexity of the algorithm
  must, in our opinion, prove that it brings an improvement even when this
  trade-off is taken into account.
- We suggest using 
-\emph on
-effective particles per second
-\emph default
- (or per another unit of a limited resource) measure to give accurate notion
- of its usefulness.
  The authors of the Marginal Particle Filter suggest using approximate methods
  from N-body learning that can reduce the cost to 
 \begin_inset Formula $O(N\, log(N))$
@@ -8139,8 +8133,8 @@ Contiguity-based Dispatching
 
 \begin_layout Standard
 Because Cython memoryviews can be both contiguous (in row or column sense)
- or noncontiguous, but only contiguous ones can be computed with effectively,
- it was decided that Ceygen should support both without incurring performance
+ or noncontiguous, but efficient computation is only possible with the contiguou
+s, it was decided that Ceygen should support both without incurring performance
  penalty in the favorable case.
 \end_layout
 
@@ -11941,7 +11935,7 @@ Ceygen
 \begin_inset Text
 
 \begin_layout Plain Layout
-TODO
+0.3-10-gb90e849
 \end_layout
 
 \end_inset
@@ -11981,14 +11975,6 @@ NumPy
 \begin_inset space \qquad{}
 \end_inset
 
-
-\begin_inset space \qquad{}
-\end_inset
-
-
-\begin_inset space \qquad{}
-\end_inset
-
 PyBayes
 \end_layout
 
@@ -11998,7 +11984,7 @@ PyBayes
 \begin_inset Text
 
 \begin_layout Plain Layout
-TODO
+0.3-97-gdfd59f3
 \end_layout
 
 \end_inset
@@ -12036,7 +12022,7 @@ Asim
 \begin_inset Text
 
 \begin_layout Plain Layout
-TODO
+0.1-44-g4d14d37
 \end_layout
 
 \end_inset
@@ -12653,6 +12639,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename dipl-results/Neff-activities.eps
+	width 100text%
 
 \end_inset
 
@@ -12793,7 +12780,10 @@ After sixth iteration, number of effective particles of the optimized variant
  We speculate that occasional drops to values around 100 could be caused
  by outliers in supplied observations, which is supported by the fact that
  bootstrap variant shows coinciding drops.
- 
+ The fact that the bootstrap variant, which performs less demanding task
+ of assimilating only the wind field, lags behind with number or effective
+ particles slightly below 200 further emphasizes efficiency of the proposal
+ density approach.
 \end_layout
 
 \begin_layout Standard
@@ -12828,6 +12818,11 @@ addcontentsline{toc}{chapter}{Conclusion}
 
 \begin_layout Chapter*
 Conclusion
+\end_layout
+
+\begin_layout Standard
+This text has been divided into several parts.
+ In the first one, 
 \end_layout
 
 \begin_layout Standard
@@ -12899,6 +12894,57 @@ options "bibtotoc,plain"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Chapter
+\start_of_appendix
+Contents of the Enclosed DVD-ROM
+\end_layout
+
+\begin_layout Description
+abstract.pdf contains abstract of this thesis in PDF format.
+\end_layout
+
+\begin_layout Description
+Asim/ contains source code of the Asim project version 0.1-44-g4d14d37.
+\end_layout
+
+\begin_layout Description
+Asim.pdf is a generated documentation of the Asim project, in PDF hyper-linked
+ form.
+\end_layout
+
+\begin_layout Description
+Ceygen/ contains source code of Ceygen version 0.3-10-gb90e849.
+\end_layout
+
+\begin_layout Description
+Ceygen.pdf is hyper-linked PDF documentation of the Ceygen library.
+\end_layout
+
+\begin_layout Description
+puff_assimilation/ contains source code of the distributed system worker
+ based on Asim performing assimilation; includes example inputs and outputs
+ and usage notes.
+\end_layout
+
+\begin_layout Description
+puff_simulation/ contains source code of the distributed system worker based
+ on Asim performing simulation; includes example inputs and outputs and
+ usage notes.
+\end_layout
+
+\begin_layout Description
+PyBayes/ contains source code of the PyBayes library version 0.3-97-gdfd59f3.
+\end_layout
+
+\begin_layout Description
+PyBayes.pdf is generated API documentation of the PyBayes library in hyper-linked
+ PDF form.
+\end_layout
+
+\begin_layout Description
+text.pdf is this text in hyper-linked PDF format.
 \end_layout
 
 \end_body

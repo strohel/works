@@ -1,0 +1,118 @@
+\documentclass[a4paper,12pt,oneside]{report}
+
+\newif\ifprint % true = printed version = no colours; false = colours
+\printfalse
+\newif\ifattachements % true = include fancy start pages and appendices
+\attachementsfalse
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{enumitem} % so that spacing for lists can be easily set, resume option etc
+\ifattachements
+	\usepackage{pdfpages}
+\fi
+\usepackage{fancyvrb} % for Verbatim environment than can be instructed not to page-break
+\usepackage[hyphens]{url} % the package is not needed, it needes just to set the parameter
+\usepackage[pagebackref=true]{hyperref} % tento balicek by mel byt na konci baliku!
+
+\hypersetup{
+	pdfauthor={Matej Laitl},
+	pdftitle={Implementation environment for Bayesian filtering algorithms}
+}
+
+%% Nastavení okraju
+\usepackage{calc}
+\setlength{\textheight}{\paperheight -3cm -3cm}  % horni a dolni okraje 3cm, do tech se musi vejit header a footer
+\setlength{\textwidth}{\paperwidth -3.5cm -2.5cm}  % levy okraj 3,5cm (na vazbu), pravy okraj 2,5cm
+\setlength{\oddsidemargin}{3.5cm -1in}
+\setlength{\topmargin}{(\paperheight-\textheight-\headheight-\headsep-\footskip)/2 - 1in}
+
+%\parindent=0pt % odsazení 1. řádku odstavce
+\parskip=6pt   % mezera mezi odstavci
+
+% set that list should not have vertical space
+\setlist{nolistsep}
+\setlist[1]{leftmargin=\parindent} % set indentation to level 1 lists to be same as paragraph indent
+
+\ifprint
+	\hypersetup{pdfborder={0 0 0}} % no borders around links
+\else
+	\hypersetup{colorlinks=true} % colour links instead of borders
+\fi
+
+\pdfminorversion=5 % aby PdfTeX produkovat pdfka verze 1.5 a zejmena nekricel pri jejich vkladani
+
+% definitions of our own commands:
+\newcommand{\pdf}{probability density function}
+\newcommand{\pdfs}{probability density functions}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\dx}{\mathrm{d}x}
+\newcommand{\x}{\(\times\)}
+
+\begin{document}
+\VerbatimFootnotes % this must be AFTER preamble
+
+\ifattachements
+	\pagenumbering{alph} % just that LaTex does not complain there are 2 pages no. 2. not shown anywhere
+	\input{startpages.tex} % include some fancy start pages
+\fi
+
+% obsah
+\clearpage
+\pagenumbering{roman}
+\tableofcontents
+
+\input{chap0-notation.tex}
+
+\input{chap0-introduction.tex}
+
+\input{chap1-theory.tex}
+
+\input{chap2-software.tex}
+
+\input{chap3-pybayes.tex}
+
+\input{chap4-conclusion.tex}
+
+\clearpage % so that table of contents mentions correct page
+\phantomsection % so that hyperref makes correct reference
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+
+\clearpage % so that table of contents mentions correct page
+\phantomsection % so that hyperref makes correct reference
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+\ifattachements
+	% přílohy
+	\appendix % aby LaTeX cisloval jinak
+
+	\chapter{Contents of the Enclosed CD-ROM}
+
+	\begin{description}
+		\item[PyBayes-0.3/] \hfill \\
+			source code of the PyBayes library, version 0.3.
+		\item[PyBayes-0.3-API-Docs/] \hfill \\
+			PyBayes API Documentation based on version 0.3, HTML version; point your browser to the
+			\nolinkurl{PyBayes-0.3-API-Docs/index.html} file to view it.
+		\item[abstract.pdf] \hfill \\
+			Czech and English abstract of this text.
+		\item[PyBayes-0.3-API-Docs.pdf] \hfill \\
+			PyBayes API Documentation based on version 0.3, PDF version, hyper-cross\-referenced.
+		\item[PyBayes-0.3.tar.cz] \hfill \\
+			source code of the PyBayes library, version 0.3, packed using tar + gzip for easy
+			distribution.
+		\item[thesis.pdf] \hfill \\
+			electronic version of this text, hyper-crossreferenced.
+	\end{description}
+
+\fi
+
+\end{document}
