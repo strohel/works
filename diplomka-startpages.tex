@@ -16,12 +16,30 @@
 \newcommand{\konzultant}{}
 \newcommand{\pracovisteKonz}{}
 
-\newcommand{\klicova}{TODO asimilace, Bayesovská filtrace, sekvenční Monte Carlo, radioaktivní únik}
-\newcommand{\keyword}{TODO assimilation, Bayesian estimation, sequential Monte Carlo, radioactive
-release}
+\newcommand{\klicova}{asimilace, disperzní model, sekvenční Monte Carlo, radioaktivní únik,
+softwarová analýza, numerické výpočty, Python, Cython}
+\newcommand{\keyword}{assimilation, dispersion model, sequential Monte Carlo, radioactive
+release, software analysis, numerical computing, Python, Cython}
 % Abstrakt práce: (cca 7 vět, min. 80 slov)
-\newcommand{\abstrCZ}{TODO.}
-\newcommand{\abstrEN}{TODO.}
+\newcommand{\abstrCZ}{Tato práce je zaměřena na návrh a implementaci softwarového řešení pro 
+asimilaci atmosferických disperzních modelů, které simulují únik radioaktivních látek. Důraz je 
+kladen na výpočetní efektivitu řešení. K asimilaci je přistupováno pomocí sekvenčního Monte Carlo 
+vzorkování, které je v textu speciálně upraveno pro daný problém. Softwarová analýza vyústí ve 
+vytvoření projektu Asim, který implementuje asimilaci, vylepšení knihovny pro Bayesovskou filtraci 
+PyBayes a vytvoření knihovny pro lineární algebru Ceygen, která je použita ke zvýšení výkonu 
+použitého implementačního prostředí --- Pythonu, který je kompilován projektem Cython. Je ukázáno, 
+že Ceygen přináší 2- až 10-násobný nárůst výkonu algebraických metod pro určité velikosti vstupů. 
+Nakonec je ověřena správná funkčnost celého asimilačního řešení pomocí dvojného experimentu.}
+\newcommand{\abstrEN}{This text is devoted to designing and implementing software solution for 
+assimilation of atmospheric dispersion models that simulate radioactive pollutant release, with 
+accent of computational efficiency. The assimilation is approached using sequential Monte Carlo 
+methods, which are tailored to this specific problem in the text. Software analysis results in 
+creation of the Asim project to perform the assimilation, improvements to the PyBayes Bayesian 
+filtering library and creation of the Ceygen linear algebra library that is used to accelerate 
+computations in the implementation environment of choice, Cython-compiled Python. Ceygen is later 
+shown to provide \(2\times\) to \(10\times\) performance increase of algebraic methods for certain 
+problem sizes. Functionality of the assimilation solution is successfully verified using a twin 
+experiment.}
 
 %%% zde zacina kresleni dokumentu
 

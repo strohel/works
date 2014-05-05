@@ -743,13 +743,14 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-TODO: motivation, previous works, need for performance, results peek
-\end_layout
-
-\begin_layout Standard
-TODO: Our goal is to estimate absorbed ionizing radiation doses at points
- of interest using available environmental measurements and to predict future
- development of the radioactive plume and related irradiation
+Assimilation of dispersion models using sequential Monte Carlo techniques
+ has recently become attractive thanks to methods that improve its efficiency.
+ Monte Carlo, when approached as a form of Bayesian filtering, allows to
+ combine diverse measurement sources naturally to produce informed estimation
+ of a hidden state.
+ This text focuses mainly on design and development of a clean software
+ solution implementing its algorithms in the field of atmospheric assimilation.
+ Special emphasis is taken on computational efficiency.
 \end_layout
 
 \begin_layout Standard
@@ -774,7 +775,7 @@ Chapter 2
  modeled and how it can be measured for assimilation purposes.
  Later it constructs the task of assimilation using the mathematical language
  from chapter 1.
- It also devoted some space to presentation of a technique employed to optimize
+ It also devotes some space to presentation of a technique employed to optimize
  efficiency of particle filtering.
 \end_layout
 
@@ -784,7 +785,7 @@ Chapter 2
 Chapter 3
 \emph default
  is devoted to software analysis.
- After discussion of requirements posed on desired software solution it
+ After discussion of requirements posed on desired software solution, it
  summarizes available projects and frameworks.
  It then offers conclusions from the analysis in form of suggestions for
  layout of the target software stack and interactions between its components.
