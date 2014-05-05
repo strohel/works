@@ -1052,7 +1052,7 @@ prior
 \begin_inset Formula $x_{t}$
 \end_inset
 
- doesn't depend on 
+ does not depend on 
 \begin_inset Formula $y_{t-1}$
 \end_inset
 
@@ -1116,7 +1116,7 @@ reference "eq:PosteriorPdf"
 \begin_inset Formula $x_{t}$
 \end_inset
 
- or not at all, because it doesn't depend on 
+ or not at all, because it does not depend on 
 \begin_inset Formula $x_{t}$
 \end_inset
 
@@ -1686,7 +1686,7 @@ effective
 
  particles, the rest serves as (to some extent inevitable) computational
  overhead.
- This problem is most pronounced when the proposal density doesn't match
+ This problem is most pronounced when the proposal density does not match
  the resulting posterior density sufficiently (often being too broad) a
  condition often observed in the bootstrap filter.
  In accordance with literature, our tests have shown that careful choice
@@ -4482,7 +4482,7 @@ prange
 \end_layout
 
 \begin_layout Standard
-Parallelization feature would be of little use if Cython didn't solve the
+Parallelization feature would be of little use if Cython did not solve the
  Global Interpreter Lock issue described above.
  The GIL is used by CPython to ensure consistency of otherwise non-thread-safe
  data structures, most prominently reference counters attached to each living
@@ -4536,7 +4536,7 @@ fused types
  is somehow restricted compared template support as known e.g.
  from the C++ language: all possible specializations of a fused type need
  to be known at compile time.
- The advantage is that this approach doesn't change build system semantics:
+ The advantage is that this approach does not change build system semantics:
  functions using fused types are still generated in the same phase.
  Cython generates a typed code block for each possible combination (for
  public code; in case of publicly inaccessible parts, only actually used
@@ -4558,11 +4558,11 @@ typed memoryviews
 \emph default
 , a special Cython-specific data type representing a view on a multidimensional
  numeric array.
- Unlike NumPy's 
+ Unlike NumPy 
 \family typewriter
 ndarray
 \family default
-, memoryviews encode their base data type (e.g.
+s, memoryviews encode their base data type (e.g.
  
 \family typewriter
 double
@@ -4781,7 +4781,7 @@ https://github.com/markflorisson88/minivect
 \end_layout
 
 \begin_layout Standard
-Back in the days when memoryviews didn't exist and custom support for NumPy
+Back in the days when memoryviews did not exist and custom support for NumPy
  
 \family typewriter
 ndarray
@@ -7455,7 +7455,7 @@ is
 \begin_inset space ~
 \end_inset
 
-fast: Ceygen would be of no use if it wasn't highly performant; it does
+fast: Ceygen would be of no use if it was not highly performant; it does
  not implement functionality that is 
 \emph on
 not available
@@ -7645,7 +7645,7 @@ errors
 
 consistently: Care is taken to propagate all errors properly (down from
  Eigen) to fulfill semantics expected by Python programmers.
- Ceygen functions don't crash on invalid input, but rather raise reasonable
+ Ceygen functions do not crash on invalid input, but rather raise reasonable
  errors.
  Steps taken to achieve this are described below.
 \end_layout
@@ -8561,7 +8561,7 @@ The
 ceygen.core
 \family default
  module implements matrix dot product for various matrix/vector combinations.
- As Cython memoryviews don't differentiate between row and column vectors
+ As Cython memoryviews do not differentiate between row and column vectors
  (contrary to Eigen), Ceygen assumes that vectors are transposed in a way
  so that operation result is of smaller dimensions.
  
@@ -11651,7 +11651,7 @@ In this final chapter, we verify that the implemented software stack works
  correctly and performs according to expected performance and accuracy levels
  on a series of benchmarks and an experiment.
  After defining the hardware and software environment used to perform the
- tests, results of the Ceygen's benchmark suite are presented and compared
+ tests, results of the Ceygen benchmark suite are presented and compared
  against analogous NumPy functions.
  The second part of this chapter is devoted to verification of the assimilation
  algorithms as implemented in Asim in a so-called twin experiment.
@@ -12440,8 +12440,14 @@ multiprocessing
 \end_inset
 
  and larger matrices.
- We speculate that reference counting (which is implemented using atomic
- integer operations in Cython memoryviews) might be the culprit.
+ We speculate that this is caused by the fact that all threads used the
+ same instances of passed arrays in this synthetic test; this has lead to
+ frequent cache flushes as different threads have written into the same
+ memory locations.
+ Also, reference counting (which is implemented using atomic integer operations
+ in Cython memoryviews) might be the culprit.
+ We expect that real-world code would not exhibit such properties and that
+ it would parallelize better.
 \end_layout
 
 \begin_layout Standard
@@ -12822,7 +12828,102 @@ Conclusion
 
 \begin_layout Standard
 This text has been divided into several parts.
- In the first one, 
+ In the first one, well-known theory of recursive Bayesian estimation was
+ briefly reviewed, then emphasis has been put on some of its algorithms:
+ the particle filter and more specialized marginal particle filter.
+\end_layout
+
+\begin_layout Standard
+Second chapter continued with presentation of the employed model to simulate
+ atmospheric dispersion and devised ways to perform assimilation on top
+ of this model: state and observation models have been defined and discussed.
+ Significant portion of the chapter has been dedicated to derivation of
+ proposal density that has been later shown to substantially increase efficiency.
+\end_layout
+
+\begin_layout Standard
+Next part concentrated on software analysis.
+ First, requirements on desired software stack were devised from a set of
+ use-cases.
+ Rapid prototyping possibility, extensibility, high computing efficiency
+ and proper documentation were identified as key demands.
+ The chapter continued by review of possible building blocks and ended with
+ suggestions.
+ Asim project for assimilation, PyBayes enhancements and a new library for
+ linear algebra employing Eigen were proposed.
+\end_layout
+
+\begin_layout Standard
+Chapter 4 presents design of individual developed software components and
+ describes their implementation.
+ It tries to clarify relationships between individual classes and finally
+ shows interaction of objects that span multiple components during a complex
+ task of proposal distribution-enhanced assimilation of dispersion models.
+\end_layout
+
+\begin_layout Standard
+The final chapter shows results achieved with the implemented software.
+ It is noted that 
+\begin_inset Formula $2\times$
+\end_inset
+
+ to 
+\begin_inset Formula $10\times$
+\end_inset
+
+ can be achieved by Ceygen for small to moderate problem sizes.
+ Functionality of the Asim and other participating projects is finally verified
+ on a twin experiment; successful assimilation is achieved with adequate
+ particle filtering efficiency.
+\end_layout
+
+\begin_layout Standard
+If we were to identify key contributions of this work, it would be:
+\end_layout
+
+\begin_layout Itemize
+The 
+\emph on
+Ceygen
+\emph default
+ library, publicly released software useful for anybody who seeks a way
+ to perform efficient linear algebra with Cython memoryviews.
+ Ceygen is, to our knowledge, the best performing solution for small to
+ moderate vectors and matrices available for memoryviews.
+\end_layout
+
+\begin_layout Itemize
+The 
+\emph on
+Asim
+\emph default
+ project, which brings object-oriented design to dispersion model assimilation
+ research, coupled with improvements to the PyBayes library, from which
+ many may benefit at it is also an open-source project.
+\end_layout
+
+\begin_layout Standard
+Suggestions for possible future improvement areas include mainly integration
+ of emerging techniques that have the potential to further improve efficiency
+ of sequential Monte Carlo sampling.
+ One example of such technique is the AMIS
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Adaptive Multiple Importance Sampling.
+\end_layout
+
+\end_inset
+
+ approach that has been studied in the assimilation field in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SmidlHofman:12"
+
+\end_inset
+
+ with promising results.
 \end_layout
 
 \begin_layout Standard
