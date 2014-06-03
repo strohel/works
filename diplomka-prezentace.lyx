@@ -355,122 +355,10 @@ p(x_{t}|y_{1:t}) & \approx\sum_{i=1}^{N}\omega_{t}^{(i)}\delta(x_{t}-x_{t}^{(i)}
 \end_inset
 
 
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "55col%"
-special "none"
-height "1in"
-height_special "totalheight"
-status open
-
-\begin_layout Enumerate
-vzorkování 
-\begin_inset Formula $x_{t}^{(i)}\sim q(x_{t}|x_{t-1},y_{t})$
-\end_inset
-
-
 \end_layout
 
-\begin_layout Enumerate
-aktualizace vah: 
-\begin_inset Formula $\omega_{t}^{(i)}=\frac{p(y_{t}|x_{t})p(x_{t}|x_{t-1})}{q(x_{t}|x_{t-1},y_{t})}\omega_{t}^{(i)}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset space \hfill{}
-\end_inset
-
-
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "45col%"
-special "none"
-height "1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-begin{enumerate}
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-setcounter{enumi}{2}
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-item normalizace vah: 
-\backslash
-(
-\backslash
-sum_{i=1}^N
-\backslash
-omega_i=1
-\backslash
-)
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-item převzorkování  
-\backslash
-(
-\backslash
-left(
-\backslash
-omega_i=
-\backslash
-frac{1}{N}
-\backslash
-right)
-\backslash
-)
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-end{enumerate}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+\begin_layout Itemize
+algoritmus: vzorkování → ohodnocení → normalizace → převzorkování
 \end_layout
 
 \begin_layout Itemize
@@ -638,6 +526,10 @@ Software
 Softwarové projekty
 \end_layout
 
+\begin_layout FrameSubtitle
+Vše v Pythonu, kompilováno Cythonem
+\end_layout
+
 \begin_layout Standard
 \begin_inset Graphics
 	filename dia/asim-pybayes-ceygen-overview.dia
@@ -658,7 +550,7 @@ PyBayes rozšířen (vytvořen v rámci mé Bakalářské práce)
 
 \begin_layout Description
 Ceygen lin.
- algebra nad novým datovým typem 
+ algebra nad novým (velmi efektivním) maticovým typem 
 \family typewriter
 memoryview
 \family default
