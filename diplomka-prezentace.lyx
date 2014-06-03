@@ -270,6 +270,10 @@ Temelín a přilehlé čítače
 
 \end_layout
 
+\begin_layout Section
+Teorie
+\end_layout
+
 \begin_layout BeginFrame
 Bayesovská filtrace
 \end_layout
@@ -485,10 +489,6 @@ problém: ochuzování vzorku, mírou je
 
 \end_layout
 
-\begin_layout Section
-Asimilace
-\end_layout
-
 \begin_layout BeginFrame
 Model radioaktivního úniku
 \end_layout
@@ -602,56 +602,107 @@ status open
 
 \end_layout
 
+\begin_layout Section
+Software
+\end_layout
+
 \begin_layout BeginFrame
 Softwarové projekty
 \end_layout
 
-\begin_layout Description
-Asim uzavřený Python projekt, konkrétní aplikace Bayes.
- filtrování na asimilaci atmosférického úniku 
-\emph on
-(VÚ, DP)
+\begin_layout Standard
+\begin_inset Graphics
+	filename dia/asim-pybayes-ceygen-overview.dia
+	width 100col%
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Description
-PyBayes open-source Python projekt (1000+ stažení); implementace obecných
- metod Bayes.
- filtrace a hustot pravděpodobnosti 
-\emph on
-(BP, DP)
+Asim specializovaný, vznikl v rámci DP
 \end_layout
 
 \begin_layout Description
-Ceygen open-source projekt v Pythonu a C++, volání metod Eigenu z Py(Cy)thonu
- bez režie 
-\emph on
-(DP)
+PyBayes rozšířen (vytvořen v rámci mé Bakalářské práce)
 \end_layout
 
 \begin_layout Description
-Eigen C++ šablonová knihovna pro lineární algebru
-\end_layout
-
-\begin_layout Description
-Cython open-source kompilátor Pythonu do C, eliminace režie 
-\emph on
-(několik oprav chyb)
-\end_layout
-
-\begin_layout Description
-Python
+Ceygen založen kvůli výpočetní efektivitě, používá Eigen
 \end_layout
 
 \begin_layout BeginFrame
-Návrh projektu Asim
+Projekt Ceygen
+\end_layout
+
+\begin_layout FrameSubtitle
+Open-source volně dostupný projekt, založený na knihovně Eigen
+\end_layout
+
+\begin_layout Itemize
+Algebraické operace v Pythonu (Cythonu) nad datovým typem 
+\family typewriter
+memoryview
+\family default
+ bez režie/paralelizované
+\end_layout
+
+\begin_layout Description
+rychlý 2--10
+\begin_inset Formula $\times$
+\end_inset
+
+ zrychlení v závislosti na operaci a velikosti
+\end_layout
+
+\begin_layout Description
+dokumentovaný generováno pomocí Sphinx, on-line, PDF
+\end_layout
+
+\begin_layout Description
+generický škála základních datových typů bez duplikace kódu, kombinace Cython
+ a C++ šablon
+\end_layout
+
+\begin_layout Description
+testovaný 99 unit-testů, automatizace na Travis CI
+\end_layout
+
+\begin_layout Description
+paralelní nevyžaduje GIL → obchází limitaci CPythonu
+\end_layout
+
+\begin_layout Description
+robustní propagace výjimek z C++ do Pythonu
+\end_layout
+
+\begin_layout Description
+kompatibilní s NumPy → drtivou většinou Python balíčků
+\end_layout
+
+\begin_layout Itemize
+atirmetika (po složkách), lin.
+ algebra, rozklady (lu, llt), redukce
+\end_layout
+
+\begin_layout BeginFrame
+Ceygen: výkon
 \end_layout
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename /home/strohel/projekty/utia/asim/model2.pdf
-	lyxscale 50
-	width 100col%
-	rotateAngle 270
+	filename cyegen_bench/add_vv.eps
+	lyxscale 40
+	width 45col%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename cyegen_bench/dot_mv.eps
+	lyxscale 40
+	width 45col%
 
 \end_inset
 
@@ -659,254 +710,61 @@ Návrh projektu Asim
 \end_layout
 
 \begin_layout Standard
-PuffModely jsou jednotlivé 
-\begin_inset Quotes eld
+\begin_inset Graphics
+	filename cyegen_bench/dot_mm.eps
+	lyxscale 40
+	width 45col%
+
 \end_inset
 
-částice
-\begin_inset Quotes erd
+
+\begin_inset Graphics
+	filename cyegen_bench/det.eps
+	lyxscale 40
+	width 45col%
+
 \end_inset
 
- v particle filteru
+
+\end_layout
+
+\begin_layout BeginFrame
+Rozšíření PyBayes
+\end_layout
+
+\begin_layout FrameSubtitle
+Open-source volně dostupný projekt
+\end_layout
+
+\begin_layout Itemize
+port Cython verze na Cython 
+\family typewriter
+memoryview
+\family default
+ + Ceygen
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+zachování možnosti použití jako čistě Pythonový balíček
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+nové hustoty pravděpodobnosti: ořezaná Gauss hustota, gamma, inverzní gamma,
+ podmíněné varianty
+\end_layout
+
+\begin_layout Itemize
+nové funkce třídy ParticleFilter: lépe rozšiřitelná, proposal hustota
 \end_layout
 
 \begin_layout BeginFrame
 Projekt Asim
 \end_layout
 
-\begin_layout Block
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{Implementováno:}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Block
-Disperzní model (PuffModel)
-\end_layout
-
-\begin_layout Block
-Meteorologický model, model ozáření
-\end_layout
-
-\begin_layout Block
-Asimilace směru a rychlosti větru v čase
-\end_layout
-
-\begin_layout Block
-Optimalizace Python kódu Cythonem
-\end_layout
-
-\begin_layout Block
-Dvojný experiment (simulace -> asimilace)
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-%
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Block
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{TODO:}
-\end_layout
-
-\end_inset
-
-Odhadování i rychlosti úniku radionuklidů
-\end_layout
-
-\begin_layout Block
-Větší efektivita paralelizace (zatím mizerná)
-\end_layout
-
-\begin_layout EndFrame
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-begin{frame}[fragile]
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-frametitle{Projekt Ceygen}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-Algebraické operace v Pythonu (Cythonu) bez režie/paralelizované
-\end_layout
-
-\begin_layout Itemize
-Dokumentace, regresní testy, Continuous Integration, kompatibilita Python
- 2.6/2.7/3.2/3.3
-\end_layout
-
-\begin_layout Itemize
-Zájem komunity
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\scriptsize},language=Python"
-inline false
-status open
-
-\begin_layout Plain Layout
-
->>> cdef double[:, :] big = np.array([[1., 2., 2.,  0., 0., 0.],
-\end_layout
-
-\begin_layout Plain Layout
-
->>>                                   [3., 4., 0., -2., 0., 0.]])
-\end_layout
-
-\begin_layout Plain Layout
-
->>> ceygen.core.dot_mm(big[:, 0:2], big[:, 2:4], big[:, 4:6])
-\end_layout
-
-\begin_layout Plain Layout
-
-[[ 2.
- -4.]
-\end_layout
-
-\begin_layout Plain Layout
-
- [ 6.
- -8.]]
-\end_layout
-
-\begin_layout Plain Layout
-
->>> big
-\end_layout
-
-\begin_layout Plain Layout
-
-[[ 1.
-  2.
-   2.
-  0.
-   2.
- -4.]
-\end_layout
-
-\begin_layout Plain Layout
-
- [ 3.
-  4.
-   0.
- -2.
-   6.
- -8.]],
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-end{frame}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Výsledky
-\end_layout
-
-\begin_layout BeginFrame
-Výsledky asimilace
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/03000s-03600s.jpg
-	lyxscale 40
-	width 45col%
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/06600s-07200s.jpg
-	lyxscale 40
-	width 45col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/10200s-10800s.jpg
-	lyxscale 40
-	width 45col%
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/13800s-14400s.jpg
-	lyxscale 40
-	width 45col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout BeginFrame
-Výsledky asimilace (Neff)
+\begin_layout FrameSubtitle
+neveřejný Cython projekt: PyBayes + Ceygen + disperzním model
 \end_layout
 
 \begin_layout Standard
@@ -917,37 +775,48 @@ has_inner_box 1
 inner_pos "t"
 use_parbox 0
 use_makebox 0
-width "49col%"
+width "60col%"
 special "none"
 height "1in"
 height_special "totalheight"
 status open
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename assimilation/effective-particles.pdf
-	lyxscale 50
-	width 100col%
+\begin_layout Itemize
+prototypy a implementace:
+\end_layout
 
-\end_inset
-
-
+\begin_deeper
+\begin_layout Itemize
+model disperze a ozáření
 \end_layout
 
 \begin_layout Itemize
-optimální 
-\begin_inset Quotes eld
-\end_inset
+model úniku, meteorologický model
+\end_layout
 
-conjugate
-\begin_inset Quotes erd
-\end_inset
+\end_deeper
+\begin_layout Itemize
+simulace
+\end_layout
 
- vzorkování přináší vyšší 
-\begin_inset Formula $N_{\mathrm{eff}}$
-\end_inset
+\begin_layout Itemize
+asimilace
+\end_layout
 
- s rychlejším nástupem
+\begin_deeper
+\begin_layout Itemize
+Bayes.
+ metody z PyBayes nad disp.
+ modely
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Python + deklarace → kompilace Cythonem
+\end_layout
+
+\begin_layout Itemize
+dokumentace
 \end_layout
 
 \end_inset
@@ -964,36 +833,35 @@ has_inner_box 1
 inner_pos "t"
 use_parbox 0
 use_makebox 0
-width "49col%"
+width "35col%"
 special "none"
 height "1in"
 height_special "totalheight"
 status open
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename assimilation/effective-particles-per-second.pdf
-	lyxscale 50
-	width 100col%
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+~
+\end_layout
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Itemize
-\begin_inset Formula $\unit[2]{\times}$
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename dia/asim-assimilation.dia
+	lyxscale 30
+	width 100col%
+
 \end_inset
 
- -- 
-\begin_inset Formula $\unit[3]{\times}$
-\end_inset
 
- vyšší 
-\begin_inset Formula $\unitfrac{N_{eff}}{s}$
-\end_inset
-
- než naivní vzorkování
 \end_layout
 
 \end_inset
@@ -1002,6 +870,52 @@ status open
 \end_layout
 
 \begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Výsledky asimilace
+\end_layout
+
+\begin_layout FrameSubtitle
+Trajektorie
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename dipl-results/simulation.png
+	lyxscale 40
+	width 50col%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename dipl-results/assimilation.png
+	lyxscale 40
+	width 50col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Výsledky asimilace
+\end_layout
+
+\begin_layout FrameSubtitle
+Neff a odhad vypuštěné aktivity
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename dipl-results/Neff-activities.eps
+	lyxscale 80
+	width 90col%
+
+\end_inset
+
 
 \end_layout
 
