@@ -1,0 +1,1109 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usepackage{movie15}
+
+\usetheme{Air}
+\author[Matěj Laitl]{Matěj Laitl\\ vedoucí práce: Ing. Václav Šmídl, Ph.D.; ÚTIA}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language czech
+\language_package default
+\inputencoding utf8
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Výpočetní prostředí pro asimilaci disperzních atmosférických modelů
+\end_layout
+
+\begin_layout Date
+4.
+ června 2014
+\end_layout
+
+\begin_layout BeginFrame
+Úkoly práce
+\end_layout
+
+\begin_layout Itemize
+teorie: atmosferické disperze, radioaktivní únik, asimilace
+\end_layout
+
+\begin_layout Itemize
+softwarová analýza, návrh integrace existujících knihoven
+\end_layout
+
+\begin_layout Itemize
+implementace dle analýzy, zapojení balíčku PyBayes
+\end_layout
+
+\begin_layout Itemize
+výpočetní efektivita
+\end_layout
+
+\begin_layout Itemize
+ověření funkčnosti řešení, srovnání
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Problém
+\end_layout
+
+\begin_layout BeginFrame
+Atmosferický únik radionuklidů
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "55col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Chceme:}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Itemize
+zjistit, kam se šíří
+\end_layout
+
+\begin_layout Itemize
+umožní spočítat dávku záření v bodech zájmu (obce)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Block
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Máme:}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Itemize
+numerickou předpověď větru, atmosferických podmínek
+\end_layout
+
+\begin_layout Itemize
+anemometr v elektrárně
+\end_layout
+
+\begin_layout Itemize
+Geiger-Müllerovy čítače dávky (odečet co 10 minut)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "39col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset VSpace 2em
+\end_inset
+
+
+\begin_inset Graphics
+	filename vyzkumak-temelin-receptory.pdf
+	lyxscale 80
+	width 100col%
+	BoundingBox 460bp 120bp 835bp 520bp
+	clip
+
+\end_inset
+
+
+\begin_inset VSpace smallskip
+\end_inset
+
+Temelín a přilehlé čítače
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Bayesovská filtrace
+\end_layout
+
+\begin_layout FrameSubtitle
+Bayesovské řešení a jeho aproximace
+\end_layout
+
+\begin_layout Block
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Odhadujeme stav 
+\backslash
+(x_t
+\backslash
+) z pozorování 
+\backslash
+(y_{1:t}
+\backslash
+) --- modely}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset VSpace -1.5em
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+x_{t} & =f(x_{t-1})+šum & \rightarrow &  & x_{t} & \sim p(x_{t}|x_{t-1})\\
+y_{t} & =h(x_{t})+šum & \rightarrow &  & y_{t} & \sim p(y_{t}|x_{t})
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Block
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Aproximace Bayesovského řešení: sekvenční Monte Carlo (SIR, PF)}
+\end_layout
+
+\end_inset
+
+
+\begin_inset VSpace -1.5em
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+p(x_{t}|y_{1:t}) & \approx\sum_{i=1}^{N}\omega_{t}^{(i)}\delta(x_{t}-x_{t}^{(i)})\quad & x_{t}^{(i)} & \textrm{ mož. realizace} & \omega_{t}^{(i)} & \textrm{ váha}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "55col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Enumerate
+vzorkování 
+\begin_inset Formula $x_{t}^{(i)}\sim q(x_{t}|x_{t-1},y_{t})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+aktualizace vah: 
+\begin_inset Formula $\omega_{t}^{(i)}=\frac{p(y_{t}|x_{t})p(x_{t}|x_{t-1})}{q(x_{t}|x_{t-1},y_{t})}\omega_{t}^{(i)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "45col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{enumerate}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+setcounter{enumi}{2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+item normalizace vah: 
+\backslash
+(
+\backslash
+sum_{i=1}^N
+\backslash
+omega_i=1
+\backslash
+)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+item převzorkování  
+\backslash
+(
+\backslash
+left(
+\backslash
+omega_i=
+\backslash
+frac{1}{N}
+\backslash
+right)
+\backslash
+)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{enumerate}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+problém: ochuzování vzorku, mírou je 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+, někdy 
+\begin_inset Formula $N_{\mathrm{eff}}\ll N$
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Asimilace
+\end_layout
+
+\begin_layout BeginFrame
+Model radioaktivního úniku
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "59col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Itemize
+série Gaussovských 
+\begin_inset Quotes eld
+\end_inset
+
+obláčků
+\begin_inset Quotes erd
+\end_inset
+
+ (puffů) škodliviny
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathbf{x}_{t}=(Q_{t},\overbrace{a_{t},b_{t}}^{\textrm{vítr}},\;\textrm{stav }\forall\textrm{ puffů})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+obláčky unášeny větrem, rozptyl dle atmosferických podmínek → 
+\begin_inset Formula $p(\mathbf{x}_{t}|\mathbf{x}_{t-1})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathbf{y}_{t}=(\overbrace{v_{t},\phi_{t}}^{\textrm{vítr}},\overbrace{y_{t,1},\ldots,y_{t,M}}^{\textrm{dávky}})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "39col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Description
+\begin_inset Graphics
+	filename dipl-results/puff-model-overlay.png
+	lyxscale 40
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $M$
+\end_inset
+
+ --- počet receptorů
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $I$
+\end_inset
+
+ --- počet puffů v modelu
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula ${\displaystyle y_{t,m}=\sum_{i=1}^{I}\intop_{t}\iiintop_{\mathbf{s}}c_{i}(\mathbf{s}-\mathbf{s}_{m},t)\:\mathrm{d}\mathbf{s}\mathrm{d}t}\;+\textrm{šum}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Softwarové projekty
+\end_layout
+
+\begin_layout Description
+Asim uzavřený Python projekt, konkrétní aplikace Bayes.
+ filtrování na asimilaci atmosférického úniku 
+\emph on
+(VÚ, DP)
+\end_layout
+
+\begin_layout Description
+PyBayes open-source Python projekt (1000+ stažení); implementace obecných
+ metod Bayes.
+ filtrace a hustot pravděpodobnosti 
+\emph on
+(BP, DP)
+\end_layout
+
+\begin_layout Description
+Ceygen open-source projekt v Pythonu a C++, volání metod Eigenu z Py(Cy)thonu
+ bez režie 
+\emph on
+(DP)
+\end_layout
+
+\begin_layout Description
+Eigen C++ šablonová knihovna pro lineární algebru
+\end_layout
+
+\begin_layout Description
+Cython open-source kompilátor Pythonu do C, eliminace režie 
+\emph on
+(několik oprav chyb)
+\end_layout
+
+\begin_layout Description
+Python
+\end_layout
+
+\begin_layout BeginFrame
+Návrh projektu Asim
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename /home/strohel/projekty/utia/asim/model2.pdf
+	lyxscale 50
+	width 100col%
+	rotateAngle 270
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+PuffModely jsou jednotlivé 
+\begin_inset Quotes eld
+\end_inset
+
+částice
+\begin_inset Quotes erd
+\end_inset
+
+ v particle filteru
+\end_layout
+
+\begin_layout BeginFrame
+Projekt Asim
+\end_layout
+
+\begin_layout Block
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Implementováno:}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Block
+Disperzní model (PuffModel)
+\end_layout
+
+\begin_layout Block
+Meteorologický model, model ozáření
+\end_layout
+
+\begin_layout Block
+Asimilace směru a rychlosti větru v čase
+\end_layout
+
+\begin_layout Block
+Optimalizace Python kódu Cythonem
+\end_layout
+
+\begin_layout Block
+Dvojný experiment (simulace -> asimilace)
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Block
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{TODO:}
+\end_layout
+
+\end_inset
+
+Odhadování i rychlosti úniku radionuklidů
+\end_layout
+
+\begin_layout Block
+Větší efektivita paralelizace (zatím mizerná)
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{frame}[fragile]
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+frametitle{Projekt Ceygen}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Algebraické operace v Pythonu (Cythonu) bez režie/paralelizované
+\end_layout
+
+\begin_layout Itemize
+Dokumentace, regresní testy, Continuous Integration, kompatibilita Python
+ 2.6/2.7/3.2/3.3
+\end_layout
+
+\begin_layout Itemize
+Zájem komunity
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\scriptsize},language=Python"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>>> cdef double[:, :] big = np.array([[1., 2., 2.,  0., 0., 0.],
+\end_layout
+
+\begin_layout Plain Layout
+
+>>>                                   [3., 4., 0., -2., 0., 0.]])
+\end_layout
+
+\begin_layout Plain Layout
+
+>>> ceygen.core.dot_mm(big[:, 0:2], big[:, 2:4], big[:, 4:6])
+\end_layout
+
+\begin_layout Plain Layout
+
+[[ 2.
+ -4.]
+\end_layout
+
+\begin_layout Plain Layout
+
+ [ 6.
+ -8.]]
+\end_layout
+
+\begin_layout Plain Layout
+
+>>> big
+\end_layout
+
+\begin_layout Plain Layout
+
+[[ 1.
+  2.
+   2.
+  0.
+   2.
+ -4.]
+\end_layout
+
+\begin_layout Plain Layout
+
+ [ 3.
+  4.
+   0.
+ -2.
+   6.
+ -8.]],
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{frame}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Výsledky
+\end_layout
+
+\begin_layout BeginFrame
+Výsledky asimilace
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/03000s-03600s.jpg
+	lyxscale 40
+	width 45col%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/06600s-07200s.jpg
+	lyxscale 40
+	width 45col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/10200s-10800s.jpg
+	lyxscale 40
+	width 45col%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename /home/strohel/projekty/utia/asim/results/v0.1-2-g275e411-assimilation-naive/13800s-14400s.jpg
+	lyxscale 40
+	width 45col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Výsledky asimilace (Neff)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "49col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename assimilation/effective-particles.pdf
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+optimální 
+\begin_inset Quotes eld
+\end_inset
+
+conjugate
+\begin_inset Quotes erd
+\end_inset
+
+ vzorkování přináší vyšší 
+\begin_inset Formula $N_{\mathrm{eff}}$
+\end_inset
+
+ s rychlejším nástupem
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "49col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename assimilation/effective-particles-per-second.pdf
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\unit[2]{\times}$
+\end_inset
+
+ -- 
+\begin_inset Formula $\unit[3]{\times}$
+\end_inset
+
+ vyšší 
+\begin_inset Formula $\unitfrac{N_{eff}}{s}$
+\end_inset
+
+ než naivní vzorkování
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Shrnutí
+\end_layout
+
+\begin_layout Itemize
+přínos:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+znovupoužitelné open-source projekty Ceygen a PyBayes
+\end_layout
+
+\begin_layout Itemize
+demonstrace optimalizace a paralelizace Cythonem
+\end_layout
+
+\begin_layout Itemize
+obektově-orientovaná implementace Bayes.
+ asimilace disperzního atmosferického modelu (nové, projekt Asim)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+TODO:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+více odhadovaných veličin (vypouštěná aktivita 
+\begin_inset Formula $Q_{t}$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+větší efektivita paralelizace
+\end_layout
+
+\begin_layout Itemize
+intergrace s webovým rozhraním
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Závěr
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 3em
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size giant
+Děkuji za pozornost
+\size default
+
+\begin_inset VSpace 8em
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align right
+Matěj Laitl
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+ 
+\backslash
+structure{
+\backslash
+footnotesize{matej@laitl.cz}}
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document
