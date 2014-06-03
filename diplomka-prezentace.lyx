@@ -657,7 +657,12 @@ PyBayes rozšířen (vytvořen v rámci mé Bakalářské práce)
 \end_layout
 
 \begin_layout Description
-Ceygen založen kvůli výpočetní efektivitě, používá Eigen
+Ceygen lin.
+ algebra nad novým datovým typem 
+\family typewriter
+memoryview
+\family default
+ poskytovaným Cythonem
 \end_layout
 
 \begin_layout BeginFrame
