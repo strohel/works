@@ -595,6 +595,34 @@ status open
 \begin_inset Formula ${\displaystyle y_{t,m}=\sum_{i=1}^{I}\intop_{t}\iiintop_{\mathbf{s}}c_{i}(\mathbf{s}-\mathbf{s}_{m},t)\:\mathrm{d}\mathbf{s}\mathrm{d}t}\;+\textrm{šum}$
 \end_inset
 
+ 
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+→
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Formula $p(y_{t}|x_{t})$
+\end_inset
+
 
 \end_layout
 
@@ -682,7 +710,8 @@ kompatibilní s NumPy → drtivou většinou Python balíčků
 \end_layout
 
 \begin_layout Itemize
-atirmetika (po složkách), lin.
+Aritmetika (op.
+ po složkách), lin.
  algebra, rozklady (lu, llt), redukce
 \end_layout
 
@@ -805,18 +834,13 @@ asimilace
 
 \begin_deeper
 \begin_layout Itemize
-Bayes.
- metody z PyBayes nad disp.
- modely
+Aplikace Bayes.
+ metod z PyBayes nad disperzními modely
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 Python + deklarace → kompilace Cythonem
-\end_layout
-
-\begin_layout Itemize
-dokumentace
 \end_layout
 
 \end_inset
@@ -869,16 +893,26 @@ status open
 
 \end_layout
 
-\begin_layout EndFrame
-
+\begin_layout Itemize
+adaptéry pro dávkové zpracování (distribuované výpočty)
 \end_layout
 
+\begin_deeper
+\begin_layout Itemize
+I/O v JSON formátu, externí meteorologická data
+\end_layout
+
+\end_deeper
 \begin_layout BeginFrame
-Výsledky asimilace
+Výsledky asimilace: dvojný experiment
 \end_layout
 
 \begin_layout FrameSubtitle
 Trajektorie
+\end_layout
+
+\begin_layout Itemize
+simulace → zatajení stavu, zašumění pozorování → asimilace → porovnání
 \end_layout
 
 \begin_layout Standard
@@ -887,6 +921,10 @@ Trajektorie
 	lyxscale 40
 	width 50col%
 
+\end_inset
+
+
+\begin_inset space \hfill{}
 \end_inset
 
 
@@ -912,7 +950,7 @@ Neff a odhad vypuštěné aktivity
 \begin_inset Graphics
 	filename dipl-results/Neff-activities.eps
 	lyxscale 80
-	width 90col%
+	width 100col%
 
 \end_inset
 
@@ -924,43 +962,38 @@ Shrnutí
 \end_layout
 
 \begin_layout Itemize
-přínos:
+Přínos:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-znovupoužitelné open-source projekty Ceygen a PyBayes
+open-source projekt 
+\series bold
+Ceygen
+\series default
+ (velmi obecně použitelný)
 \end_layout
 
 \begin_layout Itemize
-demonstrace optimalizace a paralelizace Cythonem
+vylepšení open-source projektu 
+\series bold
+PyBayes
 \end_layout
 
 \begin_layout Itemize
-obektově-orientovaná implementace Bayes.
- asimilace disperzního atmosferického modelu (nové, projekt Asim)
+objektově-orientovaná a dobře dokumentovaná implementace Bayes.
+ asimilace disperzního atmosferického modelu (možný základ pro další experimenty
+)
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-TODO:
+Možná rozšíření:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-více odhadovaných veličin (vypouštěná aktivita 
-\begin_inset Formula $Q_{t}$
-\end_inset
-
-)
-\end_layout
-
-\begin_layout Itemize
-větší efektivita paralelizace
-\end_layout
-
-\begin_layout Itemize
-intergrace s webovým rozhraním
+další techniky pro zvýšení efektivity sekvenčního MC
 \end_layout
 
 \end_deeper
